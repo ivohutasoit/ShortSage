@@ -1,18 +1,17 @@
 package com.softhaxi.shortsage.v1.pages;
 
+import com.softhaxi.shortsage.v1.panels.BalancePanel;
+import com.softhaxi.shortsage.v1.panels.MessagesPanel;
 import com.softhaxi.shortsage.v1.util.SpringUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
 
 /**
  *
@@ -21,8 +20,8 @@ import javax.swing.border.EtchedBorder;
 public class DashboardPage extends JPanel {
     
     private JPanel pModem;
-    private JPanel pUser;
-    private JPanel pInfo;
+    private MessagesPanel pMessage;
+    private BalancePanel pBalance;
     private JPanel pChart;
     
     public DashboardPage() {
@@ -90,13 +89,11 @@ public class DashboardPage extends JPanel {
         
         p1.add(pModem);
         
-        pInfo = new JPanel(new BorderLayout());
-        pInfo.setBackground(new Color(41, 128, 185));
-        p1.add(pInfo);
+        pMessage = new MessagesPanel();
+        p1.add(pMessage);
         
-        pUser = new JPanel(new BorderLayout());
-        pUser.setBackground(new Color(26, 188, 156));
-        p1.add(pUser);
+        pBalance = new BalancePanel();
+        p1.add(pBalance);
         
         JPanel p2 = new JPanel(new BorderLayout());
         p2.setBorder(new EmptyBorder(4, 0, 0, 1));

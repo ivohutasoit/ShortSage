@@ -100,6 +100,11 @@ public class MessagePage extends javax.swing.JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (tNumbers.getText().isEmpty() || tMessage.getText().isEmpty()) {
+                    JOptionPane.showConfirmDialog(null, "Field(s) can not be empty!",
+                            "New Message", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 result = JOptionPane.showConfirmDialog(null, "Are you sure to send this message?",
                         "New Message", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (result == JOptionPane.OK_OPTION) {
@@ -110,6 +115,7 @@ public class MessagePage extends javax.swing.JPanel {
                         dialog.dispose();
                     }
                 }
+
             }
         });
         bCancel.addActionListener(new ActionListener() {

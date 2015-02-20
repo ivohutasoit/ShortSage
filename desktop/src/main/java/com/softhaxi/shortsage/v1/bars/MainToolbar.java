@@ -21,9 +21,19 @@ public class MainToolbar extends JToolBar {
     }
     
     private void initComponents() {
-        JButton bNewMsg = new JButton("New Message");
-        bNewMsg.addActionListener(new ActionListener() {
+        JButton bConnect = new JButton("Connect Modem");
+        add(bConnect);
+        final JButton bNewMsg = new JButton("New Message");
+        bNewMsg.setEnabled(false);
+        bConnect.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((JButton)e.getSource()).setVisible(false);
+                bNewMsg.setEnabled(true);
+            }
+        });
+        bNewMsg.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new MessageDialog(host, "New Message", true).setVisible(true);

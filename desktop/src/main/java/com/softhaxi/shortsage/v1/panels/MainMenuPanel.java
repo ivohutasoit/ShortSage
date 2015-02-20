@@ -22,29 +22,30 @@ import javax.swing.tree.DefaultMutableTreeNode;
  *
  * @author Hutasoit
  */
-public class MainMenuPanel extends JPanel 
-    implements ActionListener {
+public class MainMenuPanel extends JPanel
+        implements ActionListener {
+
     private final ResourceBundle global = ResourceBundle.getBundle("global");
     private static String hCurrent = null;
-    
+
     private JPanel hPanel;
     private JPanel dPanel;
     private JPanel tPanel;
-    
+
     private JLabel dlTitle;
     private JButton hbWorkspace;
-    private JButton hbMessaging;
+    private JButton hbModem;
     private JButton hbSetting;
-    
+
     private DefaultMutableTreeNode top;
     private JTree tree;
     private JScrollPane scroller;
-    
+
     public MainMenuPanel() {
         initComponents();
         initDetailPanel(hCurrent);
     }
-    
+
     private void initComponents() {
         setPreferredSize(new Dimension(240, getHeight()));
         setLayout(new BorderLayout(5, 5));
@@ -52,21 +53,21 @@ public class MainMenuPanel extends JPanel
 //        Border margin = new EmptyBorder(2,2,2,2);
 //        setBorder(new CompoundBorder(border, margin));
         setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(5, 5, 0, 5), new EtchedBorder()));
-        
+
         dPanel = new JPanel();
         dPanel.setLayout(new BorderLayout());
         dPanel.setBorder(new EmptyBorder(4, 4, 0, 4));
         dlTitle = new JLabel();
         dlTitle.setFont(dlTitle.getFont().deriveFont(Font.BOLD));
         dPanel.add(dlTitle, BorderLayout.NORTH);
-        
+
         tPanel = new JPanel(new BorderLayout());
         tPanel.setBackground(Color.white);
         top = new DefaultMutableTreeNode(dlTitle.getText());
         dPanel.add(tPanel, BorderLayout.CENTER);
-        
+
         add(dPanel, BorderLayout.CENTER);
-        
+
         hPanel = new JPanel(new GridLayout(3, 1, 5, 0));
         hPanel.setPreferredSize(new Dimension(getWidth(), 90));
         hbWorkspace = new JButton(global.getString("label.workspace").toUpperCase());
@@ -76,47 +77,91 @@ public class MainMenuPanel extends JPanel
 //        hbWorkspace.setBorderPainted(false);
 //        hbWorkspace.setContentAreaFilled(false);
         hPanel.add(hbWorkspace);
-        
-        hbMessaging = new JButton(global.getString("label.messaging").toUpperCase());
-        hbMessaging.setHorizontalAlignment(JButton.LEFT);
-        hbMessaging.addActionListener(this);
-        hPanel.add(hbMessaging);
-        
+
+        hbModem = new JButton(global.getString("label.modem").toUpperCase());
+        hbModem.setHorizontalAlignment(JButton.LEFT);
+        hbModem.addActionListener(this);
+        hPanel.add(hbModem);
+
         hbSetting = new JButton(global.getString("label.setting").toUpperCase());
         hbSetting.setHorizontalAlignment(JButton.LEFT);
         hbSetting.addActionListener(this);
         hPanel.add(hbSetting);
         add(hPanel, BorderLayout.SOUTH);
     }
-    
+
     /**
-     * 
-     * @param header 
+     *
+     * @param header
      */
     private void initDetailPanel(String header) {
-        if(header == null || header.equalsIgnoreCase(global.getString("label.workspace"))) {
+        dlTitle.setText(header);
+        if (header == null || header.equalsIgnoreCase(global.getString("label.workspace"))) {
             header = global.getString("label.workspace").toUpperCase();
             dlTitle.setText(header);
+
+            tPanel.removeAll();
+            top = new DefaultMutableTreeNode(dlTitle.getText());
+            DefaultMutableTreeNode tiMain = new DefaultMutableTreeNode("Main Menu");
+            tiMain.add(new DefaultMutableTreeNode("Dashboard"));
+            tiMain.add(new DefaultMutableTreeNode("Imports Data [Underconstruction]"));
+            tiMain.add(new DefaultMutableTreeNode("Reports [Underconstruction]"));
+            top.add(tiMain);
+            top.add(new DefaultMutableTreeNode("Extension [Underconstruction]"));
+            top.add(new DefaultMutableTreeNode("Setup Menu [Underconstruction]"));
+            tree = new JTree(top);
+            tree.setRootVisible(false);
+            JScrollPane treeView = new JScrollPane(tree);
+            treeView.setBorder(new EmptyBorder(0, 0, 0, 0));
+            tPanel.add(treeView, BorderLayout.CENTER);
+        } else if (header.equalsIgnoreCase(global.getString("label.modem"))) {
+            tPanel.removeAll();
+            top = new DefaultMutableTreeNode(dlTitle.getText());
+            DefaultMutableTreeNode tiEntities = new DefaultMutableTreeNode("Entities");
+            tiEntities.add(new DefaultMutableTreeNode("Contact Person [Underconstruction]"));
+            tiEntities.add(new DefaultMutableTreeNode("Contact Group [Underconstruction]"));
+            tiEntities.add(new DefaultMutableTreeNode("Phone Field [Underconstruction]"));
+            tiEntities.add(new DefaultMutableTreeNode("Message Template [Underconstruction]"));
+            tiEntities.add(new DefaultMutableTreeNode("Bulk Message [Underconstruction]"));
+            top.add(tiEntities);
+            DefaultMutableTreeNode tiFolders = new DefaultMutableTreeNode("Folders");
+            tiFolders.add(new DefaultMutableTreeNode(global.getString("label.inbox") + " [Underconstruction]"));
+            tiFolders.add(new DefaultMutableTreeNode(global.getString("label.outbox") + " [Underconstruction]"));
+            top.add(tiFolders);
+            top.add(new DefaultMutableTreeNode("Extension [Underconstruction]"));
+            top.add(new DefaultMutableTreeNode("Reports [Underconstruction]"));
+            tree = new JTree(top);
+            tree.setRootVisible(false);
+
+            JScrollPane treeView = new JScrollPane(tree);
+            treeView.setBorder(new EmptyBorder(0, 0, 0, 0));
+            tPanel.add(treeView, BorderLayout.CENTER);
+        } else if (header.equalsIgnoreCase(global.getString("label.setting"))){
+            tPanel.removeAll();
+            top = new DefaultMutableTreeNode(dlTitle.getText());
+            DefaultMutableTreeNode tiMain = new DefaultMutableTreeNode("Main Menu");
+            tiMain.add(new DefaultMutableTreeNode("User Setting [Underconstruction]"));
+            top.add(tiMain);
+            
+            tree = new JTree(top);
+            tree.setRootVisible(false);
+            
+            JScrollPane treeView = new JScrollPane(tree);
+            treeView.setBorder(new EmptyBorder(0, 0, 0, 0));
+            tPanel.add(treeView, BorderLayout.CENTER);
         }
-        tPanel.removeAll();
-        top = new DefaultMutableTreeNode(dlTitle.getText());
-        top.add(new DefaultMutableTreeNode("Main Menu"));
-        top.add(new DefaultMutableTreeNode("Extension"));
-        top.add(new DefaultMutableTreeNode("Setup Menu"));
-        tree = new JTree(top);
-        tree.setRootVisible(false);
-        JScrollPane treeView = new JScrollPane(tree);
-        treeView.setBorder(new EmptyBorder(0, 0, 0, 0));
-        tPanel.add(treeView, BorderLayout.CENTER);
+        for (int i = 0; i < tree.getRowCount(); i++) {
+            tree.expandRow(i);
+        }
     }
 
     /**
-     * 
-     * @param e 
+     *
+     * @param e
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        dlTitle.setText(((JButton)e.getSource()).getText());
+        dlTitle.setText(((JButton) e.getSource()).getText());
         initDetailPanel(dlTitle.getText());
     }
 }
