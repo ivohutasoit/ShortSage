@@ -2,9 +2,11 @@ package com.softhaxi.shortsage.v1.bars;
 
 import java.awt.event.KeyEvent;
 import java.util.ResourceBundle;
+import javax.swing.Box;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 /**
@@ -18,6 +20,7 @@ public class MainMenubar extends JMenuBar {
     private JMenu mhEdit;
     private JMenu mhTools;
     private JMenu mhHelp;
+    private JTextField mtSearch;
     
     private JMenuItem miExit;
     
@@ -45,6 +48,11 @@ public class MainMenubar extends JMenuBar {
         mhHelp = new JMenu(global.getString("label.help"));
         mhHelp.setMnemonic(KeyEvent.VK_H);
         add(mhHelp);
+        
+        add(Box.createHorizontalGlue());
+        mtSearch = new JTextField(25);
+        mtSearch.setMaximumSize(mtSearch.getPreferredSize());
+        add(mtSearch);
     }
     
     public void addListener(String name) {
