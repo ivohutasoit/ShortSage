@@ -75,15 +75,38 @@ public class MenuDummy {
         SystemMenu group = new SystemMenu();
         group.setKey("M0101");
         group.setTitle("M0101");
-        group.setName("Contact Group [Underconstruction]");
+        group.setName("Contact Group");
+        group.setProgram("com.softhaxi.shortsage.v1.pages.ContactGroupPage");
         group.setIcon("images/ic_group.png");
         group.setKeyShow(true);
         entMenu.add(new DefaultMutableTreeNode(group));
         
-        entMenu.add(new DefaultMutableTreeNode(new SystemMenu("M112", "M11002", "Contact Person [Underconstruction]", null, true)));
-        entMenu.add(new DefaultMutableTreeNode(new SystemMenu("M113", "M11003", "Phone Fields [Underconstruction]", null, true)));
-        entMenu.add(new DefaultMutableTreeNode(new SystemMenu("M114", "M11004", "Message Template [Underconstruction]", null, true)));
-        entMenu.add(new DefaultMutableTreeNode(new SystemMenu("M115", "M110025", "Bulk Message [Underconstruction]", null, true)));
+        SystemMenu person = new SystemMenu();
+        person.setKey("M0102");
+        person.setTitle("M0102");
+        person.setName("Contact Person");
+        person.setProgram("com.softhaxi.shortsage.v1.pages.ContactPersonPage");
+        person.setIcon("images/ic_contact.png");
+        person.setKeyShow(true);
+        entMenu.add(new DefaultMutableTreeNode(person));
+        
+        SystemMenu template = new SystemMenu();
+        template.setKey("M0103");
+        template.setTitle("M0103");
+        template.setName("Message Template");
+        template.setProgram("com.softhaxi.shortsage.v1.pages.MessageTemplatePage");
+        template.setIcon("images/ic_group.png");
+        template.setKeyShow(true);
+        entMenu.add(new DefaultMutableTreeNode(template));
+        
+        SystemMenu bulk = new SystemMenu();
+        bulk.setKey("M0104");
+        bulk.setTitle("M0104");
+        bulk.setName("Bulk Message");
+        bulk.setProgram("com.softhaxi.shortsage.v1.pages.BulkMessagePage");
+        bulk.setIcon("images/ic_group.png");
+        bulk.setKeyShow(true);
+        entMenu.add(new DefaultMutableTreeNode(bulk));
         
         DefaultMutableTreeNode extMenu = new DefaultMutableTreeNode("Extension [Underconstruction]");
         
