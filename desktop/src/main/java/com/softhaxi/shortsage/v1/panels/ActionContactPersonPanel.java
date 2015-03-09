@@ -5,7 +5,7 @@ import java.swing.*;
 import java.swing.border.*;
 
 /**
- * 
+ * Reference <a href="http://www.dreamincode.net/forums/topic/339462-swing-top-down-with-gridbaglayout/">Swing Top Down with GridBagLayout</a>
  * @author Ivo Hutasoit
  * @since 1
  * @verson 1.0.0
