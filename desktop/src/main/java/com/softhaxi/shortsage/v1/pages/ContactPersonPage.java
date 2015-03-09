@@ -1,4 +1,4 @@
-package com.softhaxi.shortsage.v1.pages
+package com.softhaxi.shortsage.v1.pages;
 
 import java.swing.*;
 
