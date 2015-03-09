@@ -35,11 +35,11 @@ public class CSearchField extends JPanel
         setLayout(new BorderLayout(5, 0));
         add(new JLabel("Search :"), BorderLayout.WEST);
         
-        JPanel p2 = new JPanel(new BorderLayout());
-        p2.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(1, 4, 1, 4)));
+        JPanel pField = new JPanel(new BorderLayout());
+        pField.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(1, 4, 1, 4)));
         txtSearch = new JTextField();
-        p2.add(txtSearch, BorderLayout.CENTER);
-        p2.setBackground(txtSearch.getBackground());
+        pField.add(txtSearch, BorderLayout.CENTER);
+        pField.setBackground(txtSearch.getBackground());
         txtSearch.setBorder(null);
         txtSearch.addKeyListener(this);
         
@@ -51,8 +51,8 @@ public class CSearchField extends JPanel
         btnSearch.setOpaque(false);
         btnSearch.addActionListener(this);
         
-        p2.add(btnSearch, BorderLayout.EAST);
-        add(p2, BorderLayout.CENTER);
+        pField.add(btnSearch, BorderLayout.EAST);
+        add(pField, BorderLayout.CENTER);
     }
     
     /**
