@@ -1,6 +1,6 @@
-package com.softhaxi.shortsage.v1.pages
+package com.softhaxi.shortsage.v1.pages;
 
-import java.swing.*;
+import javax.swing.JPanel;
 
 /**
  * @author Ivo Hutasoit
@@ -11,7 +11,7 @@ public class ContactGroupPage extends JPanel {
     /**
      * Constructor
      */
-    public ContactPersonPage() {
+    public ContactGroupPage() {
         initComponents();
     }
     

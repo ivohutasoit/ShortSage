@@ -116,65 +116,26 @@ public class MainMenuPanel extends JPanel
      */
     private void initDetailPanel(String header) {
         dlTitle.setText(header);
+        tPanel.removeAll();
         if (header == null || header.equalsIgnoreCase(global.getString("label.workspace"))) {
             header = global.getString("label.workspace").toUpperCase();
             dlTitle.setText(header);
-
-            tPanel.removeAll();
             top = MenuDummy.getNodeWorkpace();
-
-            tree = new JTree(top);
-            tree.setBorder(new EmptyBorder(2, 5, 2, 5));
-            tree.removeTreeSelectionListener(this);
-            tree.addTreeSelectionListener(this);
-            tree.setRootVisible(false);
-            tree.setCellRenderer(new MenuTreeCellRender());
-
-            JScrollPane treeView = new JScrollPane(tree);
-            treeView.setBorder(new EmptyBorder(0, 0, 0, 0));
-            tPanel.add(treeView, BorderLayout.CENTER);
         } else if (header.equalsIgnoreCase(global.getString("label.modem"))) {
-            tPanel.removeAll();
-
             top = MenuDummy.getNodeModem();
-//            top = new DefaultMutableTreeNode(dlTitle.getText());
-//            DefaultMutableTreeNode tiEntities = new DefaultMutableTreeNode("Entities");
-//            tiEntities.add(new DefaultMutableTreeNode("Contact Person [Underconstruction]"));
-//            tiEntities.add(new DefaultMutableTreeNode("Contact Group [Underconstruction]"));
-//            tiEntities.add(new DefaultMutableTreeNode("Phone Field [Underconstruction]"));
-//            tiEntities.add(new DefaultMutableTreeNode("Message Template [Underconstruction]"));
-//            tiEntities.add(new DefaultMutableTreeNode("Bulk Message [Underconstruction]"));
-//            top.add(tiEntities);
-//            DefaultMutableTreeNode tiFolders = new DefaultMutableTreeNode("Folders");
-//            tiFolders.add(new DefaultMutableTreeNode(global.getString("label.inbox") + " [Underconstruction]"));
-//            tiFolders.add(new DefaultMutableTreeNode(global.getString("label.outbox") + " [Underconstruction]"));
-//            top.add(tiFolders);
-//            top.add(new DefaultMutableTreeNode("Extension [Underconstruction]"));
-//            top.add(new DefaultMutableTreeNode("Reports [Underconstruction]"));
-
-            tree = new JTree(top);
-            tree.setBorder(new EmptyBorder(2, 5, 2, 5));
-            tree.addTreeSelectionListener(this);
-            tree.setRootVisible(false);
-            tree.setCellRenderer(new MenuTreeCellRender());
-
-            JScrollPane treeView = new JScrollPane(tree);
-            treeView.setBorder(new EmptyBorder(0, 0, 0, 0));
-            tPanel.add(treeView, BorderLayout.CENTER);
         } else if (header.equalsIgnoreCase(global.getString("label.setting"))) {
-            tPanel.removeAll();
-            top = new DefaultMutableTreeNode(dlTitle.getText());
-            DefaultMutableTreeNode tiMain = new DefaultMutableTreeNode("Main Menu");
-            tiMain.add(new DefaultMutableTreeNode("User Setting [Underconstruction]"));
-            top.add(tiMain);
-
-            tree = new JTree(top);
-            tree.setRootVisible(false);
-
-            JScrollPane treeView = new JScrollPane(tree);
-            treeView.setBorder(new EmptyBorder(0, 0, 0, 0));
-            tPanel.add(treeView, BorderLayout.CENTER);
+            top = MenuDummy.getNodeSetting();
         }
+        tree = new JTree(top);
+        tree.setBorder(new EmptyBorder(2, 5, 2, 5));
+        tree.removeTreeSelectionListener(this);
+        tree.addTreeSelectionListener(this);
+        tree.setRootVisible(false);
+        tree.setCellRenderer(new MenuTreeCellRender());
+
+        JScrollPane treeView = new JScrollPane(tree);
+        treeView.setBorder(new EmptyBorder(0, 0, 0, 0));
+        tPanel.add(treeView, BorderLayout.CENTER);
         for (int i = 0; i < tree.getRowCount(); i++) {
             tree.expandRow(i);
         }

@@ -1,5 +1,6 @@
 package com.softhaxi.shortsage.v1.pages;
 
+import com.softhaxi.shortsage.v1.components.CSearchField;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.util.Date;
@@ -8,6 +9,7 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -31,27 +33,18 @@ public class InboxPage extends JPanel {
     }
 
     private void initComponents() {
-        setLayout(new BorderLayout(0, 4));
+        setLayout(new BorderLayout(4, 4));
         setBorder(new EmptyBorder(4, 4, 4, 4));
         
-        JPanel p1 = new JPanel(new BorderLayout(5, 0));
-        p1.add(new JLabel("Search :"), BorderLayout.WEST);
-        JPanel p2 = new JPanel(new BorderLayout());
-        p2.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(1, 4, 1, 4)));
-        JTextField tSearch = new JTextField();
-        p2.add(tSearch, BorderLayout.CENTER);
-        p2.setBackground(tSearch.getBackground());
-        tSearch.setBorder(null);
-        JButton bSearch = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_search.png")));
-        bSearch.setBorderPainted(false); 
-        bSearch.setBorder(BorderFactory.createEmptyBorder(1,1,1,1));
-        bSearch.setContentAreaFilled(false); 
-        bSearch.setFocusPainted(false); 
-        bSearch.setOpaque(false);
-        p2.add(bSearch, BorderLayout.EAST);
-        p1.add(p2, BorderLayout.CENTER);
+        CSearchField pSearch = new CSearchField() {
 
-        add(p1, BorderLayout.NORTH);
+            @Override
+            public void doSearch() {
+                JOptionPane.showMessageDialog(null, "Search action was not implemented full!");
+            }
+        };
+
+        add(pSearch, BorderLayout.NORTH);
 
         pDetail = new JPanel(new BorderLayout(0, 3));
         JToolBar tpDetail = new JToolBar();

@@ -95,7 +95,7 @@ public class MenuDummy {
         template.setTitle("M0103");
         template.setName("Message Template");
         template.setProgram("com.softhaxi.shortsage.v1.pages.MessageTemplatePage");
-        template.setIcon("images/ic_group.png");
+        template.setIcon("images/ic_template.png");
         template.setKeyShow(true);
         entMenu.add(new DefaultMutableTreeNode(template));
         
@@ -104,7 +104,7 @@ public class MenuDummy {
         bulk.setTitle("M0104");
         bulk.setName("Bulk Message");
         bulk.setProgram("com.softhaxi.shortsage.v1.pages.BulkMessagePage");
-        bulk.setIcon("images/ic_group.png");
+        bulk.setIcon("images/ic_bulk.png");
         bulk.setKeyShow(true);
         entMenu.add(new DefaultMutableTreeNode(bulk));
         
@@ -114,5 +114,28 @@ public class MenuDummy {
         modem.add(entMenu);
         modem.add(extMenu);
         return modem;
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public static DefaultMutableTreeNode getNodeSetting() {
+        DefaultMutableTreeNode setting = new DefaultMutableTreeNode("Setting");
+        
+        DefaultMutableTreeNode mainMenu = new DefaultMutableTreeNode("Main Menu");
+        
+        SystemMenu custom = new SystemMenu();
+        custom.setKey("S0001");
+        custom.setTitle("S0001");
+        custom.setName("Customization");
+//        dashboard.setProgram("com.softhaxi.shortsage.v1.pages.DashboardPage");
+        custom.setIcon("images/ic_clip.png");
+        custom.setKeyShow(true);
+        mainMenu.add(new DefaultMutableTreeNode(custom));
+        
+        setting.add(mainMenu);
+        
+        return setting;
     }
 }
