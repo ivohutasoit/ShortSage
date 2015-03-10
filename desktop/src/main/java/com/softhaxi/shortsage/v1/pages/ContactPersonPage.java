@@ -1,6 +1,7 @@
 package com.softhaxi.shortsage.v1.pages;
 
 import com.softhaxi.shortsage.v1.components.CSearchField;
+import com.softhaxi.shortsage.v1.forms.ActionContactPersonForm;
 import com.softhaxi.shortsage.v1.panels.ActionContactPersonPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,7 +25,7 @@ public class ContactPersonPage extends JPanel {
     
     
     private void initComponents() {
-        setLayout(new BorderLayout(0, 4));
+        setLayout(new BorderLayout());
         setBorder(new EmptyBorder(4, 4, 4, 4));
         
         JPanel pList = new JPanel(new BorderLayout(0, 4));
@@ -43,6 +44,6 @@ public class ContactPersonPage extends JPanel {
 //        pList.setPreferredSize(new Dimension(240, getHeight()));
         add(pList, BorderLayout.WEST);
         
-        add(new ActionContactPersonPanel(1), BorderLayout.CENTER);
+        add(new ActionContactPersonForm(), BorderLayout.CENTER);
     }
 }

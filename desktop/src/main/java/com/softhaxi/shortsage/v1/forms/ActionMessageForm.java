@@ -1,5 +1,17 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.components.CTextPrompt;
+import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.models.Message;
+import java.awt.Color;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 public class ActionMessageForm extends JPanel {
     
     private ActionState state;
@@ -15,7 +27,7 @@ public class ActionMessageForm extends JPanel {
     private JRadioButton rNow;
     private JRadioButton rNext;
     private JTextField tSendDate;
-    private JCombobox xTemplate;
+    private JComboBox xTemplate;
     private JTextArea tMessage;
     
     private JButton bSave;
@@ -36,10 +48,10 @@ public class ActionMessageForm extends JPanel {
     }
     
     private void initComponents() {
-        lDestinantion = new JTextField(20);
+        tDestination = new JTextField(20);
         CTextPrompt pDest = new CTextPrompt("Person or Group", tDestination);
         pDest.setForeground(Color.RED);
-        pDest.setAlpha(0.7f);
+        pDest.changeAlpha(0.7f);
     }
     
     private void initState() {

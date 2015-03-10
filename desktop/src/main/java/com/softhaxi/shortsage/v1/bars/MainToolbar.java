@@ -1,14 +1,9 @@
 package com.softhaxi.shortsage.v1.bars;
 
-import com.softhaxi.shortsage.v1.dialogs.MessageDialog;
-import com.softhaxi.shortsage.v1.forms.MainWindow;
-import com.softhaxi.shortsage.v1.pages.FolderPage;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import com.softhaxi.shortsage.v1.stages.MainWindow;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JToolBar;
 
 /**

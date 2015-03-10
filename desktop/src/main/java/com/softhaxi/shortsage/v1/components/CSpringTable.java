@@ -1,5 +1,10 @@
 package com.softhaxi.shortsage.v1.components;
 
+import javax.swing.JTable;
+import static javax.swing.JTable.AUTO_RESIZE_OFF;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+
 /**
  *
  * Link Reference <a href="http://stackoverflow.com/questions/15126651/how-to-auto-resize-all-columns-of-a-jtable-to-the-same-size">Same Width Column</a>

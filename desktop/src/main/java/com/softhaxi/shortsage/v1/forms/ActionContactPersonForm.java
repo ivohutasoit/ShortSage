@@ -1,8 +1,20 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.models.ContactPerson;
+import java.awt.BorderLayout;
+import javax.swing.GroupLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.border.EmptyBorder;
+
 public class ActionContactPersonForm extends JPanel {
     
-    private ActionSate state;
+    private ActionState state;
     private ContactPerson object;
     
     
@@ -20,35 +32,43 @@ public class ActionContactPersonForm extends JPanel {
     }
     
     private void initComponents() {
-        setLayout(new BorderLayout(5, 5));
-        setBorder(new CompoundBorder(new EmptyBorder(5, 5, 5, 5)));
+        setLayout(new BorderLayout());
         
-        JToolbar ftBar = new JToolbar();
-        ftBar.add(new JButton("New", new ImageIcon(getClass().getResources("images/ic_new.png"))));
-        ftBar.add(new JButton("Edit", new ImageIcon(getClass().getResources("images/ic_edit.png"))));
+        JToolBar ftBar = new JToolBar();
+        ftBar.add(new JButton("New", new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png"))));
+        ftBar.add(new JButton("Edit", new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
         
         add(ftBar, BorderLayout.NORTH);
         
         JPanel pForm = new JPanel();
-        GroupLayout layout = new new GroupLayout(pForm);
+        GroupLayout layout = new GroupLayout(pForm);
         pForm.setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         
-        JLabel lPrimary = new JLabel("Primary Code: ");
-        JTextField tPrimary = new JTextField(16);
+        JLabel lFirst = new JLabel("First Label: ");
+        JTextField tFirst = new JTextField(16);
+        
+        JLabel lSecond = new JLabel("Second Code: ");
+        JTextField tSecond = new JTextField(16);
         
         layout.setHorizontalGroup(layout.createSequentialGroup()
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                .addComponent(lPrimary))
+                .addComponent(lFirst)
+                .addComponent(lSecond))
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(tPrimary))
+                .addComponent(tFirst)
+                .addComponent(tSecond))
         );
         layout.setVerticalGroup(layout.createSequentialGroup()
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(lPrimary)
-                .addComponent(tPrimary))
+                .addComponent(lFirst)
+                .addComponent(tFirst))
+            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                .addComponent(lSecond)
+                .addComponent(tSecond))
         );
+        add(pForm, BorderLayout.CENTER);
     }
     
     private void initState() {

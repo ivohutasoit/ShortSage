@@ -1,5 +1,9 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.models.MessageTemplate;
+import javax.swing.JPanel;
+
 public class ActionMessageTemplateForm extends JPanel {
     
     private ActionState state;

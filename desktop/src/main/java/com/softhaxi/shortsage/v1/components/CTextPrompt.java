@@ -1,10 +1,14 @@
 package com.softhaxi.shortsage.v1.components;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import javax.swing.JLabel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 /**
@@ -206,14 +210,15 @@ public class CTextPrompt extends JLabel
                 || promptShowed == PromptShowed.FOCUS_GAINED) {
                         setVisible(true);
                 } else {
-                        SetVisible(false);
+                        setVisible(false);
                 }
         } else {
                 if(promptShowed == PromptShowed.ALWAYS 
                 || promptShowed == PromptShowed.FOCUS_LOST) {
                         setVisible(true);
                 } else {
-                        SetVisible(false);
+                        setVisible(false);
+                }
         }
     }
 }
