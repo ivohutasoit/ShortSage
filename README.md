@@ -1,9 +1,14 @@
 # ShortSage - a SMS Gateway
-We concern to development new platform and generic SMS Gateway for all user. ShortSage was introducted to you for you any uses on SMS Gateway. Right now we still in development progress with currently features:
+ShortSage is a SMS Gateway for generic uses. We give you customable and flexible features for your business.
+Currently, we have focus on first build with some features under construction.
+
+Some list of task to be completed on next implementation are:
 <ol>
-<li>Dashboard for all control SMS Gateway</li>
-<li>Import Data from any format data and any file types</li>
-<li>Data maintenance</li>
-<li>Bulk SMS</li>
-<li>User Interface customization</li>
+<li>Service for Modem</li>
+<li>Inbox, Outbox, and Bulk Message Page</li>
+<li>Contact Person, Group, and Message Template Page</li>
+<li>Just In Time and Scheduler sending message</li>
+<li>Import and Duplicate Detection Data</li>
+<li>Dashboard Application</li>
+<li>Settings Menu</li>
 </ol>
