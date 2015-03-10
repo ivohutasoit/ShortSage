@@ -1,4 +1,4 @@
-package com.softhaxi.shortsage.v1.forms;
+package com.softhaxi.shortsage.v1.stages;
 
 import com.softhaxi.shortsage.v1.bars.MainMenubar;
 import com.softhaxi.shortsage.v1.bars.MainStatusbar;
