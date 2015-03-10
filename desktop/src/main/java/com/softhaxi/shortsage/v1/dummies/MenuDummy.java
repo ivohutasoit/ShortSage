@@ -35,6 +35,13 @@ public class MenuDummy {
         importData.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(importData));
         
+        SystemMenu duplication = new SystemMenu();
+        duplication.setKey("G0003");
+        duplication.setTitle("G0003");
+        duplication.setName("Duplicate Detection");
+        duplication.setKeyShow(true);
+        mainMenu.add(new DefaultMutableTreeNode(duplication));
+        
         DefaultMutableTreeNode extMenu = new DefaultMutableTreeNode("Extension [Underconstruction]");
         DefaultMutableTreeNode setupMenu = new DefaultMutableTreeNode("Setup [Underconstruction]");
         
@@ -71,7 +78,7 @@ public class MenuDummy {
         outbox.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(outbox));
         
-        DefaultMutableTreeNode entMenu = new DefaultMutableTreeNode("Entities");
+        DefaultMutableTreeNode setupMenu = new DefaultMutableTreeNode("Setup");
         SystemMenu group = new SystemMenu();
         group.setKey("M0101");
         group.setTitle("M0101");
@@ -79,7 +86,7 @@ public class MenuDummy {
         group.setProgram("com.softhaxi.shortsage.v1.pages.ContactGroupPage");
         group.setIcon("images/ic_group.png");
         group.setKeyShow(true);
-        entMenu.add(new DefaultMutableTreeNode(group));
+        setupMenu.add(new DefaultMutableTreeNode(group));
         
         SystemMenu person = new SystemMenu();
         person.setKey("M0102");
@@ -88,7 +95,7 @@ public class MenuDummy {
         person.setProgram("com.softhaxi.shortsage.v1.pages.ContactPersonPage");
         person.setIcon("images/ic_contact.png");
         person.setKeyShow(true);
-        entMenu.add(new DefaultMutableTreeNode(person));
+        setupMenu.add(new DefaultMutableTreeNode(person));
         
         SystemMenu template = new SystemMenu();
         template.setKey("M0103");
@@ -97,7 +104,7 @@ public class MenuDummy {
         template.setProgram("com.softhaxi.shortsage.v1.pages.MessageTemplatePage");
         template.setIcon("images/ic_template.png");
         template.setKeyShow(true);
-        entMenu.add(new DefaultMutableTreeNode(template));
+        setupMenu.add(new DefaultMutableTreeNode(template));
         
         SystemMenu bulk = new SystemMenu();
         bulk.setKey("M0104");
@@ -106,12 +113,12 @@ public class MenuDummy {
         bulk.setProgram("com.softhaxi.shortsage.v1.pages.BulkMessagePage");
         bulk.setIcon("images/ic_bulk.png");
         bulk.setKeyShow(true);
-        entMenu.add(new DefaultMutableTreeNode(bulk));
+        setupMenu.add(new DefaultMutableTreeNode(bulk));
         
         DefaultMutableTreeNode extMenu = new DefaultMutableTreeNode("Extension [Underconstruction]");
         
         modem.add(mainMenu);
-        modem.add(entMenu);
+        modem.add(setupMenu);
         modem.add(extMenu);
         return modem;
     }
@@ -128,11 +135,23 @@ public class MenuDummy {
         SystemMenu custom = new SystemMenu();
         custom.setKey("S0001");
         custom.setTitle("S0001");
-        custom.setName("Customization");
-//        dashboard.setProgram("com.softhaxi.shortsage.v1.pages.DashboardPage");
+        custom.setName("Administration");
         custom.setIcon("images/ic_clip.png");
         custom.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(custom));
+        
+        SystemMenu busman = new SystemMenu();
+        busman.setKey("S0002");
+        busman.setTitle("S0002");
+        busman.setName("BUsiness Management");
+        busman.setIcon("images/ic_clip.png");
+        busman.setKeyShow(true);
+        mainMenu.add(new DefaultMutableTreeNode(busman));
+        
+        // Setups
+        // General Setup, Miscellanneous Setup, Customs Autonumber, Signature Maintanance
+        
+        // Extensions
         
         setting.add(mainMenu);
         
