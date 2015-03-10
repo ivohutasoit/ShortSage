@@ -3,6 +3,7 @@ package com.softhaxi.shortsage.v1.components;
 /**
  *
  * Link Reference <a href="http://stackoverflow.com/questions/15126651/how-to-auto-resize-all-columns-of-a-jtable-to-the-same-size">Same Width Column</a>
+ * Link Reference <a href="http://stackoverflow.com/questions/13013989/how-to-adjust-jtable-columns-to-fit-the-longest-content-in-column-cells">Fit Data Column</a>
  */
 public class CSpringTable extends JTable {
     
