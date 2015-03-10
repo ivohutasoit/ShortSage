@@ -1,5 +1,5 @@
 package com.softhaxi.shortsage.v1.enums;
 
-public enum PanelAction {
+public enum ActionState {
     SHOW, CREATE, EDIT, DELETE
 }
