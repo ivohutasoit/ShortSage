@@ -2,7 +2,7 @@
 ShortSage is a SMS Gateway for generic uses. We give you customable and flexible features for your business.
 Currently, we have focused on first build with some features for basic use by customer.
 
-Some list of task to be completed on next implementation are:
+Some list of task to be completed on desktop implementation are:
 <ol>
 <li>Service for Modem</li>
 <li>Inbox, Outbox, and Bulk Message Page</li>
