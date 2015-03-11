@@ -1,4 +1,4 @@
-package com.softhaxi.shortsage.v1.dialogs;
+package com.softhaxi.shortsage.v1.components;
 
 import com.softhaxi.shortsage.v1.intfs.IPanelDialog;
 
