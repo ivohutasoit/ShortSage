@@ -15,6 +15,8 @@ import javax.swing.border.EtchedBorder;
 
 /**
  * Reference <a href="http://www.dreamincode.net/forums/topic/339462-swing-top-down-with-gridbaglayout/">Swing Top Down with GridBagLayout</a>
+ * Reference <a href="https://weblogs.java.net/blog/evanx/archive/2006/10/address_form_wi.html">Address Form</a>
+ * 
  * @author Ivo Hutasoit
  * @since 1
  * @verson 1.0.0
