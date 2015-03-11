@@ -1,6 +1,7 @@
 package com.softhaxi.shortsage.v1;
 
 import com.softhaxi.shortsage.v1.stages.MainWindow;
+import com.softhaxi.shortsage.v1.util.Verificator;
 
 /**
  *
@@ -33,6 +34,7 @@ public class MainApp {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
+//                Verificator.checkPortList();
                 new MainWindow().setVisible(true);
             }
         });

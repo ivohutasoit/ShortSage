@@ -1,19 +1,17 @@
 package com.softhaxi.shortsage.v1.pages;
 
+import com.softhaxi.shortsage.v1.components.CNumberedTable;
 import com.softhaxi.shortsage.v1.components.CSearchField;
+import com.softhaxi.shortsage.v1.components.CZebraTable;
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.Dimension;
 import java.util.Date;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -66,44 +64,29 @@ public class InboxPage extends JPanel {
     }
 
     private void initTable() {
-        String[] columnNames = {"No",
+        String[] columnNames = {
             "Number",
             "Message",
             "Date"};
 
         Object[][] data = {
-            {"1", "+6282166013128",
+            {"+6282166013128",
                 "Hello! Are you at home?", new Date().toString()},
-            {"2", "+6282165961213",
+            {"+6282165961213",
                 "Do you want to trip next month?", new Date().toString()}
         };
 
-        JTable table = new JTable(data, columnNames);
-//        table.setAutoResizeMode( JTable.AUTO_RESIZE_OFF );
-//        for (int column = 0; column < table.getColumnCount(); column++) {
-//            TableColumn tableColumn = table.getColumnModel().getColumn(column);
-//            int preferredWidth = tableColumn.getMinWidth();
-//            int maxWidth = tableColumn.getMaxWidth();
-//
-//            for (int row = 0; row < table.getRowCount(); row++) {
-//                TableCellRenderer cellRenderer = table.getCellRenderer(row, column);
-//                Component c = table.prepareRenderer(cellRenderer, row, column);
-//                int width = c.getPreferredSize().width + table.getIntercellSpacing().width;
-//                preferredWidth = Math.max(preferredWidth, width);
-//
-//        //  We've exceeded the maximum width, no need to check other rows
-//                if (preferredWidth >= maxWidth) {
-//                    preferredWidth = maxWidth;
-//                    break;
-//                }
-//            }
-//
-//            tableColumn.setPreferredWidth(preferredWidth);
-//        }
+        CZebraTable table = new CZebraTable(data, columnNames);
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
         table.setFillsViewportHeight(true);
-
+        
+        CNumberedTable rowTable = new CNumberedTable(table);
         //Create the scroll pane and add the table to it.
         JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setRowHeaderView(rowTable);
+        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
+                    rowTable.getTableHeader());
 
         //Add the scroll pane to this panel.
         pDetail.add(scrollPane, BorderLayout.CENTER);

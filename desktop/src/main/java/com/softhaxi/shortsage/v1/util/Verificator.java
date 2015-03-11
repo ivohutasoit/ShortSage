@@ -1,5 +1,9 @@
 package com.softhaxi.shortsage.v1.util;
 
+import java.util.Enumeration;
+import javax.comm.CommPort;
+import javax.comm.CommPortIdentifier;
+
 public class Verificator {
     /**
      * Reference <a href="http://stackoverflow.com/questions/19266277/java-for-smslib-building-error-for-sending-message-using-smslib">Check Port List</a>
@@ -21,7 +25,7 @@ public class Verificator {
             CommPort port = null;
             try {
                 System.out.print("open " + portId.getName());
-                port = portId.open(ListPorts.class.getName(), 2000);
+                port = portId.open(Verificator.class.getName(), 2000);
                 port.close();
                 System.out.println("...closed");                
             } catch (Exception ex) {

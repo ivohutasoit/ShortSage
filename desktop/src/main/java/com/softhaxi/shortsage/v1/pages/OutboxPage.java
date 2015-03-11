@@ -1,6 +1,22 @@
 package com.softhaxi.shortsage.v1.pages;
 
+import com.softhaxi.shortsage.v1.components.CNumberedTable;
+import com.softhaxi.shortsage.v1.components.CSearchField;
+import com.softhaxi.shortsage.v1.components.CZebraTable;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.util.Date;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 
 /**
  * 
@@ -9,6 +25,8 @@ import javax.swing.JPanel;
  * @version 1.0.0
  */
 public class OutboxPage extends JPanel {
+    
+    private JPanel pDetail;
     /**
      * 
      */
@@ -51,6 +69,31 @@ public class OutboxPage extends JPanel {
      * Reference <a href="http://stackoverflow.com/questions/7137786/how-can-i-put-a-control-in-the-jtableheader-of-a-jtable/7137801#7137801">JTable Select All</a>
      */ 
     private void initTable() {
+        String[] columnNames = {
+            "Number",
+            "Message",
+            "Date"};
+
+        Object[][] data = {
+            {"+6282166013128",
+                "Hello! Are you at home?", new Date().toString()},
+            {"+6282165961213",
+                "Do you want to trip next month?", new Date().toString()}
+        };
+
+        CZebraTable table = new CZebraTable(data, columnNames);
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setFillsViewportHeight(true);
         
+        CNumberedTable rowTable = new CNumberedTable(table);
+        //Create the scroll pane and add the table to it.
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setRowHeaderView(rowTable);
+        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
+                    rowTable.getTableHeader());
+
+        //Add the scroll pane to this panel.
+        pDetail.add(scrollPane, BorderLayout.CENTER);
     }
 }

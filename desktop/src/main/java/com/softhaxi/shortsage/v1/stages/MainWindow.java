@@ -38,7 +38,7 @@ public class MainWindow extends JFrame {
     private void initComponents() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(String.format("%s %s", global.getString("app.name.short"), global.getString("app.version.short")));
-        setPreferredSize(new Dimension(800, 500));
+        setPreferredSize(new Dimension(1200, 700));
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLayout(new BorderLayout());
         menus = new MainMenubar();

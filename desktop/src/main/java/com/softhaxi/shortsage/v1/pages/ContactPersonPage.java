@@ -2,11 +2,9 @@ package com.softhaxi.shortsage.v1.pages;
 
 import com.softhaxi.shortsage.v1.components.CSearchField;
 import com.softhaxi.shortsage.v1.forms.ActionContactPersonForm;
-import com.softhaxi.shortsage.v1.panels.ActionContactPersonPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
