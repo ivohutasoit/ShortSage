@@ -49,6 +49,7 @@ public class OutboxPage extends JPanel {
     
     /**
      * Reference <a href="http://stackoverflow.com/questions/7137786/how-can-i-put-a-control-in-the-jtableheader-of-a-jtable/7137801#7137801">JTable Select All</a>
+     */ 
     private void initTable() {
         
     }
