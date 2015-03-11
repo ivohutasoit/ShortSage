@@ -24,6 +24,7 @@ public class CNumberedTable extends JTable
         TableColumn column = new TableColumn();
         column.setHeaderValue("");
         addColumn(column);
+        column.setCellRenderer(new CNumberedRenderer());
         
         getColumnModel().getColumn(0).setPreferredWidth(24);
         setPreferredScrollableViewportSize(getPreferredSize());
@@ -70,33 +71,59 @@ public class CNumberedTable extends JTable
     
     @Override
     public void stateChanged(ChangeEvent e) {
-		    // Keep the scrolling of the row table in sync with main table
+    	// Keep the scrolling of the row table in sync with main table
 
-		    JViewport viewport = (JViewport) e.getSource();
-		    JScrollPane scrollPane = (JScrollPane)viewport.getParent();
-		    scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
-	  }
+    	JViewport viewport = (JViewport) e.getSource();
+    	JScrollPane scrollPane = (JScrollPane)viewport.getParent();
+    	scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
+    }
 	  
-	  @Override
-	  public void propertyChange(PropertyChangeEvent e) {
-		    // Keep the row table in sync with the main table
+    @Override
+    public void propertyChange(PropertyChangeEvent e) {
+	// Keep the row table in sync with the main table
 
-    		if ("selectionModel".equals(e.getPropertyName())) {
-    			setSelectionModel( main.getSelectionModel() );
-    		}
+    	if ("selectionModel".equals(e.getPropertyName())) {
+    		setSelectionModel( main.getSelectionModel() );
+    	}
 
-    		if ("rowHeight".equals(e.getPropertyName())) {
-    			repaint();
-    		}
+    	if ("rowHeight".equals(e.getPropertyName())) {
+    		repaint();
+    	}
 
-    		if ("model".equals(e.getPropertyName())) {
-    			main.getModel().addTableModelListener( this );
-    			revalidate();
+    	if ("model".equals(e.getPropertyName())) {
+    		main.getModel().addTableModelListener( this );
+    		revalidate();
+    	}
+    }
+    
+    @Override
+    public void tableChanged(TableModelEvent e) {
+    	revalidate();
+    }
+    
+    private static class CNumberedRenderer extends DefaultTableCellRenderer {
+    	public CNumberedRenderer() {
+    		setHorizontalAlignment(JLabel.RIGHT);
+    	}
+    	
+    	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, 
+    		boolean hasFocus, int row, int column) {
+    		if(table != null) {
+    			JTableHeader header = table.getTableHeader();
+    			if(header != null) {
+    				setForeground(header.getForeground());
+    				setBackground(header.getBackground());
+    				setFont(header.getFont());
+    			}
     		}
-	  }
-	  
-	  @Override
-  	public void tableChanged(TableModelEvent e) {
-  		revalidate();
-  	}
+    		
+    		if(isSelected) {
+    			setFont(getFont().deriveFont(Font.BOLD));
+    		}
+    		setText((value == null) ? "" : value.toString());
+    		setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+    		
+    		return this;
+    	}
+    }
 }
