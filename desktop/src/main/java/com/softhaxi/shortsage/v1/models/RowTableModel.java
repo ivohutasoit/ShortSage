@@ -444,6 +444,16 @@ public class RowTableModel<T> extends AbstractTableModel {
     	this.modelEditable = editable;
     }
     
+    /**
+	 *  Convert an unformatted column name to a formatted column name. That is:
+	 *
+	 *  - insert a space when a new uppercase character is found, insert
+	 *    multiple upper case characters are grouped together.
+	 *  - replace any "_" with a space
+	 *
+	 *  @param columnName  unformatted column name
+	 *  @return the formatted column name
+	 */
     public static String formatColumnName(String columnName) {
     	if (columnName.length() < 3) return columnName;
 
