@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.components;
 
-import com.softhaxi.shortsage.v1.intf.IPanelDialog;
+import com.softhaxi.shortsage.v1.intfs.IPanelDialog;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
