@@ -1,7 +1,7 @@
 package com.softhaxi.shortsage.v1.forms;
 
 import com.softhaxi.shortsage.v1.enums.ActionState;
-import com.softhaxi.shortsage.v1.models.ContactGroup;
+import com.softhaxi.shortsage.v1.model.ContactGroup;
 import javax.swing.JPanel;
 
 public class ActionContactGroupForm extends JPanel {

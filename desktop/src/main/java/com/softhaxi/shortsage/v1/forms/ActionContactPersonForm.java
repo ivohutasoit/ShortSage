@@ -1,7 +1,7 @@
 package com.softhaxi.shortsage.v1.forms;
 
 import com.softhaxi.shortsage.v1.enums.ActionState;
-import com.softhaxi.shortsage.v1.models.ContactPerson;
+import com.softhaxi.shortsage.v1.model.ContactPerson;
 import java.awt.BorderLayout;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;

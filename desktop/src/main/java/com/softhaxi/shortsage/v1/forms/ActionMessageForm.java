@@ -2,7 +2,7 @@ package com.softhaxi.shortsage.v1.forms;
 
 import com.softhaxi.shortsage.v1.components.CTextPrompt;
 import com.softhaxi.shortsage.v1.enums.ActionState;
-import com.softhaxi.shortsage.v1.models.Message;
+import com.softhaxi.shortsage.v1.model.Message;
 import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
