@@ -143,17 +143,27 @@ public class MenuDummy {
         SystemMenu busman = new SystemMenu();
         busman.setKey("S0002");
         busman.setTitle("S0002");
-        busman.setName("BUsiness Management");
+        busman.setName("Business Management");
         busman.setIcon("images/ic_clip.png");
         busman.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(busman));
         
         // Setups
         // General Setup, Miscellanneous Setup, Customs Autonumber, Signature Maintanance
+        DefaultMutableTreeNode setupMenu = new DefaultMutableTreeNode("Setup Menu");
+        SystemMenu modem = new SystemMenu();
+        modem.setKey("S1001");
+        modem.setTitle("S1001");
+        modem.setName("Modem Setup");
+        modem.setProgram("com.softhaxi.shortsage.v1.pages.ModemPage");
+        modem.setIcon("images/ic_clip.png");
+        modem.setKeyShow(true);
+        setupMenu.add(new DefaultMutableTreeNode(modem));
         
         // Extensions
         
         setting.add(mainMenu);
+        setting.add(setupMenu);
         
         return setting;
     }
