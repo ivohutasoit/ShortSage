@@ -19,6 +19,26 @@ public class MainToolbar extends JToolBar {
     }
     
     private void initComponents() {
+        JButton bModem = new JButton("Connect");
+        add(bModem);
+        bModem.addActionListener(new ActionListener() {
+        
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(Service.getInstance().getServiceStatus() == ServiceStatus.START) {
+                    Service.getInstance().stopService();
+                    bModem.setText("Connect");
+                    return;
+                }
+                
+                SerialModemGateway gateway = new SerialModemGateway("modem.com1", "COM4", 115200, "", "");
+                gateway.setInbound(true);
+                gateway.setOutbound(true);
+                
+                GlobalConstant.getInstance().addGateway("modem.com1", gateway);
+                bModem.setText("Disconnect");
+            }
+        }); 
 //        JButton bConnect = new JButton("Connect Modem");
 //        add(bConnect);
 //        final JButton bNewMsg = new JButton("New Message");
