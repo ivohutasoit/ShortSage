@@ -31,10 +31,11 @@ public class MainToolbar extends JToolBar {
                     return;
                 }
                 
+                
                 SerialModemGateway gateway = new SerialModemGateway("modem.com1", "COM4", 115200, "", "");
                 gateway.setInbound(true);
                 gateway.setOutbound(true);
-                
+            
                 GlobalConstant.getInstance().addGateway("modem.com1", gateway);
                 bModem.setText("Disconnect");
             }
