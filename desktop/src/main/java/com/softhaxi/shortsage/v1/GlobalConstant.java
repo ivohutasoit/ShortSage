@@ -9,6 +9,12 @@ public class GlobalConstant {
     private GlobalConstant() {
         gateways = new HashMap<>();
         user = new SystemUser();
+        
+        Service.getInstance().setOutboundMessageNotification(new OutboundNotification());
+        Service.getInstance().setInboundMessageNotification(new InboundNotification());
+        Service.getInstance().setCallNotification(new CallNotification());
+        Service.getInstance().setGatewayStatusNotification(new StatusNotification());
+        Service.getInstance().setOrphanedMessageNotification(new OrphanedMessageNotification());
     }
     
     public static GlobalConstant getInstance() {
