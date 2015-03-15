@@ -154,8 +154,8 @@ public class MenuDummy {
         SystemMenu modem = new SystemMenu();
         modem.setKey("S1001");
         modem.setTitle("S1001");
-        modem.setName("Modem Setup");
-        modem.setProgram("com.softhaxi.shortsage.v1.pages.ModemPage");
+        modem.setName("Gateway Setup");
+        modem.setProgram("com.softhaxi.shortsage.v1.pages.GatewaySetupPage");
         modem.setIcon("images/ic_clip.png");
         modem.setKeyShow(true);
         setupMenu.add(new DefaultMutableTreeNode(modem));

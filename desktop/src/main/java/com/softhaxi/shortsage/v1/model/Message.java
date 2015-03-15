@@ -9,8 +9,8 @@ import java.util.Date;
  */
 public class Message implements Serializable {
     private String id;
-    private String reciever;
-    private String message;
+    private String contact;
+    private String text;
     private Date date;
     private String type;
     private int status;
@@ -34,31 +34,31 @@ public class Message implements Serializable {
     }
 
     /**
-     * @return the reciever
+     * @return the contact
      */
-    public String getReciever() {
-        return reciever;
+    public String getContact() {
+        return contact;
     }
 
     /**
-     * @param reciever the reciever to set
+     * @param contact the contact to set
      */
-    public void setReciever(String reciever) {
-        this.reciever = reciever;
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     /**
-     * @return the message
+     * @return the text
      */
-    public String getMessage() {
-        return message;
+    public String getText() {
+        return text;
     }
 
     /**
-     * @param message the message to set
+     * @param text the text to set
      */
-    public void setMessage(String message) {
-        this.message = message;
+    public void setText(String text) {
+        this.text = text;
     }
 
     /**
@@ -158,6 +158,6 @@ public class Message implements Serializable {
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
     }
-    
+
     
 }

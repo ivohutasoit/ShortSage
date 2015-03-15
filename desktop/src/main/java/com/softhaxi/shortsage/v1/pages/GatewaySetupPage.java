@@ -1,14 +1,18 @@
 package com.softhaxi.shortsage.v1.pages;
 
+import com.softhaxi.shortsage.v1.components.CDialog;
 import com.softhaxi.shortsage.v1.components.CNumberedTable;
 import com.softhaxi.shortsage.v1.components.CSearchField;
 import com.softhaxi.shortsage.v1.components.CZebraTable;
-import com.softhaxi.shortsage.v1.dummies.MessageDummy;
-import com.softhaxi.shortsage.v1.table.model.OutboxTableModel;
+import com.softhaxi.shortsage.v1.dto.Gateway;
+import com.softhaxi.shortsage.v1.forms.ActionGatewaySetupForm;
+import com.softhaxi.shortsage.v1.table.model.GatewayTableModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.util.Date;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,18 +25,23 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 /**
- * 
+ *
  * @author Ivo Hutasoit
  * @since 1
  * @version 1.0.0
  */
-public class OutboxPage extends JPanel {
-    
+public class GatewaySetupPage extends JPanel
+    implements ActionListener {
     private JPanel pDetail;
+    
+    private JButton bNew;
+    private JButton bEdit;
+    private JButton bDelete;
+    private JButton bRefresh;
     /**
      * 
      */
-    public OutboxPage() {
+    public GatewaySetupPage() {
         initComponents();
         initTable();
     }
@@ -56,26 +65,30 @@ public class OutboxPage extends JPanel {
         JToolBar tpDetail = new JToolBar();
         tpDetail.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
         tpDetail.setFloatable(false);
-        tpDetail.add(new JButton("New", new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png"))));
-        tpDetail.add(new JButton("Edit", new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
+        
+        bNew = new JButton("New", new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        bNew.addActionListener(this);
+        tpDetail.add(bNew);
+        
+        bEdit = new JButton("Edit", new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png")));
+        tpDetail.add(bEdit);
         tpDetail.add(new JToolBar.Separator());
-        tpDetail.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png"))));
+        
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        tpDetail.add(bDelete);
         tpDetail.add(Box.createHorizontalGlue());
-        tpDetail.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png"))));
+        
+        bRefresh = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png")));
+        tpDetail.add(bRefresh);
         
         pDetail.add(tpDetail, BorderLayout.NORTH);
         add(pDetail, BorderLayout.CENTER);
     }
     
-    /**
-     * Reference <a href="http://stackoverflow.com/questions/7137786/how-can-i-put-a-control-in-the-jtableheader-of-a-jtable/7137801#7137801">JTable Select All</a>
-     */ 
     private void initTable() {
-        CZebraTable table = new CZebraTable(new OutboxTableModel(MessageDummy.getOutbox()));
+        CZebraTable table = new CZebraTable(new GatewayTableModel(new ArrayList<Gateway>()));
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
-        table.getColumnModel().getColumn(0).setPreferredWidth(100);
-        table.getColumnModel().getColumn(1).setPreferredWidth(700);
         
         CNumberedTable rowTable = new CNumberedTable(table);
         //Create the scroll pane and add the table to it.
@@ -86,5 +99,18 @@ public class OutboxPage extends JPanel {
 
         //Add the scroll pane to this panel.
         pDetail.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton) {
+            JButton source = (JButton)e.getSource();
+            
+            if(source == bNew) {
+                ActionGatewaySetupForm form = new ActionGatewaySetupForm();
+                form.setPreferredSize(new Dimension(400, 500));
+                CDialog dialog = new CDialog(null, form, "Create Gateway", true);
+            }
+        }
     }
 }

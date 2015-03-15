@@ -20,5 +20,6 @@ public class CDialog extends JDialog {
         panel.setDialogHost(this);
         pack();
         setLocationRelativeTo(parent);
+        setVisible(true);
     }
 }

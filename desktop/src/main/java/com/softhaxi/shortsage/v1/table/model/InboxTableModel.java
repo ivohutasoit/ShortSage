@@ -2,8 +2,10 @@ package com.softhaxi.shortsage.v1.table.model;
 
 import com.softhaxi.shortsage.v1.model.Message;
 import com.softhaxi.shortsage.v1.table.RowTableModel;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -18,9 +20,14 @@ public class InboxTableModel extends RowTableModel<Message> {
                 "Date"
             };
 
-    public InboxTableModel(int type) {
+    private final SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy");
+    
+    public InboxTableModel(List<Message> messages) {
         super(Arrays.asList(COLUMN_INBOX));
 
+        for (Message message : messages) {
+            addRow(message);
+        }
         setRowClass(Message.class);
         setModelEditable(false);
     }
@@ -31,11 +38,11 @@ public class InboxTableModel extends RowTableModel<Message> {
 
         switch (column) {
             case 0:
-                return message.getReciever();
+                return message.getContact();
             case 1:
-                return message.getMessage();
+                return message.getText();
             case 2:
-                return message.getDate();
+                return sdf.format(message.getDate());
             default:
                 return null;
         }
@@ -47,10 +54,10 @@ public class InboxTableModel extends RowTableModel<Message> {
 
         switch (column) {
             case 0:
-                message.setReciever((String) value);
+                message.setContact((String) value);
                 break;
             case 1:
-                message.setMessage((String) value);
+                message.setText((String) value);
                 break;
             case 2:
                 message.setDate((Date) value);

@@ -3,19 +3,23 @@ package com.softhaxi.shortsage.v1.pages;
 import com.softhaxi.shortsage.v1.components.CNumberedTable;
 import com.softhaxi.shortsage.v1.components.CSearchField;
 import com.softhaxi.shortsage.v1.components.CZebraTable;
+import com.softhaxi.shortsage.v1.dummies.MessageDummy;
+import com.softhaxi.shortsage.v1.table.TableColumnAdjuster;
+import com.softhaxi.shortsage.v1.table.model.InboxTableModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.Date;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.table.TableColumn;
 
 /**
  *
@@ -56,30 +60,17 @@ public class InboxPage extends JPanel {
         tpDetail.add(Box.createHorizontalGlue());
         tpDetail.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png"))));
 
-//        JPanel p6 = new JPanel();
-//        p6.add(b);
-//        pDetail.add(p6, BorderLayout.CENTER);
         pDetail.add(tpDetail, BorderLayout.NORTH);
         add(pDetail, BorderLayout.CENTER);
     }
 
     private void initTable() {
-        String[] columnNames = {
-            "Number",
-            "Message",
-            "Date"};
-
-        Object[][] data = {
-            {"+6282166013128",
-                "Hello! Are you at home?", new Date().toString()},
-            {"+6282165961213",
-                "Do you want to trip next month?", new Date().toString()}
-        };
-
-        CZebraTable table = new CZebraTable(data, columnNames);
+        CZebraTable table = new CZebraTable(new InboxTableModel(MessageDummy.getInbox()));
         table.setShowGrid(false);
-        table.setIntercellSpacing(new Dimension(0, 0));
-        table.setFillsViewportHeight(true);
+        table.setIntercellSpacing(new Dimension(0, 0));        
+//        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.getColumnModel().getColumn(0).setPreferredWidth(100);
+        table.getColumnModel().getColumn(1).setPreferredWidth(700);
         
         CNumberedTable rowTable = new CNumberedTable(table);
         //Create the scroll pane and add the table to it.
