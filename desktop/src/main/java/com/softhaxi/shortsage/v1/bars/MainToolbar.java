@@ -30,6 +30,17 @@ public class MainToolbar extends JToolBar {
     }
 
     private void initComponents() {
+        
+        final JButton bNewMessage = new JButton("New Message");
+        add(bNewMessage);
+        bNewMessage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CDialog dialog = new CDialog(new MessageActionForm());
+                dialog.setVisible(true);
+            }
+        });
+        
         final JButton bModem = new JButton();
         if (Service.getInstance().getServiceStatus() != ServiceStatus.STARTED) {
             bModem.setText("Connect");
