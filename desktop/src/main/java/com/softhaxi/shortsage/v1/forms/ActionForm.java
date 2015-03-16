@@ -33,12 +33,32 @@ public abstract class ActionForm<T> extends JPanel {
     }
     
     protected void initComponents() {
-      
+        setLayout(new BorderLayout());
+        setBorder(new EmptyBorder(2, 2, 2, 2));
+        
+        tBar = new JToolBar();
+        tBar.setFloatable(false);
+        tBar.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
+        add(ftBar, BorderLayout.NORTH);
+        
+        bNew = new JButton("New", new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        bEdit = new JButton("Edit", new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png")));
+        bSave = new JButton("Save", new ImageIcon(getClass().getClassLoader().getResource("images/ic_save.png")));
+        bSaveNew = new JButton("Save and New", new ImageIcon(getClass().getClassLoader().getResource("images/ic_save_as.png")));
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        bCancel = new JButton("Cancel", new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
+        
+        
     }
     
     protected void initState() {
       if(page == null) {
-        
+        if (state == ActionState.CREATE || state == ActionState.EDIT) {
+            bNew.setVisible(false);
+            bEdit.setVisible(false);
+            bDelete.setVisible(false);
+            cStatus.setEnabled(false);
+        }
       }
     }
     
