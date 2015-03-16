@@ -37,6 +37,7 @@ public class ActionGatewaySetupForm extends JPanel
 
     private ActionState state;
     private Gateway object;
+    private JDialog dialog;
 
     private JButton bNew;
     private JButton bEdit;
@@ -170,21 +171,47 @@ public class ActionGatewaySetupForm extends JPanel
             bNew.setVisible(false);
             bEdit.setVisible(false);
             bDelete.setVisible(false);
+            cStatus.setEnabled(false);
         }
     }
 
     private void initData() {
-
+        
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        if(e.getSource() instanceof JButton) {
+                JButton bb = (JButton) e.getSource();
+                
+                if(dialog != null) {
+                   if(bb == bSave) {
+                        if(!save()) {
+                           return;
+                        }
+                        continue;   
+                   } else if(bb == bSaveNew) {
+                        if(!save()) {
+                           return;
+                        }
+                        continue;
+                   } 
+                   
+                   dialog.dispose();
+                   dialog.close();
+                } 
+        }
     }
 
     @Override
     public void setDialogHost(JDialog host) {
-
+        this.dialog = host;
     }
 
+    private boolean save() {
+        if(state == ActionState.CREATE) {
+           return true;
+        }
+        return false;
+    }
 }
