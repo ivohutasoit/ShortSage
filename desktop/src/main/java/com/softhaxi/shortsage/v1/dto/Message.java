@@ -18,7 +18,7 @@ public class Message implements Serializable {
   @Column(name = "MSTEXT")
   private String message;
   
-  @Column(name = ""MSDATE)
+  @Column(name = "MSDATE")
   private Date date;
   
   @Column(name = "MSFLDR", length = 100)
@@ -33,7 +33,10 @@ public class Message implements Serializable {
   @Column(name = "MSCRBY", length = 100)
   private String createdBy;
   
+  @Column(name = "MSMDON")
   private Date modifiedOn;
+  
+  @Column(name = "MSMDBY", length = 100)
   private String modifiedBy;
   
   @Column(name = "MSDLST")
