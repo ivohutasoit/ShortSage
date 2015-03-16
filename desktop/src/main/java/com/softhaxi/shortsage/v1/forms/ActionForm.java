@@ -30,6 +30,7 @@ public abstract class ActionForm<T> extends JPanel {
       
       initComponents();
       initState();
+      initData();
     }
     
     protected void initComponents() {
