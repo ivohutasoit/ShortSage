@@ -122,7 +122,7 @@ public class ActionGatewaySetupForm extends JPanel
         JLabel lStatus = new JLabel("Status:");
         cStatus = new JCOmboBox(STATUS_LIST);
         
-        tRemark = new JTextArea();
+        tRemark = new JTextArea(5, 5);
 
         layout.setHorizontalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
