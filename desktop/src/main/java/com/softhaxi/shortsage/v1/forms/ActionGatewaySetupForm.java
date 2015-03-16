@@ -29,6 +29,12 @@ import javax.swing.border.EtchedBorder;
 public class ActionGatewaySetupForm extends JPanel
         implements ActionListener, IPanelDialog {
 
+    private static String[] STATUS_LIST = {
+        "CREATED",
+        "ATTACHED",
+        "DEATTACHED",
+    } 
+
     private ActionState state;
     private Gateway object;
 
@@ -102,14 +108,37 @@ public class ActionGatewaySetupForm extends JPanel
 
         JLabel lPort = new JLabel("Port:");
         tPort = new JTextField();
+        
+        JLabel lRate = new JLabel("Baud Rate:");
+        tRate = new JTextField();
+        
+        JLabel lManufacture = new JLabel("Manufacture:");
+        tManufacture = new JTextField();
+        
+        JLabel lModel = new JLabel("Model:");
+        tModel = new JTextField();
+        
+        JLabel lStatus = new JLabel("Status:");
+        cStatus = new JCOmboBox(STATUS_LIST);
+        
+        tRemark = new JTextArea();
 
         layout.setHorizontalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(lName)
-                        .addComponent(lPort))
+                        .addComponent(lPort)
+                        .addComponent(lRate)
+                        .addComponent(lManufacture)
+                        .addComponent(lModel)
+                        .addComponent(lStatus))
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(tName)
-                        .addComponent(tPort))
+                        .addComponent(tPort)
+                        .addComponent(tRate)
+                        .addComponent(tManufacture)
+                        .addComponent(tModel)
+                        .addComponent(cStatus)
+                        .addComponent(tRemark))
         );
         layout.setVerticalGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -118,6 +147,20 @@ public class ActionGatewaySetupForm extends JPanel
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(lPort)
                         .addComponent(tPort))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lRate)
+                        .addComponent(tRate))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lManufature)
+                        .addComponent(tManufacture))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lModel)
+                        .addComponent(tModel))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lStatus)
+                        .addComponent(cStatus))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(tRemark))
         );
         add(pForm, BorderLayout.CENTER);
     }
