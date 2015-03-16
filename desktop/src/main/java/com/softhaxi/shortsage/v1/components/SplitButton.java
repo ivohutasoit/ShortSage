@@ -44,7 +44,7 @@ public class SplitButton extends JButton implements ActionListener {
         this.bDropDown.setBorderPainted(false);
         this.bMain.setBorderPainted(false);
 
-//        this.setPreferredSize(new Dimension(75, 34));
+        this.setPreferredSize(this.bMain.getPreferredSize());
 //        this.setMaximumSize(new Dimension(75, 34));
 //        this.setMinimumSize(new Dimension(200, 34));
 
