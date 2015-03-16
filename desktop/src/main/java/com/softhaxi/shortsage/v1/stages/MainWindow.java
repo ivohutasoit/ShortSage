@@ -7,6 +7,7 @@ import com.softhaxi.shortsage.v1.pages.DashboardPage;
 import com.softhaxi.shortsage.v1.panels.MainMenuPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +33,13 @@ public class MainWindow extends JFrame {
      */
     public MainWindow() {
         initComponents();
+
+        try {
+            Toolkit kit = Toolkit.getDefaultToolkit();
+            setIconImage(kit.createImage(ClassLoader.getSystemResource("images/ic_logo.png")));
+        } catch (Exception ex) {
+            System.err.printf(ex.getMessage());
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Component Inistialization">                          

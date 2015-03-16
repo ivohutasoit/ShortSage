@@ -36,8 +36,7 @@ public class MainToolbar extends JToolBar {
         bNewMessage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CDialog dialog = new CDialog(new MessageActionForm());
-                dialog.setVisible(true);
+                
             }
         });
         

@@ -2,8 +2,9 @@ package com.softhaxi.shortsage.v1.forms;
 
 import com.softhaxi.shortsage.v1.dto.Gateway;
 import com.softhaxi.shortsage.v1.enums.ActionState;
-import com.softhaxi.shortsage.v1.intfs.IPanelDialog;
+import com.softhaxi.shortsage.v1.pages.GatewaySetupPage;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.GroupLayout;
@@ -27,17 +28,16 @@ import javax.swing.border.EtchedBorder;
  * @version 1.0.0
  */
 public class ActionGatewaySetupForm extends JPanel
-        implements ActionListener, IPanelDialog {
+        implements ActionListener {
 
     private static String[] STATUS_LIST = {
         "CREATED",
         "ATTACHED",
-        "DEATTACHED",
-    } 
+        "DEATTACHED"
+    };
 
     private ActionState state;
     private Gateway object;
-    private JDialog dialog;
 
     private JButton bNew;
     private JButton bEdit;
@@ -49,7 +49,7 @@ public class ActionGatewaySetupForm extends JPanel
     private JTextField tName;
     private JTextField tPort;
     private JTextField tRate;
-    private JTextField tManufacture;
+    private JTextField tManufactur;
     private JTextField tModel;
     private JComboBox<String> cStatus;
     private JComboBox<String> cHandle;
@@ -63,18 +63,18 @@ public class ActionGatewaySetupForm extends JPanel
         this(null, ActionState.SHOW, object);
     }
     
-    public ActionGatewaySetupForm(GatewaySetupPage host) {
+    public ActionGatewaySetupForm(GatewaySetupPage page) {
         this(page, ActionState.CREATE, null);
     }
     
-    public ActionGatewaySetupForm(GatewaySetupPage host, Gateway object) {
+    public ActionGatewaySetupForm(GatewaySetupPage page, Gateway object) {
         this(page, ActionState.SHOW, object);
     }
 
     public ActionGatewaySetupForm(GatewaySetupPage page, ActionState state, Gateway object) {
         this.state = state;
         this.object = object;
-
+        
         initComponents();
         initState();
         initData();
@@ -83,6 +83,7 @@ public class ActionGatewaySetupForm extends JPanel
     private void initComponents() {
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(2, 2, 2, 2));
+        setPreferredSize(new Dimension(400, 300));
 
         JToolBar ftBar = new JToolBar();
         ftBar.setFloatable(false);
@@ -106,6 +107,7 @@ public class ActionGatewaySetupForm extends JPanel
         ftBar.add(bDelete);
 
         bCancel = new JButton("Cancel", new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
+        bCancel.addActionListener(this);
         ftBar.add(bCancel);
 
         add(ftBar, BorderLayout.NORTH);
@@ -125,15 +127,16 @@ public class ActionGatewaySetupForm extends JPanel
         JLabel lRate = new JLabel("Baud Rate:");
         tRate = new JTextField();
         
-        JLabel lManufacture = new JLabel("Manufacture:");
-        tManufacture = new JTextField();
+        JLabel lManufactur = new JLabel("Manufacture:");
+        tManufactur = new JTextField();
         
         JLabel lModel = new JLabel("Model:");
         tModel = new JTextField();
         
         JLabel lStatus = new JLabel("Status:");
-        cStatus = new JCOmboBox(STATUS_LIST);
+        cStatus = new JComboBox(STATUS_LIST);
         
+        JLabel lRemark = new JLabel("Remark:");
         tRemark = new JTextArea(5, 5);
 
         layout.setHorizontalGroup(layout.createSequentialGroup()
@@ -141,14 +144,15 @@ public class ActionGatewaySetupForm extends JPanel
                         .addComponent(lName)
                         .addComponent(lPort)
                         .addComponent(lRate)
-                        .addComponent(lManufacture)
+                        .addComponent(lManufactur)
                         .addComponent(lModel)
-                        .addComponent(lStatus))
+                        .addComponent(lStatus)
+                        .addComponent(lRemark))
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(tName)
                         .addComponent(tPort)
                         .addComponent(tRate)
-                        .addComponent(tManufacture)
+                        .addComponent(tManufactur)
                         .addComponent(tModel)
                         .addComponent(cStatus)
                         .addComponent(tRemark))
@@ -164,8 +168,8 @@ public class ActionGatewaySetupForm extends JPanel
                         .addComponent(lRate)
                         .addComponent(tRate))
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(lManufature)
-                        .addComponent(tManufacture))
+                        .addComponent(lManufactur)
+                        .addComponent(tManufactur))
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(lModel)
                         .addComponent(tModel))
@@ -173,6 +177,7 @@ public class ActionGatewaySetupForm extends JPanel
                         .addComponent(lStatus)
                         .addComponent(cStatus))
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lRemark)
                         .addComponent(tRemark))
         );
         add(pForm, BorderLayout.CENTER);
@@ -192,34 +197,29 @@ public class ActionGatewaySetupForm extends JPanel
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {        
+        JDialog dialog = null;
+        if(getRootPane().getParent() instanceof JDialog) {
+            dialog = (JDialog) getRootPane().getParent();
+        }
         if(e.getSource() instanceof JButton) {
                 JButton bb = (JButton) e.getSource();
                 
                 if(dialog != null) {
                    if(bb == bSave) {
                         if(!save()) {
-                           return;
                         }
-                        continue;   
                    } else if(bb == bSaveNew) {
                         if(!save()) {
-                           return;
                         }
-                        continue;
                    } 
                    
                    dialog.dispose();
-                   dialog.close();
+                   dialog.setVisible(false);
                 } 
         }
     }
-
-    @Override
-    public void setDialogHost(JDialog host) {
-        this.dialog = host;
-    }
-
+    
     private boolean save() {
         if(state == ActionState.CREATE) {
            return true;

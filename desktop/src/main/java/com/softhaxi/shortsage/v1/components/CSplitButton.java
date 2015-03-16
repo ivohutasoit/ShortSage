@@ -16,25 +16,25 @@ import javax.swing.plaf.basic.BasicArrowButton;
  *
  * @author Hutasoit
  */
-public class SplitButton extends JButton implements ActionListener {
+public class CSplitButton extends JButton implements ActionListener {
 
     private JButton bMain;
     private JButton bDropDown;
     private JPopupMenu mPopup;
 
-    public SplitButton() {
+    public CSplitButton() {
         this("");
     }
 
-    public SplitButton(String text) {
+    public CSplitButton(String text) {
         this(new JButton(text), SwingConstants.SOUTH);
     }
 
-    public SplitButton(String text, Icon icon) {
+    public CSplitButton(String text, Icon icon) {
         this(new JButton(text, icon), SwingConstants.SOUTH);
     }
 
-    public SplitButton(JButton button, int direction) {
+    public CSplitButton(JButton button, int direction) {
         this.bMain = button;
 
         this.bDropDown = new BasicArrowButton(direction);
