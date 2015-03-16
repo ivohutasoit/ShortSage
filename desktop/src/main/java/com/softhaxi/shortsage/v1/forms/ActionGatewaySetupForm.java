@@ -56,10 +56,22 @@ public class ActionGatewaySetupForm extends JPanel
     private JTextArea tRemark;
 
     public ActionGatewaySetupForm() {
-        this(ActionState.CREATE, null);
+        this(null, ActionState.CREATE, null);
+    }
+    
+    public ActionGatewaySetupForm(Gateway object) {
+        this(null, ActionState.SHOW, object);
+    }
+    
+    public ActionGatewaySetupForm(GatewaySetupPage host) {
+        this(page, ActionState.CREATE, null);
+    }
+    
+    public ActionGatewaySetupForm(GatewaySetupPage host, Gateway object) {
+        this(page, ActionState.SHOW, object);
     }
 
-    public ActionGatewaySetupForm(ActionState state, Gateway object) {
+    public ActionGatewaySetupForm(GatewaySetupPage page, ActionState state, Gateway object) {
         this.state = state;
         this.object = object;
 
