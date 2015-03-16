@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.util;
 
-import com.softhaxi.shortsage.v1.dto.Gateway;
+import com.softhaxi.shortsage.v1.dto.*;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.SessionFactory;
 
@@ -24,6 +24,7 @@ public class HibernateUtil {
             AnnotationConfiguration conf = new AnnotationConfiguration()
                     .addPackage("com.softhaxi.shortsage.v1.dto")
                     .addAnnotatedClass(Gateway.class)
+                    .addAnnotatedClass(Message.class)
                     //.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
                     .setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect")
                     //.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
