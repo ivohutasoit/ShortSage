@@ -1,5 +1,6 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.components.CActionForm;
 import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.toedter.calendar.JCalendar;
@@ -7,7 +8,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class MessageActionForm extends ActionForm<Message> {
+public class MessageActionForm extends CActionForm<Message> {
     
     private JTextField tContact;
     private JCalendar cDate;

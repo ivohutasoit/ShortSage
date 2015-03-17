@@ -5,7 +5,7 @@ import com.softhaxi.shortsage.v1.components.CNumberedTable;
 import com.softhaxi.shortsage.v1.components.CSearchField;
 import com.softhaxi.shortsage.v1.components.CZebraTable;
 import com.softhaxi.shortsage.v1.dto.Gateway;
-import com.softhaxi.shortsage.v1.forms.ActionGatewaySetupForm;
+import com.softhaxi.shortsage.v1.forms.GatewayActionForm;
 import com.softhaxi.shortsage.v1.table.model.GatewayTableModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -113,7 +112,7 @@ public class GatewaySetupPage extends JPanel
             JButton source = (JButton) e.getSource();
 
             if (source == bNew) {
-                ActionGatewaySetupForm form = new ActionGatewaySetupForm();
+                final GatewayActionForm form = new GatewayActionForm();
                 CDialog dialog = new CDialog(null, form, "Create Gateway", true);
                 try {
                     Toolkit kit = Toolkit.getDefaultToolkit();

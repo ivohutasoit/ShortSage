@@ -1,5 +1,6 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.components.CActionForm;
 import com.softhaxi.shortsage.v1.components.CZebraTable;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.model.ContactGroup;
@@ -9,7 +10,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
-public class ContactGroupActionForm extends ActionForm<ContactGroup> {
+public class ContactGroupActionForm extends CActionForm<ContactGroup> {
     private JPanel pHeader;
     private JTextField tNumber;
     private JTextField tName;

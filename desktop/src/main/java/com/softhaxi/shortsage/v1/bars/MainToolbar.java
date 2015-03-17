@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.bars;
 
-import com.softhaxi.shortsage.v1.GlobalConstant;
+import com.softhaxi.shortsage.v1.global.Constant;
 import com.softhaxi.shortsage.v1.stages.MainWindow;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,7 +66,7 @@ public class MainToolbar extends JToolBar {
                 gateway.setInbound(true);
                 gateway.setOutbound(true);
 
-                GlobalConstant.getInstance().addGateway("modem.com1", gateway);
+                Constant.getInstance().addGateway("modem.com1", gateway);
                 if (Service.getInstance().getServiceStatus() == ServiceStatus.STARTED) {
                     bModem.setText("Disconnect");
                 }

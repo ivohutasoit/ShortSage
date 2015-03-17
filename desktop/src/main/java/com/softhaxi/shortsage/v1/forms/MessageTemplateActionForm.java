@@ -1,12 +1,13 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.components.CActionForm;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.model.MessageTemplate;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class MessageTemplateActionForm extends ActionForm<MessageTemplate> {
+public class MessageTemplateActionForm extends CActionForm<MessageTemplate> {
 
     private JTextField tID;
     private JTextField tName;
