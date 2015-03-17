@@ -11,10 +11,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 public abstract class ActionForm<T> extends JPanel {
-    
+
     protected ActionState state;
     protected T object;
-    
+
     protected JToolBar tBar;
     protected JButton bNew;
     protected JButton bEdit;
@@ -23,35 +23,35 @@ public abstract class ActionForm<T> extends JPanel {
     protected JButton bSaveNew;
     protected JButton bCancel;
     protected JButton bRefresh;
-    
+
     protected ActionForm() {
-      this(ActionState.CREATE, null);
+        this(ActionState.CREATE, null);
     }
 
     protected ActionForm(T object) {
-      this(ActionState.SHOW, object);
+        this(ActionState.SHOW, object);
     }
-    
+
     protected ActionForm(ActionState state, T object) {
-      this.state = state;
-      this.object = object;
-      
-      initComponents();
-      initState();
-      initData();
+        this.state = state;
+        this.object = object;
+
+        initComponents();
+        initState();
+        initData();
     }
-    
+
     /**
-     * 
+     *
      */
-    protected void initComponents() {
+    public void initComponents() {
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(2, 2, 2, 2));
-        
+
         tBar = new JToolBar();
         tBar.setFloatable(false);
         tBar.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
-        
+
         bNew = new JButton("New", new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
         tBar.add(bNew);
 
@@ -70,22 +70,33 @@ public abstract class ActionForm<T> extends JPanel {
 
         bCancel = new JButton("Cancel", new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
         tBar.add(bCancel);
-        
+
         add(tBar, BorderLayout.NORTH);
     }
-    
+
     /**
-     * 
+     *
      */
-    protected void initState() {
-      if(page == null) {
-        if (state == ActionState.CREATE || state == ActionState.EDIT) {
-            bNew.setVisible(false);
-            bEdit.setVisible(false);
-            bDelete.setVisible(false);
-        }
-      }
+    public void initState() {
+        //JPanel page = null;
+        
+        System.out.println(getRootPane().getParent().toString());
+        System.out.println(getParent().toString());
+        
+        //if(getParent() instanceof JPanel) 
+            //page = (JPanel) getParent();
+        
+        //if (page == null) {
+            if (state == ActionState.CREATE || state == ActionState.EDIT) {
+                bNew.setVisible(false);
+                bEdit.setVisible(false);
+                bDelete.setVisible(false);
+            }
+        //}
     }
-    
-    protected abstract void initData();
+
+    /**
+     * Load data to panel
+     */
+    public abstract void initData();
 }
