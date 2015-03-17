@@ -87,5 +87,5 @@ public abstract class ActionForm<T> extends JPanel {
       }
     }
     
-    public abstract void initData();
+    protected abstract void initData();
 }
