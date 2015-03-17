@@ -12,7 +12,6 @@ import javax.swing.border.EtchedBorder;
 
 public abstract class ActionForm<T> extends JPanel {
     
-    protected JPanel page;
     protected ActionState state;
     protected T object;
     
@@ -26,15 +25,14 @@ public abstract class ActionForm<T> extends JPanel {
     protected JButton bRefresh;
     
     protected ActionForm() {
-      this(null, ActionState.CREATE, null);
+      this(ActionState.CREATE, null);
     }
 
-    protected ActionForm(JPanel page, T object) {
-      this(page, ActionState.SHOW, object);
+    protected ActionForm(T object) {
+      this(ActionState.SHOW, object);
     }
     
-    protected ActionForm(JPanel page, ActionState state, T object) {
-      this.page = page;
+    protected ActionForm(ActionState state, T object) {
       this.state = state;
       this.object = object;
       
