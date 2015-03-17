@@ -1,10 +1,12 @@
 package com.softhaxi.shortsage.v1.components;
 
+import javax.swing.JPanel;
+
 public abstract class CPanel extends JPanel {
-    protected CPanel() {
+    public CPanel() {
       
     }
     
-    protected abstract void initComponents();
-    protected abstract void initData();
+    public abstract void initComponents();
+    public abstract void initData();
 }

@@ -1,11 +1,16 @@
 package com.softhaxi.shortsage.v1.forms;
 
 import com.softhaxi.shortsage.v1.dto.Message;
+import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.toedter.calendar.JCalendar;
+import javax.swing.JComboBox;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class MessageActionForm extends ActionForm<Message> {
     
     private JTextField tContact;
-    private JCalendarComboBox cDate;
+    private JCalendar cDate;
     private JTextArea tText;
     private JComboBox cStatus;
     private JComboBox cHandle;
@@ -18,25 +23,22 @@ public class MessageActionForm extends ActionForm<Message> {
         super(object);
     }
     
-    public MessageActionForm(ActionState state, Message object) {
-        super(state, object)
+    public MessageActionForm(ActionState state, Message message) {
+        super(state, message);
     }
     
     @Override
-    private void initComponents() {
-        
+    public void initComponents() {
+      super.initComponents();
     }
     
     @Override
-    private void initState() {
-        
+    public void initState() {
+      super.initState();
     }
     
     @Override
-    private void initData() {
-        if(object != null) {
-            
-        }
+    public void initData() {
     }
   
 }

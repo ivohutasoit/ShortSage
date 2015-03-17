@@ -1,5 +1,14 @@
 package com.softhaxi.shortsafge.v1.forms;
 
+import com.softhaxi.shortsage.v1.components.CZebraTable;
+import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.forms.ActionForm;
+import com.softhaxi.shortsage.v1.model.ContactPerson;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 public class ContactPersonActionForm extends ActionForm<ContactPerson> {
     private JPanel pHeader;
     private JTextField tID;
@@ -25,17 +34,17 @@ public class ContactPersonActionForm extends ActionForm<ContactPerson> {
     }
     
     @Override
-    private void initComponents() {
+    public void initComponents() {
       super.initComponents();
     }
     
     @Override
-    private void initState() {
+    public void initState() {
       super.initState();
     }
     
     @Override
-    private void initData() {
+    public void initData() {
     }
     
 }
