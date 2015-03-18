@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.table.model;
 
-import com.softhaxi.shortsage.v1.model.Message;
+import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.table.RowTableModel;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;

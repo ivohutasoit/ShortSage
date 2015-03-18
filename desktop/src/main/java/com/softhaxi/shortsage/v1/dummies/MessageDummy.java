@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.dummies;
 
-import com.softhaxi.shortsage.v1.model.Message;
+import com.softhaxi.shortsage.v1.dto.Message;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

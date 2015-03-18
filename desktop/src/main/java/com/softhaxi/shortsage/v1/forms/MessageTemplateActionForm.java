@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.components.CActionForm;
+import com.softhaxi.shortsage.v1.component.CActionForm;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.model.MessageTemplate;
 import javax.swing.JComboBox;

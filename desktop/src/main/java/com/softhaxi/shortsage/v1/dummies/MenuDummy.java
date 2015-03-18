@@ -21,7 +21,7 @@ public class MenuDummy {
         dashboard.setKey("G0001");
         dashboard.setTitle("G0001");
         dashboard.setName("Dashboard");
-        dashboard.setProgram("com.softhaxi.shortsage.v1.pages.DashboardPage");
+        dashboard.setProgram("com.softhaxi.shortsage.v1.page.DashboardPage");
         dashboard.setIcon("images/ic_dashboard.png");
         dashboard.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(dashboard));
@@ -30,7 +30,7 @@ public class MenuDummy {
         importData.setKey("G0002");
         importData.setTitle("G0002");
         importData.setName("Import Data");
-        importData.setProgram("com.softhaxi.shortsage.v1.pages.ImportDataPage");
+        importData.setProgram("com.softhaxi.shortsage.v1.page.ImportDataPage");
         importData.setIcon("images/ic_download.png");
         importData.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(importData));
@@ -64,7 +64,7 @@ public class MenuDummy {
         inbox.setKey("M0001");
         inbox.setTitle("M0001");
         inbox.setName("Inbox Folder");
-        inbox.setProgram("com.softhaxi.shortsage.v1.pages.InboxPage");
+        inbox.setProgram("com.softhaxi.shortsage.v1.page.InboxPage");
         inbox.setIcon("images/ic_inbox.png");
         inbox.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(inbox));
@@ -73,7 +73,7 @@ public class MenuDummy {
         outbox.setKey("M0002");
         outbox.setTitle("M0002");
         outbox.setName("Outbox Folder");
-        outbox.setProgram("com.softhaxi.shortsage.v1.pages.OutboxPage");
+        outbox.setProgram("com.softhaxi.shortsage.v1.page.OutboxPage");
         outbox.setIcon("images/ic_outbox.png");
         outbox.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(outbox));
@@ -83,7 +83,7 @@ public class MenuDummy {
         group.setKey("M0101");
         group.setTitle("M0101");
         group.setName("Contact Group");
-        group.setProgram("com.softhaxi.shortsage.v1.pages.ContactGroupPage");
+        group.setProgram("com.softhaxi.shortsage.v1.page.ContactGroupPage");
         group.setIcon("images/ic_group.png");
         group.setKeyShow(true);
         setupMenu.add(new DefaultMutableTreeNode(group));
@@ -92,7 +92,7 @@ public class MenuDummy {
         person.setKey("M0102");
         person.setTitle("M0102");
         person.setName("Contact Person");
-        person.setProgram("com.softhaxi.shortsage.v1.pages.ContactPersonPage");
+        person.setProgram("com.softhaxi.shortsage.v1.page.ContactPersonPage");
         person.setIcon("images/ic_contact.png");
         person.setKeyShow(true);
         setupMenu.add(new DefaultMutableTreeNode(person));
@@ -101,7 +101,7 @@ public class MenuDummy {
         template.setKey("M0103");
         template.setTitle("M0103");
         template.setName("Message Template");
-        template.setProgram("com.softhaxi.shortsage.v1.pages.MessageTemplatePage");
+        template.setProgram("com.softhaxi.shortsage.v1.page.MessageTemplatePage");
         template.setIcon("images/ic_template.png");
         template.setKeyShow(true);
         setupMenu.add(new DefaultMutableTreeNode(template));
@@ -110,7 +110,7 @@ public class MenuDummy {
         bulk.setKey("M0104");
         bulk.setTitle("M0104");
         bulk.setName("Bulk Message");
-        bulk.setProgram("com.softhaxi.shortsage.v1.pages.BulkMessagePage");
+        bulk.setProgram("com.softhaxi.shortsage.v1.page.BulkMessagePage");
         bulk.setIcon("images/ic_bulk.png");
         bulk.setKeyShow(true);
         setupMenu.add(new DefaultMutableTreeNode(bulk));
@@ -151,20 +151,20 @@ public class MenuDummy {
         // Setups
         // General Setup, Miscellanneous Setup, Customs Autonumber, Signature Maintanance
         DefaultMutableTreeNode setup = new DefaultMutableTreeNode("Setup");
-        SystemMenu modem = new SystemMenu();
-        modem.setKey("S1001");
-        modem.setTitle("S1001");
-        modem.setName("Menu Setup");
-        modem.setProgram("com.softhaxi.shortsage.v1.pages.MenuSetupPage");
-        modem.setIcon("images/ic_clip.png");
-        modem.setKeyShow(true);
-        setup.add(new DefaultMutableTreeNode(modem));
+        SystemMenu menu = new SystemMenu();
+        menu.setKey("S1001");
+        menu.setTitle("S1001");
+        menu.setName("Menu Setup");
+        menu.setProgram("com.softhaxi.shortsage.v1.page.MenuSetupPage");
+        menu.setIcon("images/ic_clip.png");
+        menu.setKeyShow(true);
+        setup.add(new DefaultMutableTreeNode(menu));
         
         SystemMenu modem = new SystemMenu();
         modem.setKey("S1002");
         modem.setTitle("S1002");
         modem.setName("Gateway Setup");
-        modem.setProgram("com.softhaxi.shortsage.v1.pages.GatewaySetupPage");
+        modem.setProgram("com.softhaxi.shortsage.v1.page.GatewaySetupPage");
         modem.setIcon("images/ic_clip.png");
         modem.setKeyShow(true);
         setup.add(new DefaultMutableTreeNode(modem));
@@ -172,7 +172,7 @@ public class MenuDummy {
         // Extensions
         
         setting.add(mainMenu);
-        setting.add(setupMenu);
+        setting.add(setup);
         
         return setting;
     }

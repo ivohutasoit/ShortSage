@@ -3,7 +3,7 @@ package com.softhaxi.shortsage.v1.stages;
 import com.softhaxi.shortsage.v1.bars.MainMenubar;
 import com.softhaxi.shortsage.v1.bars.MainStatusbar;
 import com.softhaxi.shortsage.v1.bars.MainToolbar;
-import com.softhaxi.shortsage.v1.pages.DashboardPage;
+import com.softhaxi.shortsage.v1.page.DashboardPage;
 import com.softhaxi.shortsage.v1.panels.MainMenuPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
