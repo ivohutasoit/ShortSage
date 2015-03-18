@@ -113,7 +113,7 @@ public class ContactPersonActionForm extends CActionForm<ContactPerson> {
                 .addGroup(lH2.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(cStatus)
                         .addComponent(cHandler)
-                        .addComponent(tRemark))
+                        .addComponent(tRemark, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         lH2.setVerticalGroup(lH2.createSequentialGroup()
                 .addGroup(lH2.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -124,7 +124,7 @@ public class ContactPersonActionForm extends CActionForm<ContactPerson> {
                         .addComponent(cHandler))
                 .addGroup(lH2.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(lRemark)
-                        .addComponent(tRemark))
+                        .addComponent(tRemark, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pHeader.add(pH1);
