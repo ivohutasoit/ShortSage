@@ -150,15 +150,24 @@ public class MenuDummy {
         
         // Setups
         // General Setup, Miscellanneous Setup, Customs Autonumber, Signature Maintanance
-        DefaultMutableTreeNode setupMenu = new DefaultMutableTreeNode("Setup Menu");
+        DefaultMutableTreeNode setup = new DefaultMutableTreeNode("Setup");
         SystemMenu modem = new SystemMenu();
         modem.setKey("S1001");
         modem.setTitle("S1001");
+        modem.setName("Menu Setup");
+        modem.setProgram("com.softhaxi.shortsage.v1.pages.MenuSetupPage");
+        modem.setIcon("images/ic_clip.png");
+        modem.setKeyShow(true);
+        setup.add(new DefaultMutableTreeNode(modem));
+        
+        SystemMenu modem = new SystemMenu();
+        modem.setKey("S1002");
+        modem.setTitle("S1002");
         modem.setName("Gateway Setup");
         modem.setProgram("com.softhaxi.shortsage.v1.pages.GatewaySetupPage");
         modem.setIcon("images/ic_clip.png");
         modem.setKeyShow(true);
-        setupMenu.add(new DefaultMutableTreeNode(modem));
+        setup.add(new DefaultMutableTreeNode(modem));
         
         // Extensions
         
