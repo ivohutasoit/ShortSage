@@ -38,7 +38,13 @@ public class ContactPersonActionForm extends CActionForm<ContactPerson> {
     private JTextArea tRemark;
 
     private JPanel pDetail;
-    private CZebraTable zNumber;
+    private JToolbar tdBar;
+    private JButton bdNew;
+    private JButton bdImport;
+    private JButton bdExport;
+    private JButton bdDelete;
+    private CSplitButton sdMore;
+    private CZebraTable ztNumbers;
 
     public ContactPersonActionForm() {
         super();
@@ -130,7 +136,37 @@ public class ContactPersonActionForm extends CActionForm<ContactPerson> {
         pHeader.add(pH1);
         pHeader.add(pH2);
         pForm.add(pHeader);
-
+        
+        pDetail = nee JPanel(new BorderLayout());
+        tdBar = new JToolBar();
+        tdBar.setFloatable(false);
+        
+        bdNew = new JButton("New Number");
+        tdBar.add(bdNew);
+        
+        bdImport = new JButton("Import Numbers");
+        tdBar.add(bdImport);
+        
+        bdExport = new JButton("Export Numbers");
+        tdBar.add(bdExport);
+        
+        dbDelete = new JButton("Delete Number");
+        tdBar.add(bdDetele); 
+        
+        ztNumbers = new CZebraTable();
+        ztNumbers.setShowGrid(false);
+        ztNumbers.setIntercellSpacing(new Dimension(0, 0));
+        
+        CNumberedTable rowTable = new CNumberedTable(ztNumbers);
+        JScrollPane scrollPane = new JScrollPane(ztNumbers);
+        scrollPane.setRowHeaderView(ztNumbers);
+        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
+        rowTable.getTableHeader());
+        
+        pDetail.add(tdBar, BorderLayout.NORTH);
+        pDetail.add(scrollPane, BorderLayout.CENTER);
+        pForm.add(pDetail);
+        
         add(pForm, BorderLayout.CENTER);
     }
 
