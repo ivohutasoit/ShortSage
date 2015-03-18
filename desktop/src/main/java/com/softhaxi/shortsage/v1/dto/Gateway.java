@@ -19,7 +19,7 @@ import org.hibernate.annotations.GenericGenerator;
  * @version 1.0.0
  */
 @Entity
-@Table(name = "M0MDGT")
+@Table(name = "S0MDGT")
 public class Gateway implements Serializable {
     @Id
     @GeneratedValue(generator="system-uuid")
