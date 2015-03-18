@@ -26,15 +26,18 @@ public class HibernateUtil {
                     .addAnnotatedClass(Gateway.class)
                     .addAnnotatedClass(Message.class)
                     //.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
-                    .setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect")
+                    //.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect")
+                    .setProperty("hibernate.dialect", "org.hibernate.dialect.DerbyDialect")
                     //.setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
-                    .setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbcDriver")
+                    //.setProperty("hibernate.connection.driver_class", "org.hsqldb.jdbcDriver")
+                    .setProperty("hibernate.connection.driver_class", "org.apache.derby.jdbc.ClientDriver")
                     //.setProperty("hibernate.connection.url", "jdbc:mysql://localhost:3306/isftdb?zeroDateTimeBehavior=convertToNull")
-                    .setProperty("hibernate.connection.url", "jdbc:hsqldb:mem:shsg01")
+                    //.setProperty("hibernate.connection.url", "jdbc:hsqldb:mem:shsg01")
+                    .setProperty("hibernate.connection.url", "jdbc:derby://localhost:1527/shsg01;create=true")
                     .setProperty("hibernate.connection.username", "admin")
                     .setProperty("hibernate.connection.password", "admin")
                     .setProperty("hibernate.show_sql", "true")
-                    .setProperty("hbm2ddl.auto", "create-drop");
+                    .setProperty("hibernate.hbm2ddl.auto", "create-drop");
             sessionFactory = conf.buildSessionFactory();
         } catch (Throwable ex) {
             // Log the exception. 
