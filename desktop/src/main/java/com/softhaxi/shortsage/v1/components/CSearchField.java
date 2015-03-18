@@ -26,11 +26,17 @@ public abstract class CSearchField extends JPanel
     
     private JButton btnSearch;
     private JTextField txtSearch;
+    private boolean showLabel;
     
     /**
      * Constructor
      */
     public CSearchField() {
+        this(true);
+    }
+    
+    public CSearchField(boolean showLabel) {
+        this.showLabel = showLabel;
         initComponents();
     }
     
@@ -39,7 +45,8 @@ public abstract class CSearchField extends JPanel
      */
     private void initComponents() {
         setLayout(new BorderLayout(5, 0));
-        add(new JLabel("Search :"), BorderLayout.WEST);
+        if(showLabel) 
+                add(new JLabel("Search :"), BorderLayout.WEST);
         
         JPanel pField = new JPanel(new BorderLayout());
         pField.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(1, 4, 1, 4)));
