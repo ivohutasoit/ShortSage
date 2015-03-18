@@ -118,6 +118,14 @@ public abstract class CActionForm<T> extends JPanel {
             bCancel.setVisible(false);
         }
     }
+    
+    public void setObject(T object) {
+        this.object = object
+    }
+    
+    public T getObject() {
+        return this.object;
+    }
 
     /**
      * Load data to panel
