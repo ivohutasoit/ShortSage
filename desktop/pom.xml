@@ -62,9 +62,9 @@
         
         <!-- Component Extension -->
         <dependency>
-        	<groupId>com.toedter</groupId>
-        	<artifactId>jcalendar</artifactId>
-        	<version>1.4</version>
+            <groupId>com.toedter</groupId>
+            <artifactId>jcalendar</artifactId>
+            <version>1.4</version>
         </dependency>
         
         <!-- Database Drivers -->
@@ -74,9 +74,9 @@
             <version>5.1.32</version>
         </dependency>
         <dependency>
-        	<groupId>org.apache.derby</groupId>
-        	<artifactId>derby</artifactId>
-        	<version>10.11.1.1</version>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.11.1.1</version>
         </dependency>
         <dependency> 
             <groupId>hsqldb</groupId> 

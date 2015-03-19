@@ -7,6 +7,7 @@ import com.softhaxi.shortsage.v1.component.CZebraTable;
 import com.softhaxi.shortsage.v1.dto.Gateway;
 import com.softhaxi.shortsage.v1.forms.GatewayActionForm;
 import com.softhaxi.shortsage.v1.table.model.GatewayTableModel;
+import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -26,6 +27,8 @@ import javax.swing.JToolBar;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import org.hibernate.Query;
+import org.hibernate.Session;
 
 /**
  *
@@ -48,7 +51,6 @@ public class GatewaySetupPage extends JPanel
      */
     public GatewaySetupPage() {
         initComponents();
-        initTable();
     }
 
     private void initComponents() {
@@ -91,7 +93,9 @@ public class GatewaySetupPage extends JPanel
     }
 
     private void initTable() {
-        CZebraTable table = new CZebraTable(new GatewayTableModel(new ArrayList<Gateway>()));
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Query q = session.createQuery("from " + Gateway.class.getName());
+        CZebraTable table = new CZebraTable(new GatewayTableModel(q.list()));
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
 
@@ -104,6 +108,7 @@ public class GatewaySetupPage extends JPanel
 
         //Add the scroll pane to this panel.
         pDetail.add(scrollPane, BorderLayout.CENTER);
+        session.close();
     }
 
     @Override
@@ -125,11 +130,13 @@ public class GatewaySetupPage extends JPanel
                     @Override
                     public void windowClosing(WindowEvent e) {
                         System.out.println("Hello moto!");
+                        initTable();
                     }
 
                     @Override
                     public void windowClosed(WindowEvent e) {
                         System.out.println("Hello moto!");
+                        initTable();
                     }
                 });
                 dialog.setVisible(true);

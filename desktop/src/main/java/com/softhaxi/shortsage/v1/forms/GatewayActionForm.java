@@ -3,10 +3,12 @@ package com.softhaxi.shortsage.v1.forms;
 import com.softhaxi.shortsage.v1.component.CActionForm;
 import com.softhaxi.shortsage.v1.dto.Gateway;
 import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -15,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import org.hibernate.Session;
 
 public class GatewayActionForm extends CActionForm<Gateway>
         implements ActionListener {
@@ -168,14 +171,31 @@ public class GatewayActionForm extends CActionForm<Gateway>
                 JButton bb = (JButton) e.getSource();
                 
                 if(dialog != null) {
-                   if(bb == bSave) {
-                   } else if(bb == bSaveNew) {
-                        
+                   if(bb == bSave || bb == bSaveNew) {
+                        save();
                    } 
                    
                    dialog.dispose();
                    dialog.setVisible(false);
                 } 
         }
+    }
+    
+    private void save() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        
+        session.beginTransaction();
+        Gateway gateway = new Gateway();
+        gateway.setName(tName.getText().trim());
+        gateway.setPort(tPort.getText().trim());
+        gateway.setBaudRate(Integer.parseInt(tRate.getText().trim()));
+        gateway.setStatus(1);
+        gateway.setManufacture(tManufactur.getText().trim());
+        gateway.setModel(tModel.getText().trim());
+        gateway.setCreatedBy("SYSTEM");
+        gateway.setCreatedOn(new Date());
+        session.save(gateway);
+        session.getTransaction().commit();
+        session.close();
     }
 }
