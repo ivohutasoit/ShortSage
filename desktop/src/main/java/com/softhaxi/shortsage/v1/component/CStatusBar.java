@@ -21,6 +21,7 @@ public class CStatusBar extends JToolBar {
         resLocal.load(fis);
         fis.close()
       }
+      initComponents();
     }
     
     private void initComponents() {
