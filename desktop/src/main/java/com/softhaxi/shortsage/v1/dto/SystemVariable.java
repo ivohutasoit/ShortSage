@@ -1,23 +1,28 @@
 package com.softhaxi.shortsage.v1.dto;
 
+@Entity
+@Table(name = "S0VARL")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="VAVATY",discriminatorType=DiscriminatorType.STRING)  
+@DiscriminatorValue("VARL")
 public class SystemVariable implements Serializable {
-  private String id;
+  protected String id;
   
-  private String name;
+  protected String name;
   
-  private String value;
+  protected String value;
   
-  private String param;
+  protected String param;
   
-  private int status;
+  protected int status;
   
-  private String createdBy;
+  protected String createdBy;
   
-  private Date createdOn;
+  protected Date createdOn;
   
-  private String modifiedBy;
+  protected String modifiedBy;
   
-  private String modifiedOn;
+  protected String modifiedOn;
   
-  private int deletionState;
+  protected int deletionState;
 }
