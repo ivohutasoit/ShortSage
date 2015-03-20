@@ -34,12 +34,16 @@ public class GatewayActionForm extends CActionForm<Gateway>
         "DEATTACH",
         "DELETE"
     };
+    
+    private static Integer[] BAUD_RATES = {
+        115200
+    };
 
     private JPanel pDetail;
     private JTextField tName;
     private JTextField tPort;
-    private JTextField tRate;
-    private JTextField tManufactur;
+    private JComboBox<Integer> cRate;
+    private JTextField tManufacture;
     private JTextField tModel;
     private JComboBox<String> cStatus;
     private JComboBox<String> cHandler;
@@ -79,10 +83,10 @@ public class GatewayActionForm extends CActionForm<Gateway>
         tPort = new JTextField();
 
         JLabel lRate = new JLabel("Baud Rate:");
-        tRate = new JTextField();
+        cRate = new JComboBox<>(BAUD_RATES);
 
-        JLabel lManufactur = new JLabel("Manufacture:");
-        tManufactur = new JTextField();
+        JLabel lManufacture = new JLabel("Manufacture:");
+        tManufacture = new JTextField();
 
         JLabel lModel = new JLabel("Model:");
         tModel = new JTextField();
@@ -101,7 +105,7 @@ public class GatewayActionForm extends CActionForm<Gateway>
                         .addComponent(lName)
                         .addComponent(lPort)
                         .addComponent(lRate)
-                        .addComponent(lManufactur)
+                        .addComponent(lManufacture)
                         .addComponent(lModel)
                         .addComponent(lStatus)
                         .addComponent(lHandler)
@@ -109,8 +113,8 @@ public class GatewayActionForm extends CActionForm<Gateway>
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(tName)
                         .addComponent(tPort)
-                        .addComponent(tRate)
-                        .addComponent(tManufactur)
+                        .addComponent(cRate)
+                        .addComponent(tManufacture)
                         .addComponent(tModel)
                         .addComponent(cStatus)
                         .addComponent(cHandler)
@@ -125,10 +129,10 @@ public class GatewayActionForm extends CActionForm<Gateway>
                         .addComponent(tPort))
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(lRate)
-                        .addComponent(tRate))
+                        .addComponent(cRate))
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(lManufactur)
-                        .addComponent(tManufactur))
+                        .addComponent(lManufacture)
+                        .addComponent(tManufacture))
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(lModel)
                         .addComponent(tModel))
@@ -188,9 +192,9 @@ public class GatewayActionForm extends CActionForm<Gateway>
         Gateway gateway = new Gateway();
         gateway.setName(tName.getText().trim());
         gateway.setPort(tPort.getText().trim());
-        gateway.setBaudRate(Integer.parseInt(tRate.getText().trim()));
+        gateway.setBaudRate(Integer.parseInt(cRate.getSelectedItem().toString().trim()));
         gateway.setStatus(1);
-        gateway.setManufacture(tManufactur.getText().trim());
+        gateway.setManufacture(tManufacture.getText().trim());
         gateway.setModel(tModel.getText().trim());
         gateway.setCreatedBy("SYSTEM");
         gateway.setCreatedOn(new Date());

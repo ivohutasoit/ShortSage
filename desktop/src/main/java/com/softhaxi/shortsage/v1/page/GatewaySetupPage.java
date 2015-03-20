@@ -51,6 +51,7 @@ public class GatewaySetupPage extends JPanel
      */
     public GatewaySetupPage() {
         initComponents();
+        initTable();
     }
 
     private void initComponents() {
