@@ -14,6 +14,7 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JToolBar;
+import javax.swing.border.EmptyBorder;
 
 public class CStatusBar extends JToolBar {
 
@@ -30,7 +31,7 @@ public class CStatusBar extends JToolBar {
      * 
      */
     public CStatusBar() {
-        this("");
+        this(null);
     }
 
     /**
@@ -38,7 +39,7 @@ public class CStatusBar extends JToolBar {
      * @param filename 
      */
     public CStatusBar(String filename) {
-        if (!filename.equals("") || filename != null) {
+        if (filename != null) {
             FileInputStream fis = null;
             try {
                 fis = new FileInputStream(filename);
@@ -64,6 +65,7 @@ public class CStatusBar extends JToolBar {
      */
     private void initComponents() {
         setPreferredSize(new Dimension(getWidth(), 23));
+        setBorder(new EmptyBorder(1, 5, 1, 5));
         setFloatable(false);
 
         lProgress = new JLabel(resGlobal.getString("label.ready"));
