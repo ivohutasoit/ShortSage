@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1;
 
-import com.softhaxi.shortsage.v1.stages.MainWindow;
+import com.softhaxi.shortsage.v1.stage.MainWindow;
 import com.softhaxi.shortsage.v1.util.Verificator;
 
 /**

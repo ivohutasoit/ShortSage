@@ -2,7 +2,7 @@ package com.softhaxi.shortsage.v1.panels;
 
 import com.softhaxi.shortsage.v1.dummies.MenuDummy;
 import com.softhaxi.shortsage.v1.entities.SystemMenu;
-import com.softhaxi.shortsage.v1.stages.MainWindow;
+import com.softhaxi.shortsage.v1.stage.MainWindow;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

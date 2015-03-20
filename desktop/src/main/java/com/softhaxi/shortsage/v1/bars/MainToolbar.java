@@ -1,7 +1,7 @@
 package com.softhaxi.shortsage.v1.bars;
 
 import com.softhaxi.shortsage.v1.global.Constant;
-import com.softhaxi.shortsage.v1.stages.MainWindow;
+import com.softhaxi.shortsage.v1.stage.MainWindow;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
