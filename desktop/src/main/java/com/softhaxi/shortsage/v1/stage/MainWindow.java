@@ -3,6 +3,7 @@ package com.softhaxi.shortsage.v1.stage;
 import com.softhaxi.shortsage.v1.bars.MainMenubar;
 import com.softhaxi.shortsage.v1.bars.MainStatusbar;
 import com.softhaxi.shortsage.v1.bars.MainToolbar;
+import com.softhaxi.shortsage.v1.component.CStatusBar;
 import com.softhaxi.shortsage.v1.page.DashboardPage;
 import com.softhaxi.shortsage.v1.panels.MainMenuPanel;
 import java.awt.BorderLayout;
@@ -26,6 +27,7 @@ public class MainWindow extends JFrame {
     ResourceBundle global = ResourceBundle.getBundle("global");
 
     private MainMenubar menus;
+    private CStatusBar pStatus;
     private JPanel cPanel;
 
     /**
@@ -52,8 +54,11 @@ public class MainWindow extends JFrame {
         menus = new MainMenubar();
 //        setJMenuBar(menus);
 
+        
         add(new MainToolbar(this), BorderLayout.NORTH);
-        add(new MainStatusbar(), BorderLayout.SOUTH);
+        
+        pStatus = new CStatusBar();
+        add(pStatus, BorderLayout.SOUTH);
         add(new MainMenuPanel(this), BorderLayout.WEST);
 
         cPanel = new JPanel(new BorderLayout());
@@ -80,10 +85,12 @@ public class MainWindow extends JFrame {
         ClassLoader loader = MainWindow.class.getClassLoader();
 
         try {
+            pStatus.setStatus("Loading page...");
             Class aClass = loader.loadClass(program);
             System.out.println("Class Name: " + aClass.getName());
             JPanel panel = (JPanel) aClass.newInstance();
             setCenterPanel(panel);
+            pStatus.setStatus("Ready");
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
