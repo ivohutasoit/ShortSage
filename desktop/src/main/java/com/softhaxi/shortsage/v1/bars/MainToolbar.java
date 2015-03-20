@@ -30,7 +30,7 @@ public class MainToolbar extends JToolBar {
     }
 
     private void initComponents() {
-        
+        setFloatable(false);
         final JButton bNewMessage = new JButton("New Message");
         add(bNewMessage);
         bNewMessage.addActionListener(new ActionListener() {
