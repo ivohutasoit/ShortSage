@@ -1,7 +1,6 @@
 package com.softhaxi.shortsage.v1.stage;
 
 import com.softhaxi.shortsage.v1.bars.MainMenubar;
-import com.softhaxi.shortsage.v1.bars.MainStatusbar;
 import com.softhaxi.shortsage.v1.bars.MainToolbar;
 import com.softhaxi.shortsage.v1.component.CStatusBar;
 import com.softhaxi.shortsage.v1.page.DashboardPage;
@@ -94,5 +93,13 @@ public class MainWindow extends JFrame {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public CStatusBar getStatusBar() {
+        return pStatus;
     }
 }
