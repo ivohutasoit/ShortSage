@@ -3,9 +3,13 @@ package com.softhaxi.shortsage.v1.forms;
 import com.softhaxi.shortsage.v1.component.CActionForm;
 import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.enums.ActionState;
-import com.toedter.calendar.JCalendar;
+import com.toedter.calendar.JDateChooser;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import javafx.scene.control.DatePicker;
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -14,6 +18,13 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
+import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
+import net.sourceforge.jdatepicker.impl.UtilDateModel;
+import org.jdesktop.swingx.JXDatePicker;
 
 public class MessageActionForm extends CActionForm<Message> {
 
@@ -38,10 +49,13 @@ public class MessageActionForm extends CActionForm<Message> {
     private JRadioButton rImmidiate;
     private JRadioButton rSchedule;
     private JTextField tContact;
-    private JCalendar cDate;
+    private JDateChooser cDate;
+    private JDatePickerImpl tDate;
     private JTextArea tText;
     private JComboBox<String> cStatus;
     private JComboBox<String> cHandler;
+    private DatePicker dDate;
+    private JXDatePicker cxDate;
 
     private JButton bReply;
 
@@ -60,7 +74,7 @@ public class MessageActionForm extends CActionForm<Message> {
     @Override
     public void initComponents() {
         super.initComponents();
-        setPreferredSize(new Dimension(500, 600));
+        setPreferredSize(new Dimension(450, 300));
 
         bReply = new JButton("Reply");
         tBar.add(bReply, 4);
@@ -70,12 +84,36 @@ public class MessageActionForm extends CActionForm<Message> {
         pForm.setLayout(lForm);
         lForm.setAutoCreateGaps(true);
         lForm.setAutoCreateContainerGaps(true);
+        
+        rImmidiate = new JRadioButton("JIT Sending");
+        rImmidiate.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cxDate.setEnabled(!rImmidiate.isSelected());
+            }
+        });
+        rSchedule = new JRadioButton("Schedule Sending");
+        rSchedule.addItemListener(new ItemListener() {
+
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                cxDate.setEnabled(rSchedule.isSelected());
+            }
+        });
+        
+        JLabel lSend = new JLabel("Send Type:");
+        ButtonGroup bGroup = new ButtonGroup();
+        bGroup.add(rImmidiate);
+        bGroup.add(rSchedule);
 
         JLabel lContact = new JLabel("Contact:");
         tContact = new JTextField();
 
         JLabel lDate = new JLabel("Transaction Date:");
-        cDate = new JCalendar();
+        cDate = new JDateChooser();
+        tDate = new JDatePickerImpl(new JDatePanelImpl(new UtilDateModel()));
+        cxDate = new JXDatePicker();
 
         JLabel lStatus = new JLabel("Message Status:");
         cStatus = new JComboBox(STATUS_LIST);
@@ -85,28 +123,37 @@ public class MessageActionForm extends CActionForm<Message> {
 
         JLabel lText = new JLabel("Message:");
         tText = new JTextArea();
+        tText.setFont(lText.getFont());
 
         lForm.setHorizontalGroup(lForm.createSequentialGroup()
                 .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(lSend)
                         .addComponent(lContact)
                         .addComponent(lDate)
                         .addComponent(lStatus)
                         .addComponent(lHandler)
                         .addComponent(lText))
                 .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(rImmidiate)
+                        .addComponent(rSchedule)
                         .addComponent(tContact)
-                        .addComponent(cDate)
+                        .addComponent(cxDate)
                         .addComponent(cStatus)
                         .addComponent(cHandler)
                         .addComponent(tText))
         );
         lForm.setVerticalGroup(lForm.createSequentialGroup()
                 .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(lSend)
+                        .addComponent(rImmidiate))
+                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(rSchedule))
+                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(lContact)
                         .addComponent(tContact))
                 .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(lDate)
-                        .addComponent(cDate))
+                        .addComponent(cxDate))
                 .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(lStatus)
                         .addComponent(cStatus))
@@ -123,17 +170,33 @@ public class MessageActionForm extends CActionForm<Message> {
     @Override
     public void initState() {
         super.initState();
-
-        if (!object.getFolder().equalsIgnoreCase("INBOX")
-                && (state == ActionState.CREATE || state == ActionState.EDIT)) {
-            bReply.setVisible(false);
+        if (object != null) {
+            if (!object.getFolder().equalsIgnoreCase("INBOX")
+                    && (state == ActionState.CREATE || state == ActionState.EDIT)) {
+                bReply.setVisible(false);
+            } else {
+                bReply.setVisible(true);
+            }
         } else {
-            bReply.setVisible(true);
+            if(state == ActionState.CREATE) {
+                cStatus.setEnabled(false);
+                cHandler.setEnabled(false);
+                rImmidiate.setSelected(true);
+            }
+            bReply.setVisible(false);
         }
     }
 
     @Override
     public void initData() {
     }
+    
+    private class SendMessageTask extends SwingWorker<Integer, Boolean> {
 
+        @Override
+        protected Integer doInBackground() throws Exception {
+            return 0;
+        }
+        
+    }
 }

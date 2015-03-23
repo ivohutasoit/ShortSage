@@ -2,32 +2,28 @@ package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.panels.BalancePanel;
 import com.softhaxi.shortsage.v1.panels.MessagesPanel;
-import com.softhaxi.shortsage.v1.util.SpringUtilities;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import javax.swing.JLabel;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SpringLayout;
-import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 /**
  *
  * @author Hutasoit
  */
 public class DashboardPage extends JPanel {
-    
+
     private JPanel pModem;
     private MessagesPanel pMessage;
     private BalancePanel pBalance;
     private JPanel pChart;
-    
+
     public DashboardPage() {
         initComponents();
+        setListener();
     }
-    
+
     private void initComponents() {
 //        setLayout(new BorderLayout());
 //        setBorder(new EmptyBorder(4, 4, 4, 4));
@@ -102,8 +98,33 @@ public class DashboardPage extends JPanel {
 //        p2.add(pChart, BorderLayout.CENTER);
 //        add(p2, BorderLayout.CENTER);
     }
-    
+
     private void newInitComponents() {
-        
+
+    }
+
+    private void initData() {
+
+    }
+
+    private void setListener() {
+        addAncestorListener(new AncestorListener() {
+
+            @Override
+            public void ancestorAdded(AncestorEvent e) {
+//                System.out.println(getRootPane().getParent().toString());
+//                System.out.println(getParent().toString());
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent event) {
+
+            }
+        });
     }
 }

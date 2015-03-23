@@ -8,6 +8,8 @@ import com.softhaxi.shortsage.v1.panels.MainMenuPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +23,7 @@ import javax.swing.border.EtchedBorder;
  *
  * @author Hutasoit
  */
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements WindowListener {
 
     ResourceBundle global = ResourceBundle.getBundle("global");
 
@@ -101,5 +103,40 @@ public class MainWindow extends JFrame {
      */
     public CStatusBar getStatusBar() {
         return pStatus;
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+    
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+    
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+    
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+    
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+    
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+    
     }
 }
