@@ -59,6 +59,7 @@ public class MessageActionForm extends CActionForm<Message>
     private JXDatePicker cxDate;
 
     private JButton bReply;
+    private JDialog dLoading;
     
     private Session session;
 
@@ -198,13 +199,48 @@ public class MessageActionForm extends CActionForm<Message>
     public void actionPerform(ActioEvent e) {
         if(e.getSource() instanceof JButton) {
             JButton bs = (JButton) e.getSource();
-            if(bs = bSave) {
+            if(bs == bSave || bs == bSaveAndNew) {
+                dLoading = new JDialog(null, "Message", ModalityType.APPLICATION_MODAL);
+                JProgressBar progressBar = new JProgressBar();
+                progressBar.setIndeterminate(true);
+                JPanel panel = new JPanel(new BorderLayout());
+                panel.add(progressBar, BorderLayout.CENTER);
+                panel.add(new JLabel("Please wait......."), BorderLayout.PAGE_START);
+                dLoading.add(panel);
+                dLoading.pack();
+                dLoading.setLocationRelativeTo(null);
+                dLoading.setVisible(true);
+                
+                SendMessageTask t1 = null;
+                SaveMessageTask t2 = new SaveMessageTask();
                 if(rImmidiate.isSelected()) {
-                    SendMessageTask t1 = new SendMessageTask();
+                    t1 = new SendMessageTask();
+                    t1.addPropertyChangeListener(new PropertyChangeListener() {
+                        @Override
+                         public void propertyChange(PropertyChangeEvent evt) {
+                            if (evt.getPropertyName().equals("state")) {
+                               if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                                  t2.execute();
+                               }
+                            }
+                         }
+                    });
                     t1.execute();
-                } else {
-                    
                 }
+                
+                t2.addPropertyChangeListener(new PropertyChangeListener() {
+                
+                        @Override
+                         public void propertyChange(PropertyChangeEvent evt) {
+                            if (evt.getPropertyName().equals("state")) {
+                               if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                                  dialog.dispose();
+                               }
+                            }
+                         }
+                });
+                if(t1 == null) 
+                    t2.execute();
             }
         }
     }
