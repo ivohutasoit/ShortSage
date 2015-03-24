@@ -213,6 +213,18 @@ public class MessageActionForm extends CActionForm<Message>
                 
                 SendMessageTask t1 = null;
                 SaveMessageTask t2 = new SaveMessageTask();
+                t2.addPropertyChangeListener(new PropertyChangeListener() {
+                
+                        @Override
+                         public void propertyChange(PropertyChangeEvent evt) {
+                            if (evt.getPropertyName().equals("state")) {
+                               if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                                  dLoading.dispose();
+                               }
+                            }
+                         }
+                });
+                
                 if(rImmidiate.isSelected()) {
                     t1 = new SendMessageTask();
                     t1.addPropertyChangeListener(new PropertyChangeListener() {
@@ -228,17 +240,7 @@ public class MessageActionForm extends CActionForm<Message>
                     t1.execute();
                 }
                 
-                t2.addPropertyChangeListener(new PropertyChangeListener() {
                 
-                        @Override
-                         public void propertyChange(PropertyChangeEvent evt) {
-                            if (evt.getPropertyName().equals("state")) {
-                               if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                                  dialog.dispose();
-                               }
-                            }
-                         }
-                });
                 if(t1 == null) 
                     t2.execute();
             }
