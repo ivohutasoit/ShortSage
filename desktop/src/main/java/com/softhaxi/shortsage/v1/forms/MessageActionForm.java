@@ -26,7 +26,8 @@ import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
 import org.jdesktop.swingx.JXDatePicker;
 
-public class MessageActionForm extends CActionForm<Message> {
+public class MessageActionForm extends CActionForm<Message> 
+        implements ActionListener {
 
     private final static String[] STATUS_LIST = {
         "CREATED",
@@ -58,6 +59,8 @@ public class MessageActionForm extends CActionForm<Message> {
     private JXDatePicker cxDate;
 
     private JButton bReply;
+    
+    private Session session;
 
     public MessageActionForm() {
         super();
@@ -191,12 +194,41 @@ public class MessageActionForm extends CActionForm<Message> {
     public void initData() {
     }
     
-    private class SendMessageTask extends SwingWorker<Integer, Boolean> {
+    @Override
+    public void actionPerform(ActioEvent e) {
+        if(e.getSource() instanceof JButton) {
+            JButton bs = (JButton) e.getSource();
+            if(bs = bSave) {
+                if(rImmidiate.isSelected()) {
+                    SendMessageTask t1 = new SendMessageTask();
+                    t1.execute();
+                } else {
+                    
+                }
+            }
+        }
+    }
+    
+    private class SendMessageTask extends SwingWorker<String, Void> {
 
         @Override
-        protected Integer doInBackground() throws Exception {
-            return 0;
+        protected String doInBackground() throws Exception {
+            if(Service.getInstance().getServiceStatus() != Service.STARTED) {
+                session = HibernateUtil.getSessionFactory().openSession();
+                Query q = session.
+                
+                Service.getInstance().getServiceStatus().start();
+            }
+            return null;
         }
         
+        private 
+    }
+    
+    private class SaveMessageTask extends SwingWorker<Integer, Void> {
+        @Override
+        protected Integer doInBackground() throws Exception {
+            return -1;
+        }
     }
 }
