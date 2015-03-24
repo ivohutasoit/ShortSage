@@ -240,24 +240,32 @@ public class MessageActionForm extends CActionForm<Message>
                     t1.execute();
                 }
                 
-                
                 if(t1 == null) 
                     t2.execute();
             }
         }
     }
     
-    private class SendMessageTask extends SwingWorker<String, Void> {
+    private class SendMessageTask extends SwingWorker<Boolean, Void> {
 
         @Override
-        protected String doInBackground() throws Exception {
+        protected Boolean doInBackground() throws Exception {
             if(Service.getInstance().getServiceStatus() != Service.STARTED) {
-                session = HibernateUtil.getSessionFactory().openSession();
-                Query q = session.
+                SerialModemGateway gateway = new SerialModemGateway("modem.wavecom", "COM8", 115200, "Wavecom", "");
+                gateway.setInbound(true);
+                gateway.setOutbound(true);
+                Service.getInstance().setOutboundMessageNotification(new OutboundNotification());
+                Service.getInstance().addGateway(gateway);
+                Service.getInstance().startService();
                 
-                Service.getInstance().getServiceStatus().start();
+                OutboundMessage msg = new OutboundMessage(tContact.getText().trim(), tText.getText().trim());
+                
+                boolean res = Service.getInstance().sendMessage(msg);
+                
+                Service.getInstance().stopService();
+                return res;
             }
-            return null;
+            return false;
         }
         
         private 
