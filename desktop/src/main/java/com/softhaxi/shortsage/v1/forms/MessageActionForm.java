@@ -3,30 +3,46 @@ package com.softhaxi.shortsage.v1.forms;
 import com.softhaxi.shortsage.v1.component.CActionForm;
 import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.modem.impl.OutboundNotification;
 import com.toedter.calendar.JDateChooser;
 import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.control.DatePicker;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilDateModel;
+import org.hibernate.Session;
 import org.jdesktop.swingx.JXDatePicker;
+import org.smslib.GatewayException;
+import org.smslib.OutboundMessage;
+import org.smslib.SMSLibException;
+import org.smslib.Service;
+import org.smslib.modem.SerialModemGateway;
 
-public class MessageActionForm extends CActionForm<Message> 
+public class MessageActionForm extends CActionForm<Message>
         implements ActionListener {
 
     private final static String[] STATUS_LIST = {
@@ -60,7 +76,7 @@ public class MessageActionForm extends CActionForm<Message>
 
     private JButton bReply;
     private JDialog dLoading;
-    
+
     private Session session;
 
     public MessageActionForm() {
@@ -88,7 +104,7 @@ public class MessageActionForm extends CActionForm<Message>
         pForm.setLayout(lForm);
         lForm.setAutoCreateGaps(true);
         lForm.setAutoCreateContainerGaps(true);
-        
+
         rImmidiate = new JRadioButton("JIT Sending");
         rImmidiate.addItemListener(new ItemListener() {
 
@@ -105,7 +121,7 @@ public class MessageActionForm extends CActionForm<Message>
                 cxDate.setEnabled(rSchedule.isSelected());
             }
         });
-        
+
         JLabel lSend = new JLabel("Send Type:");
         ButtonGroup bGroup = new ButtonGroup();
         bGroup.add(rImmidiate);
@@ -128,6 +144,7 @@ public class MessageActionForm extends CActionForm<Message>
         JLabel lText = new JLabel("Message:");
         tText = new JTextArea();
         tText.setFont(lText.getFont());
+        JScrollPane pText = new JScrollPane(tText, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         lForm.setHorizontalGroup(lForm.createSequentialGroup()
                 .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -144,7 +161,7 @@ public class MessageActionForm extends CActionForm<Message>
                         .addComponent(cxDate)
                         .addComponent(cStatus)
                         .addComponent(cHandler)
-                        .addComponent(tText))
+                        .addComponent(pText))
         );
         lForm.setVerticalGroup(lForm.createSequentialGroup()
                 .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -166,9 +183,11 @@ public class MessageActionForm extends CActionForm<Message>
                         .addComponent(cHandler))
                 .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(lText)
-                        .addComponent(tText))
+                        .addComponent(pText))
         );
         add(pForm, BorderLayout.CENTER);
+
+        bSave.addActionListener(this);
     }
 
     @Override
@@ -182,7 +201,7 @@ public class MessageActionForm extends CActionForm<Message>
                 bReply.setVisible(true);
             }
         } else {
-            if(state == ActionState.CREATE) {
+            if (state == ActionState.CREATE) {
                 cStatus.setEnabled(false);
                 cHandler.setEnabled(false);
                 rImmidiate.setSelected(true);
@@ -194,12 +213,12 @@ public class MessageActionForm extends CActionForm<Message>
     @Override
     public void initData() {
     }
-    
+
     @Override
-    public void actionPerform(ActioEvent e) {
-        if(e.getSource() instanceof JButton) {
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
             JButton bs = (JButton) e.getSource();
-            if(bs == bSave || bs == bSaveAndNew) {
+            if (bs == bSave || bs == bSaveNew) {
                 dLoading = new JDialog(null, "Message", ModalityType.APPLICATION_MODAL);
                 JProgressBar progressBar = new JProgressBar();
                 progressBar.setIndeterminate(true);
@@ -210,68 +229,89 @@ public class MessageActionForm extends CActionForm<Message>
                 dLoading.pack();
                 dLoading.setLocationRelativeTo(null);
                 dLoading.setVisible(true);
-                
+
                 SendMessageTask t1 = null;
                 SaveMessageTask t2 = new SaveMessageTask();
                 t2.addPropertyChangeListener(new PropertyChangeListener() {
-                
-                        @Override
-                         public void propertyChange(PropertyChangeEvent evt) {
-                            if (evt.getPropertyName().equals("state")) {
-                               if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                                  dLoading.dispose();
-                               }
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if (evt.getPropertyName().equals("state")) {
+                            if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                                dLoading.dispose();
                             }
-                         }
+                        }
+                    }
                 });
-                
-                if(rImmidiate.isSelected()) {
+
+                if (rImmidiate.isSelected()) {
                     t1 = new SendMessageTask();
                     t1.addPropertyChangeListener(new PropertyChangeListener() {
                         @Override
-                         public void propertyChange(PropertyChangeEvent evt) {
+                        public void propertyChange(PropertyChangeEvent evt) {
                             if (evt.getPropertyName().equals("state")) {
-                               if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                                  t2.execute();
-                               }
+                                if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                                    dLoading.dispose();
+                                    //t2.execute();
+                                }
                             }
-                         }
+                        }
                     });
                     t1.execute();
                 }
-                
-                if(t1 == null) 
+
+                if (t1 == null) {
                     t2.execute();
+                }
             }
         }
     }
-    
+
     private class SendMessageTask extends SwingWorker<Boolean, Void> {
 
         @Override
         protected Boolean doInBackground() throws Exception {
-            if(Service.getInstance().getServiceStatus() != Service.STARTED) {
+            //if(Service.getInstance().getServiceStatus() != Service.ServiceStatus.STARTED) {
+            try {
                 SerialModemGateway gateway = new SerialModemGateway("modem.wavecom", "COM8", 115200, "Wavecom", "");
                 gateway.setInbound(true);
                 gateway.setOutbound(true);
                 Service.getInstance().setOutboundMessageNotification(new OutboundNotification());
                 Service.getInstance().addGateway(gateway);
                 Service.getInstance().startService();
-                
+
+                System.out.println();
+                System.out.println("Modem Information:");
+                System.out.println(" Manufacturer: " + gateway.getManufacturer());
+                System.out.println(" Model: " + gateway.getModel());
+                System.out.println(" Serial No: " + gateway.getSerialNo());
+                System.out.println(" SIM IMSI: " + gateway.getImsi());
+                System.out.println(" Signal Level: " + gateway.getSignalLevel() + " dBm");
+                System.out.println(" Battery Level: " + gateway.getBatteryLevel() + "%");
+                System.out.println();
+
                 OutboundMessage msg = new OutboundMessage(tContact.getText().trim(), tText.getText().trim());
-                
+
                 boolean res = Service.getInstance().sendMessage(msg);
-                
+
                 Service.getInstance().stopService();
+
                 return res;
+            } catch (GatewayException ex) {
+                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SMSLibException ex) {
+                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException | InterruptedException ex) {
+                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
             }
+            //}
             return false;
         }
-        
-        private 
+
     }
-    
+
     private class SaveMessageTask extends SwingWorker<Integer, Void> {
+
         @Override
         protected Integer doInBackground() throws Exception {
             return -1;
