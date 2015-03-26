@@ -3,7 +3,6 @@ package com.softhaxi.shortsage.v1.forms;
 import com.softhaxi.shortsage.v1.component.CActionForm;
 import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.enums.ActionState;
-import com.softhaxi.shortsage.v1.modem.impl.OutboundNotification;
 import com.toedter.calendar.JDateChooser;
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
@@ -15,6 +14,7 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.DatePicker;
@@ -40,7 +40,6 @@ import org.smslib.GatewayException;
 import org.smslib.OutboundMessage;
 import org.smslib.SMSLibException;
 import org.smslib.Service;
-import org.smslib.modem.SerialModemGateway;
 
 public class MessageActionForm extends CActionForm<Message>
         implements ActionListener {
@@ -78,6 +77,7 @@ public class MessageActionForm extends CActionForm<Message>
     private JDialog dLoading;
 
     private Session session;
+    private SendMessageTask t1 = null;
 
     public MessageActionForm() {
         super();
@@ -143,6 +143,7 @@ public class MessageActionForm extends CActionForm<Message>
 
         JLabel lText = new JLabel("Message:");
         tText = new JTextArea();
+        tText.setWrapStyleWord(true);
         tText.setFont(lText.getFont());
         JScrollPane pText = new JScrollPane(tText, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -216,6 +217,8 @@ public class MessageActionForm extends CActionForm<Message>
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        
+        
         if (e.getSource() instanceof JButton) {
             JButton bs = (JButton) e.getSource();
             if (bs == bSave || bs == bSaveNew) {
@@ -229,9 +232,12 @@ public class MessageActionForm extends CActionForm<Message>
                 dLoading.pack();
                 dLoading.setLocationRelativeTo(null);
                 dLoading.setVisible(true);
+                dLoading.setUndecorated(true);
+                
 
-                SendMessageTask t1 = null;
+                
                 SaveMessageTask t2 = new SaveMessageTask();
+                
                 t2.addPropertyChangeListener(new PropertyChangeListener() {
 
                     @Override
@@ -251,8 +257,14 @@ public class MessageActionForm extends CActionForm<Message>
                         public void propertyChange(PropertyChangeEvent evt) {
                             if (evt.getPropertyName().equals("state")) {
                                 if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                                    dLoading.dispose();
-                                    //t2.execute();
+                                    try {
+                                        if(t1.get() == true) {
+                                            dLoading.dispose();
+                                            dLoading.setVisible(false);
+                                        }
+                                    } catch (InterruptedException | ExecutionException ex) {
+                                        Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
                                 }
                             }
                         }
@@ -271,30 +283,11 @@ public class MessageActionForm extends CActionForm<Message>
 
         @Override
         protected Boolean doInBackground() throws Exception {
-            //if(Service.getInstance().getServiceStatus() != Service.ServiceStatus.STARTED) {
             try {
-                SerialModemGateway gateway = new SerialModemGateway("modem.wavecom", "COM8", 115200, "Wavecom", "");
-                gateway.setInbound(true);
-                gateway.setOutbound(true);
-                Service.getInstance().setOutboundMessageNotification(new OutboundNotification());
-                Service.getInstance().addGateway(gateway);
-                Service.getInstance().startService();
-
-                System.out.println();
-                System.out.println("Modem Information:");
-                System.out.println(" Manufacturer: " + gateway.getManufacturer());
-                System.out.println(" Model: " + gateway.getModel());
-                System.out.println(" Serial No: " + gateway.getSerialNo());
-                System.out.println(" SIM IMSI: " + gateway.getImsi());
-                System.out.println(" Signal Level: " + gateway.getSignalLevel() + " dBm");
-                System.out.println(" Battery Level: " + gateway.getBatteryLevel() + "%");
-                System.out.println();
-
                 OutboundMessage msg = new OutboundMessage(tContact.getText().trim(), tText.getText().trim());
 
                 boolean res = Service.getInstance().sendMessage(msg);
-
-                Service.getInstance().stopService();
+                System.out.println(msg);
 
                 return res;
             } catch (GatewayException ex) {

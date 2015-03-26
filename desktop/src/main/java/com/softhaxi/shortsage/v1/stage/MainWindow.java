@@ -86,12 +86,12 @@ public class MainWindow extends JFrame implements WindowListener {
         ClassLoader loader = MainWindow.class.getClassLoader();
 
         try {
-            pStatus.setStatus("Loading page...");
+            pStatus.getStatusLabel().setText("Loading page...");
             Class aClass = loader.loadClass(program);
             System.out.println("Class Name: " + aClass.getName());
             JPanel panel = (JPanel) aClass.newInstance();
             setCenterPanel(panel);
-            pStatus.setStatus("Ready");
+            pStatus.getStatusLabel().setText("Ready");
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }

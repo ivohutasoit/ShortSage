@@ -3,10 +3,13 @@ package com.softhaxi.shortsage.v1.page;
 import com.softhaxi.shortsage.v1.component.CNumberedTable;
 import com.softhaxi.shortsage.v1.component.CSearchField;
 import com.softhaxi.shortsage.v1.component.CZebraTable;
+import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.dummies.MessageDummy;
 import com.softhaxi.shortsage.v1.table.model.InboxTableModel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -14,9 +17,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingWorker;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import org.smslib.InboundMessage;
+import org.smslib.InboundMessage.MessageClasses;
+import org.smslib.Service;
 
 /**
  *
@@ -25,6 +32,8 @@ import javax.swing.border.EtchedBorder;
 public class InboxPage extends JPanel {
 
     private JPanel pDetail;
+    private List<Message> dbMessages;
+    private List<InboundMessage> mdMessages;
 
     public InboxPage() {
         initComponents();
@@ -78,5 +87,24 @@ public class InboxPage extends JPanel {
 
         //Add the scroll pane to this panel.
         pDetail.add(scrollPane, BorderLayout.CENTER);
+        
+        ReadMessageTask t1 = new ReadMessageTask();
+        t1.execute();
+        
+    }
+
+    private class ReadMessageTask extends SwingWorker<Boolean, Void> {
+
+        @Override
+        protected Boolean doInBackground() throws Exception {
+            mdMessages = new ArrayList<InboundMessage>();
+            Service.getInstance().readMessages(mdMessages, MessageClasses.ALL);
+            Message message = null;
+            for (InboundMessage msg : mdMessages) {
+                System.out.println(msg);
+            }
+            return true;
+        }
+
     }
 }
