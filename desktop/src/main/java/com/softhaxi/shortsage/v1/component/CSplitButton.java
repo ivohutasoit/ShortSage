@@ -2,6 +2,7 @@ package com.softhaxi.shortsage.v1.component;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -29,6 +30,10 @@ public class CSplitButton extends JButton implements ActionListener {
     public CSplitButton(String text) {
         this(new JButton(text), SwingConstants.SOUTH);
     }
+    
+    public CSplitButton(Icon icon) {
+        this(new JButton(icon), SwingConstants.SOUTH);
+    }
 
     public CSplitButton(String text, Icon icon) {
         this(new JButton(text, icon), SwingConstants.SOUTH);
@@ -44,15 +49,14 @@ public class CSplitButton extends JButton implements ActionListener {
         this.bDropDown.setBorderPainted(false);
         this.bMain.setBorderPainted(false);
 
-        this.setPreferredSize(this.bMain.getPreferredSize());
+        this.setPreferredSize(button.getSize());
 //        this.setMaximumSize(new Dimension(75, 34));
 //        this.setMinimumSize(new Dimension(200, 34));
-
-        this.setLayout(new BorderLayout());
+        setLayout(new FlowLayout());
         this.setMargin(new Insets(-3, -3, -3, -3));
 
-        this.add(bMain, BorderLayout.CENTER);
-        this.add(bDropDown, BorderLayout.EAST);
+        this.add(bMain);
+        this.add(bDropDown);
     }
 
     public void setMenu(JPopupMenu popup) {

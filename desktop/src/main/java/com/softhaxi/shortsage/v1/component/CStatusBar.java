@@ -1,6 +1,8 @@
 package com.softhaxi.shortsage.v1.component;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,10 +13,13 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 
 public class CStatusBar extends JToolBar {
 
@@ -72,9 +77,11 @@ public class CStatusBar extends JToolBar {
         add(lProgress);
         add(Box.createHorizontalGlue());
 
-        pProgress = new JProgressBar(0);
+        JPanel p1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        pProgress = new JProgressBar();
         pProgress.setVisible(false);
-        add(pProgress);
+        p1.add(pProgress);
+        add(p1);
         add(new JToolBar.Separator());
 
         lCompany = new JLabel(resLocal != null
@@ -86,20 +93,18 @@ public class CStatusBar extends JToolBar {
         lDate = new JLabel(sdf.format(new Date()));
         add(lDate);
     }
-    
+
     /**
-     * 
-     * @param status 
+     * @return the Status Label 
      */
-    public void setStatus(String status) {
-        lProgress.setText(status);
+    public JLabel getStatusLabel() {
+        return lProgress;
     }
-    
+
     /**
-     * 
-     * @param visibility 
+     * @return the Progress
      */
-    public void showProgress(boolean visibility) {
-        pProgress.setVisible(true);
+    public JProgressBar getProgressBar() {
+        return pProgress;
     }
 }
