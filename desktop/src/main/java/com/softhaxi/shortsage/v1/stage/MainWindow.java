@@ -20,8 +20,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 /**
- *
- * @author Hutasoit
+ * Reference <a href="https://java.net/projects/swingset3/sources/svn/content/trunk/SwingSet3/src/com/sun/swingset3/SwingSet3.java?rev=219">Swing Set 3</a>
+ * 
+ * 
+ * @author Ivo Hutasoit
  */
 public class MainWindow extends JFrame implements WindowListener {
 
