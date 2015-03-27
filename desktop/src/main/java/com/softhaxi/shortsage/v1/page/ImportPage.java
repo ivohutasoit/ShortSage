@@ -8,12 +8,16 @@ import javax.swing.JPanel;
  *
  * @author Hutasoit
  */
-public class ImportDataPage extends JPanel {
+public class ImportPage extends JPanel {
     /**
      * 
      */
     public ImportDataPage() {
-        setLayout(new BorderLayout());
-        add(new JLabel("Import Page"), BorderLayout.CENTER);
+        initComponents();
+        initData();
+    }
+    
+    private void initComponents() {
+        
     }
 }
