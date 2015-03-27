@@ -1,8 +1,6 @@
 package com.softhaxi.shortsage.v1.bars;
 
 import com.softhaxi.shortsage.v1.component.CDialog;
-import com.softhaxi.shortsage.v1.component.JSplitButton;
-import com.softhaxi.shortsage.v1.component.NewCSplitButton;
 import com.softhaxi.shortsage.v1.enums.ServiceHandler;
 import com.softhaxi.shortsage.v1.forms.MessageActionForm;
 import com.softhaxi.shortsage.v1.stage.MainWindow;
@@ -38,10 +36,7 @@ public class MainToolbar extends JToolBar {
 
     private void initComponents() {
         setFloatable(false);
-        
-        JSplitButton csNew = new JSplitButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_new_24.png")));
-        add(csNew);
-        
+    
         final JButton bNewMessage = new JButton("New Message");
         add(bNewMessage);
         bNewMessage.addActionListener(new ActionListener() {

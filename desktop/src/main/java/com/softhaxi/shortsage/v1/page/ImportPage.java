@@ -1,7 +1,5 @@
 package com.softhaxi.shortsage.v1.page;
 
-import java.awt.BorderLayout;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -12,9 +10,9 @@ public class ImportPage extends JPanel {
     /**
      * 
      */
-    public ImportDataPage() {
+    public ImportPage() {
         initComponents();
-        initData();
+        //initData();
     }
     
     private void initComponents() {

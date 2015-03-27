@@ -164,7 +164,7 @@ public class CZebraTable extends JTable {
 
         rowColors[1] = java.awt.Color.getHSBColor(
                 (selHSB[1] == 0.0 || selHSB[2] == 0.0) ? bgHSB[0] : selHSB[0],
-                0.1f * selHSB[1] + 0.9f * bgHSB[1],
+                0.01f * selHSB[1] + 0.9f * bgHSB[1],
                 bgHSB[2] + ((bgHSB[2] < 0.5f) ? 0.05f : -0.05f));
     }
 }

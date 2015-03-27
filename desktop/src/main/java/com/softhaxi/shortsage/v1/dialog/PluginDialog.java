@@ -1,5 +1,7 @@
 package com.softhaxi.shortsage.v1.dialog;
 
+import javax.swing.JDialog;
+
 /**
  * Show the list of plugins application 
  *

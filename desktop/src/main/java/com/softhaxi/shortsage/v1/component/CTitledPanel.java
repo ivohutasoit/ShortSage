@@ -1,5 +1,7 @@
 package com.softhaxi.shortsage.v1.component;
 
+import javax.swing.JPanel;
+
 /**
  * A simple JPanel with a border and a title
  * Reference 

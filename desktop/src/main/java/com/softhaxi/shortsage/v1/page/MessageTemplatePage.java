@@ -1,6 +1,20 @@
 package com.softhaxi.shortsage.v1.page;
 
+import com.softhaxi.shortsage.v1.component.CNumberedTable;
+import com.softhaxi.shortsage.v1.component.CSearchField;
+import com.softhaxi.shortsage.v1.component.CZebraTable;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 
 /**
 * @author Ivo Hutasoit
@@ -16,6 +30,7 @@ public class MessageTemplatePage extends JPanel {
    */
   public MessageTemplatePage() {
     initComponents();
+    initTable();
   }
   
   private void initComponents() {
@@ -57,7 +72,5 @@ public class MessageTemplatePage extends JPanel {
     rowTable.getTableHeader());
     //Add the scroll pane to this panel.
     pDetail.add(scrollPane, BorderLayout.CENTER);
-    ReadMessageTask t1 = new ReadMessageTask();
-    t1.execute();
   }
 }
