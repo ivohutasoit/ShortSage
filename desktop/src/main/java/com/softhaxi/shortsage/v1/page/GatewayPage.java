@@ -36,7 +36,7 @@ import org.hibernate.Session;
  * @since 1
  * @version 1.0.0
  */
-public class GatewaySetupPage extends JPanel
+public class GatewayPage extends JPanel
         implements ActionListener {
 
     private JPanel pDetail;
@@ -49,7 +49,7 @@ public class GatewaySetupPage extends JPanel
     /**
      *
      */
-    public GatewaySetupPage() {
+    public GatewayPage() {
         initComponents();
         initTable();
     }
