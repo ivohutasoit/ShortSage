@@ -10,14 +10,16 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * @author Ivo Hutasoit
+ * Reference <a href="http://picture-address-book-for-mac.soft32.com/screenshots/">Screen Shot</a>
+ * 
  * @since 1
  * @version 1.0.0
  */
-public class ContactPersonPage extends JPanel {
+public class ContactPage extends JPanel {
     /**
      * Constructor
      */
-    public ContactPersonPage() {
+    public ContactPage() {
         initComponents();
     }
     
