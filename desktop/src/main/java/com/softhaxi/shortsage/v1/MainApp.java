@@ -4,8 +4,9 @@ import com.softhaxi.shortsage.v1.stage.MainWindow;
 import com.softhaxi.shortsage.v1.util.Verificator;
 
 /**
- *
- * @author Hutasoit
+ * Reference <a href="http://www.jroller.com/gfx/entry/wait_with_style_in_swing">Wait Frame</a>
+ * 
+ * @author Ivo Hutasoit
  */
 public class MainApp {
     /**
