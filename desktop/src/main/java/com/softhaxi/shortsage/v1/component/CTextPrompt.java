@@ -60,6 +60,7 @@ public class CTextPrompt extends JLabel
         setForeground(this.component.getForeground());
         setBorder(new EmptyBorder(this.component.getInsets()));
         setHorizontalAlignment(JLabel.LEADING);
+        changeAlpha(0.5f);
         
         this.component.addFocusListener(this);
         this.document.addDocumentListener(this);

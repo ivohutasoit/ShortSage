@@ -46,7 +46,7 @@ public abstract class CActionForm<T> extends JPanel {
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 // Component added somewhere
-                initState();
+                //initState();
             }
 
             @Override

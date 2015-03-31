@@ -40,13 +40,18 @@ public abstract class CSearchField extends JPanel
         initComponents();
     }
     
+    public JTextField getField() {
+        return txtSearch;
+    }
+    
     /**
      * Initialize all components
      */
     private void initComponents() {
         setLayout(new BorderLayout(5, 0));
+        JLabel lblSearch = new JLabel("Search :");
         if(showLabel) 
-                add(new JLabel("Search :"), BorderLayout.WEST);
+                add(lblSearch, BorderLayout.WEST);
         
         JPanel pField = new JPanel(new BorderLayout());
         pField.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(1, 4, 1, 4)));
@@ -54,6 +59,7 @@ public abstract class CSearchField extends JPanel
         pField.add(txtSearch, BorderLayout.CENTER);
         pField.setBackground(txtSearch.getBackground());
         txtSearch.setBorder(null);
+        txtSearch.setFont(lblSearch.getFont());
         txtSearch.addKeyListener(this);
         
         btnSearch = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_search.png")));
