@@ -13,7 +13,10 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 /**
- *
+ * Referencese 
+ * <ul>
+ * <li><a href="https://designgridlayout.java.net/">Design Grid Layout</a></li>
+ * </ul>
  * @author Ivo Hutasoit
  */
 public class NewContactPersonActionForm extends CActionForm<ContactPerson> {
