@@ -82,8 +82,8 @@ public class MenuDummy {
         SystemMenu group = new SystemMenu();
         group.setKey("M0101");
         group.setTitle("M0101");
-        group.setName("Address Book");
-        group.setProgram("com.softhaxi.shortsage.v1.page.AddressBookPage");
+        group.setName("Phone Book");
+        group.setProgram("com.softhaxi.shortsage.v1.page.PhoneBookPage");
         group.setIcon("images/ic_book_16.png");
         group.setKeyShow(true);
         setupMenu.add(new DefaultMutableTreeNode(group));
