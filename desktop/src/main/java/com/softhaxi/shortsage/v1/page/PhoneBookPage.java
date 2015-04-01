@@ -15,9 +15,9 @@ import javax.swing.border.EmptyBorder;
  *
  * @author Hutasoit
  */
-public class AddressBookPage extends CPanel {
+public class PhoneBookPage extends CPanel {
 
-    public AddressBookPage() {
+    public PhoneBookPage() {
         super();
     }
     
