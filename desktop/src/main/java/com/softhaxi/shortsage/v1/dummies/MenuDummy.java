@@ -39,6 +39,7 @@ public class MenuDummy {
         duplication.setKey("G0003");
         duplication.setTitle("G0003");
         duplication.setName("Duplicate Detection");
+        duplication.setProgram("com.softhaxi.shortsage.v1.page.DuplicationDetectionPage");
         duplication.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(duplication));
         
