@@ -21,9 +21,12 @@ import javax.swing.border.EmptyBorder;
  */
 public class NewContactPersonActionForm extends CActionForm<ContactPerson> {
     
-    private JComboBox<String> cbPrefix;
-    private JTextField txPrefix;
-
+    private JComboBox<String> cmPrefix;
+    private JTextField txFName, txMName, txLName, txEmail, txCompany;
+    private JTextField txAddr1, txAddr2, txAddr3, txCity, txZip;
+    private JTextField txPhone, txHome, txWork, txCustom;
+    private JTextArea txDescription;
+    private JCheckBox chAddress, chPreference;
     /**
      *
      */
@@ -64,31 +67,29 @@ public class NewContactPersonActionForm extends CActionForm<ContactPerson> {
         txPrefix = new JTextField();
         
         JPanel pForm = new JPanel();
-        GroupLayout layout = new GroupLayout(pForm);
-        pForm.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbPrefix)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cbPrefix, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(290, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbPrefix)
-                    .addComponent(cbPrefix, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(269, Short.MAX_VALUE))
-        );
+        
+        
         add(pForm, BorderLayout.CENTER);
     }
     
     @Override
     public void initData() {
         
+    }
+    
+    private class RowShowHideAction implements ItemListener {
+        private final RowGroup group;
+        
+        public ShowHideAction(RowGroup group) {
+                this.group = group;
+        }
+        
+        @Override public void itemStateChanged(ItemEvent event) {
+                if (event.getStateChange() == ItemEvent.SELECTED) {
+                        group.show();
+                } else {
+                        group.hide();
+                }
+        }
     }
 }
