@@ -4,11 +4,20 @@ import com.softhaxi.shortsage.v1.component.CActionForm;
 import com.softhaxi.shortsage.v1.component.CZebraTable;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.model.ContactGroup;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import net.java.dev.designgridlayout.DesignGridLayout;
 
 public class ContactGroupActionForm extends CActionForm<ContactGroup> {
     private JTextField txId, txName;
@@ -36,7 +45,7 @@ public class ContactGroupActionForm extends CActionForm<ContactGroup> {
       
       txId = new JTextField();
       txName = new JTextField();
-      txRemark = new JTextArea(5);
+      txRemark = new JTextArea(5, 0);
       
       cmStatus = new JComboBox(new String[] {
         "Active",
@@ -50,7 +59,7 @@ public class ContactGroupActionForm extends CActionForm<ContactGroup> {
         "Deleted"
       });
       
-      if(state == ActionState.Create) 
+      if(state == ActionState.CREATE) 
           add(getPanelHeader(), BorderLayout.CENTER);
       else {
           JPanel pForm = new JPanel(new BorderLayout());
@@ -62,22 +71,22 @@ public class ContactGroupActionForm extends CActionForm<ContactGroup> {
     
     private JPanel getPanelHeader() {
         JPanel pHeader = new JPanel();
-        pHeader.setPreferedSize(new Dimension(300, 400));
+        pHeader.setPreferredSize(new Dimension(300, 400));
         
         DesignGridLayout layout = new DesignGridLayout(pHeader);
-        layout.row().grid(label("Group :")).add(txId).empty().add(txName, 2);
-        layout.row().grid(label("Description :")).add(txRemark);
-        layout.row().grid(label("Status :")).add(cmStatus).empty(2);
-        layout.row().grid(label("Handler :")).add(cmHandler).empty(2);
+        layout.row().grid(new JLabel("Group :")).add(txId).empty().add(txName, 2);
+        layout.row().grid(new JLabel("Description :")).add(txRemark);
+        layout.row().grid(new JLabel("Status :")).add(cmStatus).empty(2);
+        layout.row().grid(new JLabel("Handler :")).add(cmHandler).empty(2);
         
         return pHeader;
     }
     
     private JPanel getPanelTable() {
-        JPanel pTable = new JPanel(new BorderLayout();
+        JPanel pTable = new JPanel(new BorderLayout());
         JToolBar toContact = new JToolBar();
         toContact.setFloatable(false);
-        toContact.setBorder(new CompoundBorder(new Empty(2,2,2,2)));
+        toContact.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2,2,2,2)));
         
         bcNew = new JButton("New");
         bcImport = new JButton("Import Data");
