@@ -6,11 +6,11 @@ import javax.swing.JPanel;
  *
  * @author Hutasoit
  */
-public class ImportPage extends JPanel {
+public class ImportDataPage extends JPanel {
     /**
      * 
      */
-    public ImportPage() {
+    public ImportDataPage() {
         initComponents();
         //initData();
     }
