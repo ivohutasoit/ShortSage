@@ -48,26 +48,58 @@ public class ContactGroupActionForm extends CActionForm<ContactGroup> {
         "Activated",
         "Deactivated",
         "Deleted"
-      })
+      });
       
       if(state == ActionState.Create) 
-        add(initCreate(), BorderLayout.CENTER);
+          add(getPanelHeader(), BorderLayout.CENTER);
+      else {
+          JPanel pForm = new JPanel(new BorderLayout());
+          
+          pForm.add(getPanelHeader(), BorderLayout.NORTH);
+          pForm.add(getPanelTable(), BorderLayout.CENTER);
+      }
     }
     
-    private JPanel initCreate() {
-        JPanel pForm = new JPanel();
-        pForm.setPreferedSize(new Dimension(300, 400));
-        pForm.setBorder(new EmptyBorder(4,4,4,4));
+    private JPanel getPanelHeader() {
+        JPanel pHeader = new JPanel();
+        pHeader.setPreferedSize(new Dimension(300, 400));
         
-        DesignGridLayout layout = new DesignGridLayout(pForm);
+        DesignGridLayout layout = new DesignGridLayout(pHeader);
         layout.row().grid(label("Group :")).add(txId).empty().add(txName, 2);
         layout.row().grid(label("Description :")).add(txRemark);
         layout.row().grid(label("Status :")).add(cmStatus).empty(2);
         layout.row().grid(label("Handler :")).add(cmHandler).empty(2);
-        cmStatus.setEnabled(false);
-        cmHandler.setEnabled(false);
         
-        return panel;
+        return pHeader;
+    }
+    
+    private JPanel getPanelTable() {
+        JPanel pTable = new JPanel(new BorderLayout();
+        JToolBar toContact = new JToolBar();
+        toContact.setFloatable(false);
+        toContact.setBorder(new CompoundBorder(new Empty(2,2,2,2)));
+        
+        bcNew = new JButton("New");
+        bcImport = new JButton("Import Data");
+        bcExport = new JButton("Export Data");
+        bcDelete = new JButton("Delete");
+        bcRefresh = new JButton("Refresh");
+        
+        toContact.add(bcNew);
+        toContact.add(new JToolBar.Separator());
+        toContact.add(bcImport);
+        toContact.add(bcExport);
+        toContact.add(new JToolBar.Separator());
+        toContact.add(bcDelete);
+        toContact.add(Box.createHorizontalGlue());
+        toContact.add(bcRefresh);
+        
+        pTable.add(toContact, BorderLayout.NORTH);
+        
+        tbContact = new CZebraTable();
+        pTable.add(tbContact, BorderLayout.CENTER);
+        
+        return pTable;
     }
     
     @Override
