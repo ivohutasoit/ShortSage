@@ -24,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
@@ -217,34 +218,40 @@ public class MessageActionForm extends CActionForm<Message>
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
-        
+
         if (e.getSource() instanceof JButton) {
             JButton bs = (JButton) e.getSource();
             if (bs == bSave || bs == bSaveNew) {
-                dLoading = new JDialog(null, "Message", ModalityType.APPLICATION_MODAL);
-                JProgressBar progressBar = new JProgressBar();
-                progressBar.setIndeterminate(true);
-                JPanel panel = new JPanel(new BorderLayout());
-                panel.add(progressBar, BorderLayout.CENTER);
-                panel.add(new JLabel("Please wait......."), BorderLayout.PAGE_START);
-                dLoading.add(panel);
-                dLoading.pack();
-                dLoading.setLocationRelativeTo(null);
-                dLoading.setVisible(true);
-                dLoading.setUndecorated(true);
-                
 
-                
+                if (rImmidiate.isSelected()) {
+                    if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPED
+                            || Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPING) {
+                        JOptionPane.showMessageDialog(null, "GSM Service not running!", "Send Message", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                }
+
+//                dLoading = new JDialog(null, "Message", ModalityType.APPLICATION_MODAL);
+//                JProgressBar progressBar = new JProgressBar();
+//                progressBar.setIndeterminate(true);
+//                JPanel panel = new JPanel(new BorderLayout());
+//                panel.add(progressBar, BorderLayout.CENTER);
+//                panel.add(new JLabel("Please wait......."), BorderLayout.PAGE_START);
+//                dLoading.add(panel);
+//                dLoading.pack();
+//                dLoading.setLocationRelativeTo(null);
+//                dLoading.setVisible(true);
+//                dLoading.setUndecorated(true);
+
                 SaveMessageTask t2 = new SaveMessageTask();
-                
+
                 t2.addPropertyChangeListener(new PropertyChangeListener() {
 
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         if (evt.getPropertyName().equals("state")) {
                             if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                                dLoading.dispose();
+                                //dLoading.dispose();
                             }
                         }
                     }
@@ -258,9 +265,9 @@ public class MessageActionForm extends CActionForm<Message>
                             if (evt.getPropertyName().equals("state")) {
                                 if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
                                     try {
-                                        if(t1.get() == true) {
-                                            dLoading.dispose();
-                                            dLoading.setVisible(false);
+                                        if (t1.get() == true) {
+                                            //dLoading.dispose();
+                                            //dLoading.setVisible(false);
                                         }
                                     } catch (InterruptedException | ExecutionException ex) {
                                         Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
