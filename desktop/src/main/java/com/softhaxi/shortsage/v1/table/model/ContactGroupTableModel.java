@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.table.model;
 
-import com.softhaxi.shortsage.v1.model.ContactGroup;
+import com.softhaxi.shortsage.v1.dto.ContactGroup;
 import com.softhaxi.shortsage.v1.table.RowTableModel;
 
 public class ContactGroupTableModel extends RowTableModel<ContactGroup> {
