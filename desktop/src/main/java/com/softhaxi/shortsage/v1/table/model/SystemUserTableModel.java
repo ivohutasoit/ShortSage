@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.table.model;
 
-import com.softhaxi.shortsage.v1.entities.SystemUser;
+import com.softhaxi.shortsage.v1.dto.SystemUser;
 import com.softhaxi.shortsage.v1.table.RowTableModel;
 
 public class SystemUserTableModel extends RowTableModel<SystemUser> {
