@@ -129,4 +129,6 @@ public abstract class CActionForm<T> extends JPanel {
      * Load data to panel
      */
     public abstract void initData();
+    
+    //public abstract void save();
 }
