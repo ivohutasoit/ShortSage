@@ -3,48 +3,47 @@ package com.softhaxi.shortsage.v1.dto;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Version;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "M0CTPR")
-public class ContactPerson implements Serializable {
+@DiscriminatorValue("PRSN")
+public class ContactPerson extends Contact 
+    implements Serializable {
 
-    @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    @Column(name = "CPCPID", unique = true)
-    private String id;
-
-    @Column(name = "CPCPNA", length = 100)
-    private String name;
-
-    @Column(name = "CPJOIN")
+    @Column(name = "CCJOIN")
     private Date join;
+    
+    @Column(name = "CCPHNE")
+    private String phone;
 
-    @Column(name = "CPRCTS")
-    private int status;
+    /**
+     * @return the join
+     */
+    public Date getJoin() {
+        return join;
+    }
 
-    @Column(name = "CPCRBY", length = 100)
-    private String createdBy;
+    /**
+     * @param join the join to set
+     */
+    public void setJoin(Date join) {
+        this.join = join;
+    }
 
-    @Column(name = "CPCRON")
-    private Date createdOn;
+    /**
+     * @return the phone
+     */
+    public String getPhone() {
+        return phone;
+    }
 
-    @Column(name = "CPMDBY", length = 100)
-    private String modifiedBy;
-
-    @Column(name = "CPMDON")
-    private Date modifiedOn;
-
-    @Column(name = "CPDLST")
-    private int deleteState;
-
-    @Version
-    @Column(name = "CPVRSN")
-    private Integer version;
+    /**
+     * @param phone the phone to set
+     */
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+    
+    
 }
