@@ -98,8 +98,6 @@ public abstract class CActionForm<T> extends JPanel {
      *
      */
     public void initState() {
-        System.out.println(getRootPane().getParent().toString());
-        System.out.println(getParent().toString());
         CDialog dialog = null;
 
         if (getRootPane().getParent() instanceof CDialog) {
