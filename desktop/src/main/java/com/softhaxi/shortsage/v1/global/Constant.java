@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.global;
 
-import com.softhaxi.shortsage.v1.entities.SystemUser;
+import com.softhaxi.shortsage.v1.dto.SystemUser;
 import com.softhaxi.shortsage.v1.modem.impl.CallNotification;
 import com.softhaxi.shortsage.v1.modem.impl.InboundNotification;
 import com.softhaxi.shortsage.v1.modem.impl.OrphanedMessageNotification;
