@@ -1,6 +1,7 @@
 package com.softhaxi.shortsage.v1.forms;
 
 import com.softhaxi.shortsage.v1.component.CActionForm;
+import com.softhaxi.shortsage.v1.component.CDialog;
 import com.softhaxi.shortsage.v1.dto.ContactPerson;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import java.awt.BorderLayout;
@@ -21,20 +22,22 @@ import net.java.dev.designgridlayout.LabelAlignment;
 import net.java.dev.designgridlayout.RowGroup;
 
 /**
- * Referencese 
+ * Referencese
  * <ul>
  * <li><a href="https://designgridlayout.java.net/">Design Grid Layout</a></li>
  * </ul>
+ *
  * @author Ivo Hutasoit
  */
 public class ContactPersonActionForm extends CActionForm<ContactPerson> {
-    
+
     private JComboBox cmPrefix, cmCountry;
     private JTextField txFName, txMName, txLName, txEmail, txCompany;
     private JTextField txAddr1, txAddr2, txAddr3, txCity, txZip;
     private JTextField txPhone, txHome, txWork, txCustom;
     private JTextArea txRemark;
     private JCheckBox chAddress, chPreference;
+
     /**
      *
      */
@@ -58,23 +61,23 @@ public class ContactPersonActionForm extends CActionForm<ContactPerson> {
     public ContactPersonActionForm(ActionState state, ContactPerson person) {
         super(state, person);
     }
-    
+
     @Override
     public void initComponents() {
         super.initComponents();
         setBorder(new EmptyBorder(0, 2, 2, 0));
         setPreferredSize(new Dimension(500, 600));
-        
-        cmPrefix = new JComboBox(new String[] {
+
+        cmPrefix = new JComboBox(new String[]{
             "Mr.",
             "Mrs.",
             "Ms."
         });
-        
-        cmCountry = new JComboBox(new String[] {
-           "IDN" 
+
+        cmCountry = new JComboBox(new String[]{
+            "IDN"
         });
-        
+
         txFName = new JTextField();
         txMName = new JTextField();
         txLName = new JTextField();
@@ -87,9 +90,9 @@ public class ContactPersonActionForm extends CActionForm<ContactPerson> {
         txZip = new JTextField();
         txPhone = new JTextField();
         txRemark = new JTextArea();
-        JScrollPane scRemark = new JScrollPane(txRemark, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+        JScrollPane scRemark = new JScrollPane(txRemark, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        
+
         JPanel pForm = new JPanel();
         DesignGridLayout layout = new DesignGridLayout(pForm);
         layout.labelAlignment(LabelAlignment.RIGHT);
@@ -106,28 +109,55 @@ public class ContactPersonActionForm extends CActionForm<ContactPerson> {
         layout.row().grid(new JLabel("Zip Code :")).add(txZip).empty(5);
         //layout.emptyRow();
         //layout.row().grid(new JLabel("Description :")).add(scRemark);
-        
+
         add(pForm, BorderLayout.CENTER);
     }
-    
+
     @Override
     public void initData() {
-        
+
     }
-    
+
+    /**
+     *
+     */
+    @Override
+    public void initState() {
+//        CDialog dialog = null;
+//
+//        if (getRootPane().getParent() instanceof CDialog) {
+//            dialog = (CDialog) getRootPane().getParent();
+//        }
+//
+//        if (dialog != null) {
+//            bSave.setVisible(false);
+//            bSaveNew.setVisible(false);
+//            bCancel.setVisible(false);
+//        } else {
+//            if (state == ActionState.CREATE || state == ActionState.EDIT) {
+//                
+//            }
+//        }
+        bNew.setVisible(false);
+        bEdit.setVisible(false);
+        bDelete.setVisible(false);
+    }
+
     private class RowShowHideAction implements ItemListener {
+
         private RowGroup group;
-        
+
         public RowShowHideAction(RowGroup group) {
-                this.group = group;
+            this.group = group;
         }
-        
-        @Override public void itemStateChanged(ItemEvent event) {
-                if (event.getStateChange() == ItemEvent.SELECTED) {
-                        group.show();
-                } else {
-                        group.hide();
-                }
+
+        @Override
+        public void itemStateChanged(ItemEvent event) {
+            if (event.getStateChange() == ItemEvent.SELECTED) {
+                group.show();
+            } else {
+                group.hide();
+            }
         }
     }
 }
