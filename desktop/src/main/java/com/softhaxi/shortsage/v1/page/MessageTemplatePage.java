@@ -17,13 +17,23 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 /**
+ * References <a href="http://stackoverflow.com/questions/20526917/load-arraylist-data-into-jtable">Array List</a>
+ * 
 * @author Ivo Hutasoit
 * @since 1
 * @version 1.0.0
 */
 public class MessageTemplatePage extends JPanel {
   
+  private final String[] COLUMN_LIST = {
+    "Name",
+    "Message Text",
+    "Created At",
+    "Created By"
+  };
+  
   private JPanel pDetail;
+  private DefaultTableModel tModel;
   
   /**
    * Constructor
@@ -31,6 +41,10 @@ public class MessageTemplatePage extends JPanel {
   public MessageTemplatePage() {
     initComponents();
     initTable();
+    
+    // Create model with 0 number row
+    tModel = new DefaultTableModel(COLUMN_LIST, 0);
+    initData();
   }
   
   private void initComponents() {
@@ -72,5 +86,13 @@ public class MessageTemplatePage extends JPanel {
     rowTable.getTableHeader());
     //Add the scroll pane to this panel.
     pDetail.add(scrollPane, BorderLayout.CENTER);
+  }
+  
+  private void initData() {
+    // 1. Load data from database
+    
+    // 2. For each object add to model
+    
+    // 3. Set model table
   }
 }
