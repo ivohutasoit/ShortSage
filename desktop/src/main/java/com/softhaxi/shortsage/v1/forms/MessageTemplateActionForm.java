@@ -65,6 +65,7 @@ public class MessageTemplateActionForm extends CActionForm<MessageTemplate> {
             cmStatus.addItem("INACTIVE");
             
             cmHandler.removeAllItems();
+            cmHandler.addItem("NO ACTION");
             cmHandler.addItem("ACTIVATED");
             cmHandler.addItem("DEACTIVATED");
             cmHandler.addItem("DELETED");
@@ -83,7 +84,10 @@ public class MessageTemplateActionForm extends CActionForm<MessageTemplate> {
     public void initData() {
         if(state == ActionState.SHOW || state == ActionState.EDIT) {
             if(object != null) {
-                   
+                fName.setText(object.getName());
+                fText.setText(object.getText());
+                cmStatus.setSelectedIndex(object.getStatus());
+                cmHandler.setSelectedIndex(0);
             }
         }
     }
