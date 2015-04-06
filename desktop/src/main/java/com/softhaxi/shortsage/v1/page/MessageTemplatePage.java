@@ -33,7 +33,10 @@ public class MessageTemplatePage extends JPanel {
   };
   
   private JPanel pDetail;
-  private DefaultTableModel tModel;
+  private CZebraTable tData;
+  private JXSearchField fSearch; 
+  
+  private DefaultTableModel mData;
   
   /**
    * Constructor
@@ -50,13 +53,22 @@ public class MessageTemplatePage extends JPanel {
   private void initComponents() {
     setLayout(new BorderLayout(4, 4));
     setBorder(new EmptyBorder(4, 4, 4, 4));
-    CSearchField pSearch = new CSearchField() {
-        @Override
-        public void doSearch() {
-          JOptionPane.showMessageDialog(null, "Search action was not implemented full!");
+    //CSearchField pSearch = new CSearchField() {
+    //    @Override
+    //    public void doSearch() {
+    //      JOptionPane.showMessageDialog(null, "Search action was not implemented full!");
+    //    }
+    //};
+    //add(pSearch, BorderLayout.NORTH);
+    fSearch = new JXSearchField("Search Message Template...");
+    fSearch.setSearchMode(SearchMode.REGULAR);
+    fSearch.addActionListener(new ActionListener(){
+        public void actionPerformed(ActionEvent e){
+            JOptionPane.showMessageDialog(null, "Search action was not implemented full!");
         }
-    };
-    add(pSearch, BorderLayout.NORTH);
+    });
+    add(fSearch, BorderLayout.NORTH);
+    
     pDetail = new JPanel(new BorderLayout(0, 3));
     JToolBar tpDetail = new JToolBar();
     tpDetail.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
@@ -72,15 +84,15 @@ public class MessageTemplatePage extends JPanel {
   }
   
   private void initTable() {
-    CZebraTable table = new CZebraTable();
-    table.setShowGrid(false);
-    table.setIntercellSpacing(new Dimension(0, 0));
+    tData = new CZebraTable();
+    tData.setShowGrid(false);
+    tData.setIntercellSpacing(new Dimension(0, 0));
     // table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-    table.getColumnModel().getColumn(0).setPreferredWidth(100);
-    table.getColumnModel().getColumn(1).setPreferredWidth(700);
-    CNumberedTable rowTable = new CNumberedTable(table);
+    tData.getColumnModel().getColumn(0).setPreferredWidth(100);
+    tData.getColumnModel().getColumn(1).setPreferredWidth(700);
+    CNumberedTable rowTable = new CNumberedTable(tData);
     //Create the scroll pane and add the table to it.
-    JScrollPane scrollPane = new JScrollPane(table);
+    JScrollPane scrollPane = new JScrollPane(tData);
     scrollPane.setRowHeaderView(rowTable);
     scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
     rowTable.getTableHeader());
