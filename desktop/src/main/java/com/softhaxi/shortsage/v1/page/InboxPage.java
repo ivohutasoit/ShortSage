@@ -26,24 +26,27 @@ import org.smslib.InboundMessage.MessageClasses;
 import org.smslib.Service;
 
 /**
- *
- * @author Hutasoit
+ * Reference <a href="https://github.com/oliverwatkins/swing_library">Swing Library</a>
+ * 
+ * @author Ivo Hutasoit
+ * @since 1
+ * @version 1.0.0
  */
-public class InboxPage extends JPanel {
-
+public class InboxPage extends CPanel {
+    
+    private JXSearchField fSearch;
+    private CZebraTable tData;
+    
     private JPanel pDetail;
     private List<Message> dbMessages;
     private List<InboundMessage> mdMessages;
 
     public InboxPage() {
-        initComponents();
-        initTable();
+        super();
     }
 
+    @Override
     private void initComponents() {
-        setLayout(new BorderLayout(4, 4));
-        setBorder(new EmptyBorder(4, 4, 4, 4));
-
         CSearchField pSearch = new CSearchField() {
 
             @Override
@@ -68,6 +71,8 @@ public class InboxPage extends JPanel {
 
         pDetail.add(tpDetail, BorderLayout.NORTH);
         add(pDetail, BorderLayout.CENTER);
+        
+        initTable();
     }
 
     private void initTable() {
@@ -87,13 +92,14 @@ public class InboxPage extends JPanel {
 
         //Add the scroll pane to this panel.
         pDetail.add(scrollPane, BorderLayout.CENTER);
-        
-        ReadMessageTask t1 = new ReadMessageTask();
-        t1.execute();
-        
+    }
+    
+    @Override
+    public void initData() {
+           
     }
 
-    private class ReadMessageTask extends SwingWorker<Boolean, Void> {
+    private class LoadMessageTask extends SwingWorker<Boolean, Void> {
 
         @Override
         protected Boolean doInBackground() throws Exception {
