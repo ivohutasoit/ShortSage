@@ -12,3 +12,11 @@ Some list of task to be completed on desktop implementation are:
 <li>Dashboard Application</li>
 <li>Settings Menu</li>
 </ol>
+
+
+Today (13 April 2015) list of task to be completed on desktop implementation are:
+<ol>
+<li>Inbox and Outbox Message Page</li>
+<li>Phone Book Page</li>
+<li>Just In Time and Scheduler sending message</li>
+</ol>
