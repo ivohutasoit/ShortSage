@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.component.CActionForm;
+import com.softhaxi.shortsage.v1.desktop.HActionForm;
 import com.softhaxi.shortsage.v1.dto.Gateway;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
@@ -19,7 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import org.hibernate.Session;
 
-public class GatewayActionForm extends CActionForm<Gateway>
+public class GatewayActionForm extends HActionForm<Gateway>
         implements ActionListener {
 
     private static String[] STATUS_LIST = {

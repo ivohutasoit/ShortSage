@@ -40,6 +40,7 @@ public class MenuDummy {
         duplication.setTitle("G0003");
         duplication.setName("Duplicate Detection");
         duplication.setProgram("com.softhaxi.shortsage.v1.page.DuplicationDetectionPage");
+        duplication.setIcon("images/ic_copy_16.png");
         duplication.setKeyShow(true);
         mainMenu.add(new DefaultMutableTreeNode(duplication));
         

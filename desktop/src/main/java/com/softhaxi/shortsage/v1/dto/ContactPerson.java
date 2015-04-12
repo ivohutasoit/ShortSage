@@ -10,6 +10,18 @@ import javax.persistence.Entity;
 @DiscriminatorValue("PRSN")
 public class ContactPerson extends Contact 
     implements Serializable {
+    
+    @Column(name = "CCFRNA")
+    private String firstName;
+    
+    @Column(name = "CCMDNA")
+    private String midName;
+    
+    @Column(name = "CCLSNA")
+    private String lastName;
+    
+    @Column(name = "CCCNTY")
+    private String country;
 
     @Column(name = "CCJOIN")
     private Date join;
@@ -17,6 +29,62 @@ public class ContactPerson extends Contact
     @Column(name = "CCPHNE")
     private String phone;
 
+    /**
+     * @return the firstName
+     */
+    public String getFirstName() {
+        return firstName;
+    }
+
+    /**
+     * @param firstName the firstName to set
+     */
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    /**
+     * @return the midName
+     */
+    public String getMidName() {
+        return midName;
+    }
+
+    /**
+     * @param midName the midName to set
+     */
+    public void setMidName(String midName) {
+        this.midName = midName;
+    }
+
+    /**
+     * @return the lastName
+     */
+    public String getLastName() {
+        return lastName;
+    }
+
+    /**
+     * @param lastName the lastName to set
+     */
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    /**
+     * @return the country
+     */
+    public String getCountry() {
+        return country;
+    }
+
+    /**
+     * @param country the country to set
+     */
+    public void setCountry(String country) {
+        this.country = country;
+    }
+    
     /**
      * @return the join
      */
@@ -45,5 +113,8 @@ public class ContactPerson extends Contact
         this.phone = phone;
     }
     
-    
+    @Override
+    public String toString() {
+        return name;
+    }
 }

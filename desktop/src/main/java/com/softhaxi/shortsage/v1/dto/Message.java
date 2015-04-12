@@ -22,13 +22,13 @@ public class Message implements Serializable {
   @Id
   @GeneratedValue(generator="system-uuid")
   @GenericGenerator(name="system-uuid", strategy = "uuid")
-  @Column(name = "MSSGID", unique = true)
+  @Column(name = "MGMGID", unique = true)
   private String id;
   
-  @Column(name = "MSSGCT", length = 100)
+  @Column(name = "MGCPID", length = 100)
   private String contact;
   
-  @Column(name = "MSSGGR", length = 100)
+  @Column(name = "MGCGID", length = 100)
   private String group;
   
   @Column(name = "MSTEXT")

@@ -1,6 +1,6 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.component.CActionForm;
+import com.softhaxi.shortsage.v1.desktop.HActionForm;
 import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.toedter.calendar.JDateChooser;
@@ -40,7 +40,7 @@ import org.smslib.OutboundMessage;
 import org.smslib.SMSLibException;
 import org.smslib.Service;
 
-public class MessageActionForm extends CActionForm<Message>
+public class MessageActionForm extends HActionForm<Message>
         implements ActionListener {
 
     private final static String[] STATUS_LIST = {

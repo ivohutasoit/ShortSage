@@ -27,14 +27,16 @@ import org.jdesktop.swingx.JXTable;
  * @since 1
  * @version 1.0.0
  */
-public class BulkMessagePage extends JPanel {
-    
+public class MenuSetupPage extends JPanel {
+
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
     private final static String[] COLUMN_NAME = new String[]{
-        "Group Name",
-        "Text Message",
-        "Create Date",
+        "Name",
+        "Program",
+        "Icon",
+        "Created By",
+        "Created At",
         "Status"
     };
 
@@ -47,16 +49,16 @@ public class BulkMessagePage extends JPanel {
     private JXTable ttData;
     
     private DefaultTableModel mData;
-    
+
     /**
-     * Main Constructor
+     *
      */
-    public BulkMessagePage() {
+    public MenuSetupPage() {
         setVisible(false);
         initComponents();
         initListeners();
     }
-    
+
     // <editor-fold defaultstate="collapsed" desc="Region Inititalization">  
     /**
      * Initialize components of the panel
@@ -116,9 +118,11 @@ public class BulkMessagePage extends JPanel {
         ttData.setShowGrid(false);
         ttData.setIntercellSpacing(new Dimension(0, 0));
         ttData.getTableHeader().setDefaultRenderer(new TableHeaderCenterRender(ttData));
-        ttData.getColumnModel().getColumn(0).setPreferredWidth(50);
-        ttData.getColumnModel().getColumn(1).setPreferredWidth(600);
-        ttData.getColumnModel().getColumn(2).setPreferredWidth(50);
+        ttData.getColumnModel().getColumn(0).setPreferredWidth(100);
+        ttData.getColumnModel().getColumn(1).setPreferredWidth(100);
+        ttData.getColumnModel().getColumn(2).setPreferredWidth(100);
+        ttData.getColumnModel().getColumn(3).setPreferredWidth(30);
+        ttData.getColumnModel().getColumn(4).setPreferredWidth(30);
         
         JScrollPane sPane = new JScrollPane(ttData);
         HNumberedTable rowTable = new HNumberedTable(ttData);
