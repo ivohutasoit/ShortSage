@@ -1,5 +1,12 @@
 package com.softhaxi.shortsage.v1.dto;
 
+import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Version;
+
 @Entity
 @Table(name = "S0NTFN")
 public class SystemNotification 

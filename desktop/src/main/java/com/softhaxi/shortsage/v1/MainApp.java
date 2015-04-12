@@ -1,7 +1,6 @@
 package com.softhaxi.shortsage.v1;
 
-import com.softhaxi.shortsage.v1.stage.MainWindow;
-import com.softhaxi.shortsage.v1.util.Verificator;
+import com.softhaxi.shortsage.v1.stage.HostWindow;
 
 /**
  * Reference <a href="http://www.jroller.com/gfx/entry/wait_with_style_in_swing">Wait Frame</a>
@@ -36,7 +35,7 @@ public class MainApp {
             @Override
             public void run() {
 //                Verificator.checkPortList();
-                new MainWindow().setVisible(true);
+                HostWindow.getInstance().setVisible(true);
             }
         });
     }

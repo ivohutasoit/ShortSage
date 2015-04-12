@@ -40,8 +40,8 @@ public class HibernateUtil {
                     .setProperty("hibernate.connection.url", "jdbc:derby:shsg01;create=true")
                     .setProperty("hibernate.connection.username", "admin")
                     .setProperty("hibernate.connection.password", "admin")
-                    .setProperty("hibernate.show_sql", "true")
-                    .setProperty("hibernate.hbm2ddl.auto", "create-drop");
+                    .setProperty("hibernate.show_sql", "true");
+//                    .setProperty("hibernate.hbm2ddl.auto", "create-drop");
             sessionFactory = conf.buildSessionFactory();
         } catch (Throwable ex) {
             // Log the exception. 

@@ -1,13 +1,10 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.component.CActionForm;
-import com.softhaxi.shortsage.v1.component.CDialog;
-import com.softhaxi.shortsage.v1.component.CZebraTable;
+import com.softhaxi.shortsage.v1.desktop.HActionForm;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.dto.ContactGroup;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
@@ -27,15 +24,16 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
+import org.jdesktop.swingx.JXTable;
 
-public class ContactGroupActionForm extends CActionForm<ContactGroup>
+public class ContactGroupActionForm extends HActionForm<ContactGroup>
         implements ActionListener {
 
     private JTextField txId, txName;
     private JTextArea txRemark;
     private JComboBox cmStatus, cmHandler;
 
-    private CZebraTable tbContact;
+    private JXTable tbContact;
     private JButton bcNew, bcDelete, bcExport, bcImport, bcRefresh;
 
     public ContactGroupActionForm() {
@@ -128,8 +126,8 @@ public class ContactGroupActionForm extends CActionForm<ContactGroup>
 
         pTable.add(toContact, BorderLayout.NORTH);
 
-        tbContact = new CZebraTable();
-        pTable.add(tbContact, BorderLayout.CENTER);
+        tbContact = new JXTable();
+        pTable.add(new JScrollPane(tbContact), BorderLayout.CENTER);
 
         return pTable;
     }
@@ -168,21 +166,21 @@ public class ContactGroupActionForm extends CActionForm<ContactGroup>
             if (bSource == bSave || bSource == bSaveNew) {
                 if (save()) {
                     if (bSource == bSave) {
-                        CDialog dialog = null;
-
-                        if (getRootPane().getParent() instanceof CDialog) {
-                            dialog = (CDialog) getRootPane().getParent();
-                            dialog.dispose();
-                        }
-                        final ContactGroupActionForm form = new ContactGroupActionForm(object);
-                        dialog = new CDialog(null, form, "Contact Group " + object.getName(), true);
-                        try {
-                            Toolkit kit = Toolkit.getDefaultToolkit();
-                            dialog.setIconImage(kit.createImage(ClassLoader.getSystemResource("images/ic_logo.png")));
-                        } catch (Exception ex) {
-                            System.err.printf(ex.getMessage());
-                        }
-                        dialog.setVisible(true);
+//                        CDialog dialog = null;
+//
+//                        if (getRootPane().getParent() instanceof CDialog) {
+//                            dialog = (CDialog) getRootPane().getParent();
+//                            dialog.dispose();
+//                        }
+//                        final ContactGroupActionForm form = new ContactGroupActionForm(object);
+//                        dialog = new CDialog(null, form, "Contact Group " + object.getName(), true);
+//                        try {
+//                            Toolkit kit = Toolkit.getDefaultToolkit();
+//                            dialog.setIconImage(kit.createImage(ClassLoader.getSystemResource("images/ic_logo.png")));
+//                        } catch (Exception ex) {
+//                            System.err.printf(ex.getMessage());
+//                        }
+//                        dialog.setVisible(true);
                     }
                 }
             }
