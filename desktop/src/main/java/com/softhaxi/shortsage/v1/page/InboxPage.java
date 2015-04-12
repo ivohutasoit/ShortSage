@@ -1,116 +1,153 @@
 package com.softhaxi.shortsage.v1.page;
 
-import com.softhaxi.shortsage.v1.component.CNumberedTable;
-import com.softhaxi.shortsage.v1.component.CSearchField;
-import com.softhaxi.shortsage.v1.component.CZebraTable;
-import com.softhaxi.shortsage.v1.dto.Message;
-import com.softhaxi.shortsage.v1.dummies.MessageDummy;
-import com.softhaxi.shortsage.v1.table.model.InboxTableModel;
+import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
+import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
-import javax.swing.SwingWorker;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import org.smslib.InboundMessage;
-import org.smslib.InboundMessage.MessageClasses;
-import org.smslib.Service;
+import javax.swing.table.DefaultTableModel;
+import net.java.dev.designgridlayout.DesignGridLayout;
+import org.jdesktop.swingx.JXSearchField;
+import org.jdesktop.swingx.JXTable;
 
 /**
- * Reference <a href="https://github.com/oliverwatkins/swing_library">Swing Library</a>
- * 
+ *
  * @author Ivo Hutasoit
  * @since 1
  * @version 1.0.0
  */
-public class InboxPage extends CPanel {
-    
-    private JXSearchField fSearch;
-    private CZebraTable tData;
-    
-    private JPanel pDetail;
-    private List<Message> dbMessages;
-    private List<InboundMessage> mdMessages;
+public class InboxPage extends JPanel {
 
+    private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
+
+    private final static String[] COLUMN_NAME = new String[]{
+        "Contact",
+        "Message",
+        "Date",
+        "Status"
+    };
+
+    private JPanel pNorth;
+    private JPanel pCenter;
+    private JPanel pSouth;
+
+    private JXSearchField tfSearch;
+    private JComboBox cfViews;
+    private JXTable ttData;
+
+    private DefaultTableModel mData;
+
+    /**
+     * Main Constructor
+     */
     public InboxPage() {
-        super();
+        setVisible(false);
+        initComponents();
+        initListeners();
     }
 
-    @Override
+    // <editor-fold defaultstate="collapsed" desc="Region Inititalization">  
+    /**
+     * Initialize components of the panel
+     */
     private void initComponents() {
-        CSearchField pSearch = new CSearchField() {
+        setLayout(new BorderLayout());
 
-            @Override
-            public void doSearch() {
-                JOptionPane.showMessageDialog(null, "Search action was not implemented full!");
-            }
-        };
-
-        add(pSearch, BorderLayout.NORTH);
-
-        pDetail = new JPanel(new BorderLayout(0, 3));
-        JToolBar tpDetail = new JToolBar();
-        tpDetail.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
-        tpDetail.setFloatable(false);
-
-        tpDetail.add(new JButton("New", new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png"))));
-        tpDetail.add(new JButton("Edit", new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
-        tpDetail.add(new JToolBar.Separator());
-        tpDetail.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png"))));
-        tpDetail.add(Box.createHorizontalGlue());
-        tpDetail.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png"))));
-
-        pDetail.add(tpDetail, BorderLayout.NORTH);
-        add(pDetail, BorderLayout.CENTER);
-        
-        initTable();
+        initNorthPanel();
+        initCenterPanel();
+        initSouthPanel();
     }
 
-    private void initTable() {
-        CZebraTable table = new CZebraTable(new InboxTableModel(MessageDummy.getInbox()));
-        table.setShowGrid(false);
-        table.setIntercellSpacing(new Dimension(0, 0));
-//        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        table.getColumnModel().getColumn(0).setPreferredWidth(100);
-        table.getColumnModel().getColumn(1).setPreferredWidth(700);
+    /**
+     *
+     */
+    private void initNorthPanel() {
+        pNorth = new JPanel();
+        tfSearch = new JXSearchField(RES_GLOBAL.getString("label.search.item"));
+        tfSearch.setSearchMode(JXSearchField.SearchMode.REGULAR);
+        cfViews = new JComboBox();
+        cfViews.addItem("All Items");
 
-        CNumberedTable rowTable = new CNumberedTable(table);
-        //Create the scroll pane and add the table to it.
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setRowHeaderView(rowTable);
-        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
+        DesignGridLayout layout = new DesignGridLayout(pNorth);
+        layout.margins(0.5, 0.5, 0.5, 0.5);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.search") + " :"))
+                .add(tfSearch)
+                .grid(new JLabel(RES_GLOBAL.getString("label.view") + " :"))
+                .add(cfViews);
+
+        add(pNorth, BorderLayout.NORTH);
+    }
+
+    /**
+     *
+     */
+    private void initCenterPanel() {
+        pCenter = new JPanel(new BorderLayout());
+        pCenter.setBorder(new EmptyBorder(0, 4, 4, 4));
+        JToolBar pToolbar = new JToolBar();
+        pToolbar.setFloatable(false);
+        pToolbar.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
+
+        pToolbar.add(new JButton(RES_GLOBAL.getString("label.reply"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_reply_16.png"))));
+        pToolbar.add(new JButton(RES_GLOBAL.getString("label.edit"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
+        pToolbar.addSeparator();
+        pToolbar.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png"))));
+        pToolbar.add(Box.createHorizontalGlue());
+        pToolbar.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png"))));
+
+        pCenter.add(pToolbar, BorderLayout.NORTH);
+
+        ttData = new JXTable();
+        ttData.setEditable(false);
+
+        mData = new DefaultTableModel(COLUMN_NAME, 0);
+        ttData.setModel(mData);
+        ttData.setShowGrid(false);
+        ttData.setIntercellSpacing(new Dimension(0, 0));
+        ttData.getTableHeader().setDefaultRenderer(new TableHeaderCenterRender(ttData));
+        ttData.getColumnModel().getColumn(0).setPreferredWidth(100);
+        ttData.getColumnModel().getColumn(1).setPreferredWidth(450);
+        ttData.getColumnModel().getColumn(2).setPreferredWidth(80);
+
+        JScrollPane sPane = new JScrollPane(ttData);
+        HNumberedTable rowTable = new HNumberedTable(ttData);
+        sPane.setRowHeaderView(rowTable);
+        sPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
                 rowTable.getTableHeader());
 
-        //Add the scroll pane to this panel.
-        pDetail.add(scrollPane, BorderLayout.CENTER);
-    }
-    
-    @Override
-    public void initData() {
-           
+        pCenter.add(sPane, BorderLayout.CENTER);
+
+        add(pCenter, BorderLayout.CENTER);
     }
 
-    private class LoadMessageTask extends SwingWorker<Boolean, Void> {
-
-        @Override
-        protected Boolean doInBackground() throws Exception {
-            mdMessages = new ArrayList<InboundMessage>();
-            Service.getInstance().readMessages(mdMessages, MessageClasses.ALL);
-            Message message = null;
-            for (InboundMessage msg : mdMessages) {
-                System.out.println(msg);
-            }
-            return true;
-        }
+    /**
+     *
+     */
+    private void initSouthPanel() {
 
     }
+
+    /**
+     * Initialize listeners for all components of frame
+     */
+    private void initListeners() {
+//        addComponentListener(new ComponentAdapter() {
+//            @Override
+//            public void componentShown(ComponentEvent e) {
+//                JOptionPane.showMessageDialog(null, "This is dialog from Import Page");
+//            }
+//        });
+    }
+    // </editor-fold>   
 }
