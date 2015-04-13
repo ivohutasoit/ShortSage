@@ -44,7 +44,7 @@ import org.smslib.modem.SerialModemGateway;
  * @since 1
  * @version 1.0.0
  */
-public class NewGatewayActionForm extends JPanel
+public class GatewayActionForm extends JPanel
         implements ActionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
@@ -87,7 +87,7 @@ public class NewGatewayActionForm extends JPanel
     /**
      *
      */
-    public NewGatewayActionForm() {
+    public GatewayActionForm() {
         this(null, ActionState.CREATE);
     }
 
@@ -96,7 +96,7 @@ public class NewGatewayActionForm extends JPanel
      * @param object
      * @param state
      */
-    public NewGatewayActionForm(Gateway object, ActionState state) {
+    public GatewayActionForm(Gateway object, ActionState state) {
         this.object = object;
         this.state = state;
 
