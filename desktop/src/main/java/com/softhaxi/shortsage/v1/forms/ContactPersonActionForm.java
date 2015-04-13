@@ -1,24 +1,24 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.desktop.HActionForm;
 import com.softhaxi.shortsage.v1.dto.ContactPerson;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Date;
+import java.util.ResourceBundle;
 import java.util.UUID;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
+import javax.swing.JToolBar;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
 import net.java.dev.designgridlayout.RowGroup;
@@ -31,176 +31,196 @@ import org.hibernate.Session;
  * </ul>
  *
  * @author Ivo Hutasoit
+ * @since 1
+ * @version 1.0.0
  */
-public class ContactPersonActionForm extends HActionForm<ContactPerson> {
+public class ContactPersonActionForm extends JPanel {
 
-    private JComboBox cmPrefix, cmCountry, cmStatus, cmHandler;
-    private JTextField fFName, fMName, fLName, fEmail, fCompany;
-    private JTextField fAddr1, fAddr2, fAddr3, fCity, fZip;
-    private JTextField fPhone, fHome, fWork, fCustom;
-    private JTextArea fRemark;
-    private JCheckBox chAddress, chPreference;
+    private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
+
+    private ContactPerson object;
+    private ActionState state;
+    
+    /**
+     * Tool bar items
+     */
+    private JButton bNew, bEdit, bDelete;
+    private JButton bSave, bSaveNew, bCancel;
+
+    /**
+     * Fields
+     */
+    private JComboBox cfPrefix, cfCountry, cfStatus, cfHandler;
+    private JTextField tfFName, tfMName, tfLName, tfEmail, tfCompany;
+    private JTextField tfAddr1, tfAddr2, tfAddr3, tfCity, tfZip;
+    private JTextField tfPhone, tfHome, tfWork, tfCustom;
+    private JTextArea tfRemark;
+    private JCheckBox cfAddress, cfPreference;
 
     /**
      *
      */
     public ContactPersonActionForm() {
-        super();
+        this(null, ActionState.CREATE);
     }
 
     /**
      *
-     * @param person
+     * @param object
      */
-    public ContactPersonActionForm(ContactPerson person) {
-        super(person);
+    public ContactPersonActionForm(ContactPerson object) {
+        this(object, ActionState.SHOW);
     }
 
     /**
      *
+     * @param object
      * @param state
-     * @param person
      */
-    public ContactPersonActionForm(ActionState state, ContactPerson person) {
-        super(state, person);
+    public ContactPersonActionForm(ContactPerson object, ActionState state) {
+        this.object = object;
+        this.state = state;
+
+        initComponents();
+        initListeners();
+        initState();
     }
 
-    @Override
-    public void initComponents() {
-        super.initComponents();
-        setBorder(new EmptyBorder(0, 2, 2, 0));
+    // <editor-fold defaultstate="collapsed" desc="Region Initialization">
+    /**
+     *
+     */
+    private void initComponents() {
+        setLayout(new BorderLayout());
         setPreferredSize(new Dimension(500, 600));
 
-        cmPrefix = new JComboBox(new String[]{
+        initToolbar();
+        initFormPanel();
+    }
+    
+    /**
+     * 
+     */
+    private void initToolbar() {
+        JToolBar pToolbar = new JToolBar();
+        pToolbar.setFloatable(false);
+
+        bNew = new JButton(RES_GLOBAL.getString("label.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        pToolbar.add(bNew);
+
+        bEdit = new JButton(RES_GLOBAL.getString("label.edit"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png")));
+        pToolbar.add(bEdit);
+
+        bSave = new JButton(RES_GLOBAL.getString("label.save"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save.png")));
+        pToolbar.add(bSave);
+
+        bSaveNew = new JButton(RES_GLOBAL.getString("label.save.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save_as.png")));
+        pToolbar.add(bSaveNew);
+        pToolbar.addSeparator();
+
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        pToolbar.add(bDelete);
+
+        bCancel = new JButton(RES_GLOBAL.getString("label.cancel"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
+        pToolbar.add(bCancel);
+
+        add(pToolbar, BorderLayout.NORTH);
+    }
+    
+    /**
+     * 
+     */
+    private void initFormPanel() {
+        cfPrefix = new JComboBox(new String[]{
             "Mr.",
             "Mrs.",
             "Ms."
         });
 
-        cmCountry = new JComboBox(new String[]{
+        cfCountry = new JComboBox(new String[]{
             "IDN"
         });
 
-        cmStatus = new JComboBox(new String[]{
-            "Active",
-            "Deactive"
-        });
-        cmStatus.setEnabled(false);
-
-        cmHandler = new JComboBox(new String[]{
-            "No Action",
-            "Activated",
-            "Deactivated",
-            "Deleted"
-        });
-
-        fFName = new JTextField();
-        fMName = new JTextField();
-        fLName = new JTextField();
-        fEmail = new JTextField();
-        fCompany = new JTextField();
-        fAddr1 = new JTextField();
-        fAddr2 = new JTextField();
-        fAddr3 = new JTextField();
-        fCity = new JTextField();
-        fZip = new JTextField();
-        fPhone = new JTextField();
-        fRemark = new JTextArea();
-        fRemark.setRows(3);
-        fRemark.setLineWrap(true);
+        cfStatus = new JComboBox();
+        cfStatus.setEnabled(false);
+        cfHandler = new JComboBox();
+        tfFName = new JTextField();
+        tfMName = new JTextField();
+        tfLName = new JTextField();
+        tfEmail = new JTextField();
+        tfCompany = new JTextField();
+        tfAddr1 = new JTextField();
+        tfAddr2 = new JTextField();
+        tfAddr3 = new JTextField();
+        tfCity = new JTextField();
+        tfZip = new JTextField();
+        tfPhone = new JTextField();
+        tfRemark = new JTextArea();
+        tfRemark.setRows(3);
+        tfRemark.setLineWrap(true);
 
         JPanel pForm = new JPanel();
         DesignGridLayout layout = new DesignGridLayout(pForm);
         layout.labelAlignment(LabelAlignment.RIGHT);
-        layout.row().grid(new JLabel("Prefix :")).add(cmPrefix).empty(5);
-        layout.row().grid(new JLabel("Name :")).add(fFName).add(fMName).add(fLName);
-        layout.row().grid(new JLabel("Phone Number :")).add(cmCountry).add(fPhone, 3).empty(2);
-        layout.row().grid(new JLabel("Email :")).add(fEmail).empty();
-        layout.row().grid(new JLabel("Company :")).add(fCompany).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.prefix") + " :")).add(cfPrefix).empty(5);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.name"))).add(tfFName)
+                .add(tfMName)
+                .add(tfLName);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.phone") + " :")).add(cfCountry)
+                .add(tfPhone, 3)
+                .empty(2);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.email") + " :")).add(tfEmail).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.company") + " :")).add(tfCompany).empty();
         layout.emptyRow();
-        layout.row().grid(new JLabel("Address :")).add(fAddr1);
-        layout.row().grid().add(fAddr2);
-        layout.row().grid().add(fAddr3);
-        layout.row().grid(new JLabel("City :")).add(fCity).empty();
-        layout.row().grid(new JLabel("Zip Code :")).add(fZip).empty(5);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.address") + " :")).add(tfAddr1);
+        layout.row().grid().add(tfAddr2);
+        layout.row().grid().add(tfAddr3);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.city") + " :")).add(tfCity).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.zip") + " :")).add(tfZip).empty(5);
         //layout.emptyRow();
         //layout.row().grid(new JLabel("Description :")).add(new JScrollPane(fRemark));
-        layout.row().grid(new JLabel("Status :")).add(cmStatus).empty(2);
-        layout.row().grid(new JLabel("Handler :")).add(cmHandler).empty(2);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler") + " :")).add(cfHandler).empty(2);
 
         add(pForm, BorderLayout.CENTER);
-        
-        bSave.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                save();
-            }
-        });
     }
 
-    @Override
-    public void initData() {
+    /**
+     *
+     */
+    private void initListeners() {
 
     }
 
     /**
      *
      */
-    @Override
-    public void initState() {
-//        CDialog dialog = null;
-//
-//        if (getRootPane().getParent() instanceof CDialog) {
-//            dialog = (CDialog) getRootPane().getParent();
-//        }
-//
-//        if (dialog != null) {
-//            bSave.setVisible(false);
-//            bSaveNew.setVisible(false);
-//            bCancel.setVisible(false);
-//        } else {
-//            if (state == ActionState.CREATE || state == ActionState.EDIT) {
-//                
-//            }
-//        }
-        
+    private void initState() {
         if(state == ActionState.CREATE) {
-            cmHandler.setEnabled(false);
-        }
-        
-        bNew.setVisible(false);
-        bEdit.setVisible(false);
-        bDelete.setVisible(false);
-    }
-
-    public void save() {
-        if (state == ActionState.CREATE) {
-            object = new ContactPerson();
-            object.setId(UUID.randomUUID().toString());
-            object.setFirstName(fFName.getText().trim());
-            object.setMidName(fMName.getText().trim());
-            object.setLastName(fLName.getText().trim());
-            object.setName(String.format("%s %s %s",
-                    object.getFirstName(), object.getMidName(), object.getLastName()));
-            object.setCountry(cmCountry.getSelectedItem().toString());
-            object.setPhone(fPhone.getText().trim());
-            object.setStatus(1);
-            object.setCreatedBy("SYSTEM");
-            object.setCreatedOn(new Date());
-            object.setModifiedBy(object.getCreatedBy());
-            object.setModifiedOn(object.getCreatedOn());
-            object.setDeletedState(0);
-
-            Session session = HibernateUtil.getSessionFactory().openSession();
-
-            session.beginTransaction();
-            session.saveOrUpdate(object);
-            session.getTransaction().commit();
-            session.close();
-         
+            cfStatus.removeAllItems();
+            cfStatus.addItem("Create");
+            
+            cfHandler.removeAllItems();
+            cfHandler.addItem("Created");
+            cfHandler.setEnabled(false);
+            
+            bNew.setVisible(false);
+            bEdit.setVisible(false);
+            bDelete.setVisible(false);
+            bSaveNew.setVisible(false);
         }
     }
+
+    private void initData() {
+
+    }
+
+    // </editor-fold>
 
     private class RowShowHideAction implements ItemListener {
 

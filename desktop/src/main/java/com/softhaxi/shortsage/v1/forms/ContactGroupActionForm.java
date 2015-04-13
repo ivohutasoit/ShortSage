@@ -1,6 +1,5 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.desktop.HActionForm;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.dto.ContactGroup;
 import java.awt.BorderLayout;
@@ -8,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
+import java.util.ResourceBundle;
 import java.util.UUID;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -25,81 +25,139 @@ import javax.swing.border.EtchedBorder;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.JXTextField;
 
-public class ContactGroupActionForm extends HActionForm<ContactGroup>
+public class ContactGroupActionForm extends JPanel
         implements ActionListener {
+    
+    private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
+    
+    private ContactGroup object;
+    private ActionState state;
+    
+    /**
+     * Tool bar items
+     */
+    private JButton bNew, bEdit, bDelete;
+    private JButton bSave, bSaveNew, bCancel;
 
-    private JTextField txId, txName;
-    private JTextArea txRemark;
-    private JComboBox cmStatus, cmHandler;
+    /**
+     * Fields
+     */
+    private JXTextField tfName;
+    private JTextArea tfRemark;
+    private JComboBox cfStatus, cfHandler;
 
+    /**
+     * Contact Person Detail
+     */
     private JXTable tbContact;
     private JButton bcNew, bcDelete, bcExport, bcImport, bcRefresh;
 
+    /**
+     * 
+     */
     public ContactGroupActionForm() {
-        super();
+        this(null, ActionState.CREATE);
     }
 
-    public ContactGroupActionForm(ContactGroup group) {
-        super(group);
+    /**
+     * 
+     * @param object 
+     */
+    public ContactGroupActionForm(ContactGroup object) {
+        this(object, ActionState.SHOW);
     }
 
-    public ContactGroupActionForm(ActionState state, ContactGroup group) {
-        super(state, group);
+    /**
+     * 
+     * @param object
+     * @param state 
+     */
+    public ContactGroupActionForm(ContactGroup object, ActionState state) {
+        this.object = object;
+        this.state = state;
+        
+        initComponents();
+        initListeners();
+        initState();
     }
 
-    @Override
-    public void initComponents() {
-        super.initComponents();
-
-        txId = new JTextField();
-        txName = new JTextField();
-        txRemark = new JTextArea();
-        txRemark.setLineWrap(true);
-        txRemark.setRows(3);
-
-        cmStatus = new JComboBox(new String[]{
-            "Active",
-            "Deactive"
-        });
-        cmStatus.setEnabled(false);
-
-        cmHandler = new JComboBox(new String[]{
-            "No Action",
-            "Activated",
-            "Deactivated",
-            "Deleted"
-        });
-
+    /**
+     * 
+     */
+    private void initComponents() {
+        setLayout(new BorderLayout());
         if (state == ActionState.CREATE) {
             setPreferredSize(new Dimension(450, 250));
-            add(getPanelHeader(), BorderLayout.CENTER);
         } else {
             setPreferredSize(new Dimension(450, 400));
-            JPanel pForm = new JPanel(new BorderLayout());
-
-            pForm.add(getPanelHeader(), BorderLayout.NORTH);
-            pForm.add(getPanelTable(), BorderLayout.CENTER);
-            add(pForm, BorderLayout.CENTER);
+            initDetailPanel();
         }
-
-        bSave.addActionListener(this);
+        initToolbar();
+        initFormPanel();
     }
+    
+    /**
+     * 
+     */
+    private void initToolbar() {
+        JToolBar pToolbar = new JToolBar();
+        pToolbar.setFloatable(false);
 
-    private JPanel getPanelHeader() {
-        JPanel pHeader = new JPanel();
+        bNew = new JButton(RES_GLOBAL.getString("label.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        pToolbar.add(bNew);
 
-        DesignGridLayout layout = new DesignGridLayout(pHeader);
+        bEdit = new JButton(RES_GLOBAL.getString("label.edit"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png")));
+        pToolbar.add(bEdit);
+
+        bSave = new JButton(RES_GLOBAL.getString("label.save"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save.png")));
+        pToolbar.add(bSave);
+
+        bSaveNew = new JButton(RES_GLOBAL.getString("label.save.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save_as.png")));
+        pToolbar.add(bSaveNew);
+        pToolbar.addSeparator();
+
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        pToolbar.add(bDelete);
+
+        bCancel = new JButton(RES_GLOBAL.getString("label.cancel"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
+        pToolbar.add(bCancel);
+
+        add(pToolbar, BorderLayout.NORTH);
+    }
+    
+    /**
+     * 
+     */
+    private void initFormPanel() {
+        JPanel pForm = new JPanel();
+        
+        tfName = new JXTextField(RES_GLOBAL.getString("label.contact.group"));
+        tfRemark = new JTextArea();
+        tfRemark.setLineWrap(true);
+        tfRemark.setRows(3);
+
+        cfStatus = new JComboBox();
+        cfStatus.setEnabled(false);
+        cfHandler = new JComboBox();
+
+        DesignGridLayout layout = new DesignGridLayout(pForm);
         layout.labelAlignment(LabelAlignment.RIGHT);
-        layout.row().grid(new JLabel("Group :")).add(txName).empty();
-        layout.row().grid(new JLabel("Description :")).add(new JScrollPane(txRemark));
-        layout.row().grid(new JLabel("Status :")).add(cmStatus).empty(2);
-        layout.row().grid(new JLabel("Handler :")).add(cmHandler).empty(2);
-
-        return pHeader;
+        layout.row().grid(new JLabel("Group :")).add(tfName).empty();
+        layout.row().grid(new JLabel("Description :")).add(new JScrollPane(tfRemark));
+        layout.row().grid(new JLabel("Status :")).add(cfStatus).empty(2);
+        layout.row().grid(new JLabel("Handler :")).add(cfHandler).empty(2);
+        
+        add(pForm, BorderLayout.CENTER);
     }
-
-    private JPanel getPanelTable() {
+    
+    private void initDetailPanel() {
         JPanel pTable = new JPanel(new BorderLayout());
         JToolBar toContact = new JToolBar();
         toContact.setFloatable(false);
@@ -128,77 +186,26 @@ public class ContactGroupActionForm extends HActionForm<ContactGroup>
 
         tbContact = new JXTable();
         pTable.add(new JScrollPane(tbContact), BorderLayout.CENTER);
+        
+        add(pTable, BorderLayout.SOUTH);
+    }
+    
+    private void initListeners() {
+        
+    }
+ 
+    private void initState() {
 
-        return pTable;
     }
 
-    @Override
-    public void initState() {
-        super.initState();
-
-        if (state == ActionState.CREATE) {
-            txId.setEditable(false);
-            cmHandler.setEnabled(false);
-        } else if (state == ActionState.SHOW) {
-            txName.setEditable(false);
-            txRemark.setEditable(false);
-            cmHandler.setEnabled(true);
-            bCancel.setVisible(false);
-            bSave.setVisible(false);
-            bSaveNew.setVisible(false);
-        }
-    }
-
-    @Override
-    public void initData() {
-        if (object != null) {
-            txName.setText(object.getName());
-            txRemark.setText(object.getRemark());
-            cmHandler.setSelectedIndex(0);
-            cmStatus.setSelectedIndex(object.getStatus());
-        }
+    private void initData() {
+        
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton bSource = (JButton) e.getSource();
-            if (bSource == bSave || bSource == bSaveNew) {
-                if (save()) {
-                    if (bSource == bSave) {
-//                        CDialog dialog = null;
-//
-//                        if (getRootPane().getParent() instanceof CDialog) {
-//                            dialog = (CDialog) getRootPane().getParent();
-//                            dialog.dispose();
-//                        }
-//                        final ContactGroupActionForm form = new ContactGroupActionForm(object);
-//                        dialog = new CDialog(null, form, "Contact Group " + object.getName(), true);
-//                        try {
-//                            Toolkit kit = Toolkit.getDefaultToolkit();
-//                            dialog.setIconImage(kit.createImage(ClassLoader.getSystemResource("images/ic_logo.png")));
-//                        } catch (Exception ex) {
-//                            System.err.printf(ex.getMessage());
-//                        }
-//                        dialog.setVisible(true);
-                    }
-                }
-            }
         }
-    }
-
-    private boolean save() {
-        boolean saved = false;
-
-        object = new ContactGroup();
-        object.setId(UUID.randomUUID().toString());
-        object.setName(txName.getText().trim());
-        object.setRemark(txRemark.getText().trim());
-        object.setStatus(1);
-        object.setCreatedBy("SYSTEM");
-        object.setCreatedOn(new Date());
-        saved = true;
-
-        return saved;
     }
 }

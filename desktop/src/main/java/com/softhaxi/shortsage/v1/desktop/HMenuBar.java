@@ -1,12 +1,16 @@
 package com.softhaxi.shortsage.v1.desktop;
 
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
+import com.softhaxi.shortsage.v1.forms.NewMessageActionForm;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -29,7 +33,7 @@ public class HMenuBar extends JMenuBar
      * List of default menu item
      */
     private JMenu mhFile;
-    private JMenuItem miNew;
+    private JMenuItem miMessage;
     private JMenuItem miModem;
     private JMenuItem miUser;
     private JMenuItem miExit;
@@ -57,10 +61,10 @@ public class HMenuBar extends JMenuBar
         mhFile = new JMenu(RES_GLOBAL.getString("label.file"));
         mhFile.setMnemonic(KeyEvent.VK_F);
 
-        miNew = new JMenuItem(RES_GLOBAL.getString("label.new.item"), KeyEvent.VK_N);
-        miNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));
-        miNew.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
-        mhFile.add(miNew);
+        miMessage = new JMenuItem(RES_GLOBAL.getString("label.new.message"), KeyEvent.VK_N);
+        miMessage.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK));
+        miMessage.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        mhFile.add(miMessage);
 
         miModem = new JMenuItem(RES_GLOBAL.getString("label.modem.connect"), KeyEvent.VK_C);
         miModem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
@@ -104,6 +108,7 @@ public class HMenuBar extends JMenuBar
      * 
      */
     private void initListeners() {
+        miMessage.addActionListener(this);
         miModem.addActionListener(this);
     }
     // </editor-fold>
@@ -115,13 +120,39 @@ public class HMenuBar extends JMenuBar
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() instanceof JMenuItem) {
-            JMenuItem item = (JMenuItem) e.getSource();
-            if(item == miModem) {
+            JMenuItem source = (JMenuItem) e.getSource();
+            if(source == miModem) {
                 if(Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPED) {
                     firePropertyChange(PropertyChangeField.CONNECTING.toString(), false, true);
                     
 //                    firePropertyChange(PropertyChangeField.CONNECTING.toString(), true, false);
                 }
+            } else if(source == miMessage) {
+                final JDialog dialog = new JDialog();
+                dialog.setModal(true);
+                dialog.setTitle(RES_GLOBAL.getString("label.new") + " Message");
+                NewMessageActionForm form = new NewMessageActionForm();
+                form.addPropertyChangeListener(new PropertyChangeListener() {
+                    /**
+                     *
+                     * @param evt
+                     */
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+
+                        if (evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
+                            boolean value = (boolean) evt.getNewValue();
+                            if (value == false) {
+                                dialog.dispose();
+                            }
+                        }
+                    }
+                });
+                dialog.add(form);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
             }
         }
     }

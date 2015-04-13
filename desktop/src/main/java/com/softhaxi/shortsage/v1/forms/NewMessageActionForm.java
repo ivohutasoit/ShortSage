@@ -1,59 +1,71 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.dto.MessageTemplate;
+import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.enums.ActionState;
+import static java.awt.AWTEventMulticaster.add;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
-import java.util.Date;
+import java.awt.TextArea;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ResourceBundle;
-import java.util.UUID;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import net.java.dev.designgridlayout.DesignGridLayout;
-import net.java.dev.designgridlayout.LabelAlignment;
+import net.java.dev.designgridlayout.RowGroup;
 import org.hibernate.Session;
-import org.jdesktop.swingx.JXTextField;
+import org.jdesktop.swingx.JXDatePicker;
 
-public class MessageTemplateActionForm extends JPanel {
+public class NewMessageActionForm extends JPanel {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
-    private MessageTemplate object;
+    private Message object;
     private ActionState state;
 
     /**
      * Tool bar items
      */
-    private JButton bNew, bEdit, bDelete;
+    private JButton bNew, bEdit, bDelete, bReply;
     private JButton bSave, bSaveNew, bCancel;
 
     /**
      * Fields
      */
-    private JXTextField tfName;
+    private JCheckBox cfScheduler;
+    private JTextField tfContact;
+    private JXDatePicker dfDate;
     private JTextArea tfText;
-    private JComboBox cfStatus, cfHandler;
+    private JComboBox cfTemplate, cfStatus, cfHandler;
 
     /**
      * Database connection
      */
     private Session hSession;
 
-    public MessageTemplateActionForm() {
+    /**
+     *
+     */
+    public NewMessageActionForm() {
         this(null, ActionState.CREATE);
     }
 
-    public MessageTemplateActionForm(MessageTemplate object) {
-        this(null, ActionState.SHOW);
-    }
-
-    public MessageTemplateActionForm(MessageTemplate object, ActionState state) {
+    /**
+     *
+     * @param object
+     * @param state
+     */
+    public NewMessageActionForm(Message object, ActionState state) {
         this.object = object;
         this.state = state;
 
@@ -68,7 +80,7 @@ public class MessageTemplateActionForm extends JPanel {
      */
     private void initComponents() {
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(450, 250));
+        setPreferredSize(new Dimension(500, 300));
 
         initToolbar();
         initFormPanel();
@@ -112,16 +124,29 @@ public class MessageTemplateActionForm extends JPanel {
      *
      */
     private void initFormPanel() {
-        tfName = new JXTextField("Template Name");
+        JPanel pForm = new JPanel();
+
+        cfScheduler = new JCheckBox(RES_GLOBAL.getString("label.message.scheduler"));
+        cfScheduler.setForeground(Color.blue);
+        tfContact = new JTextField();
+        dfDate = new JXDatePicker();
         tfText = new JTextArea();
         tfText.setRows(3);
+        tfText.setFont(tfContact.getFont());
+        cfTemplate = new JComboBox();
         cfStatus = new JComboBox();
+        cfStatus.setEnabled(false);
         cfHandler = new JComboBox();
 
-        JPanel pForm = new JPanel();
         DesignGridLayout layout = new DesignGridLayout(pForm);
-        layout.labelAlignment(LabelAlignment.RIGHT);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.template.name") + " :")).add(tfName).empty();
+        RowGroup rgScheduler = new RowGroup();
+        cfScheduler.setSelected(true);
+        cfScheduler.addItemListener(new ShowHideAction(rgScheduler));
+
+        layout.row().left().add(cfScheduler, new JSeparator()).fill();
+        layout.row().group(rgScheduler).grid(new JLabel(RES_GLOBAL.getString("label.message.date"))).add(dfDate).empty(2);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.name") + " :")).add(tfContact, 2).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.template.name") + " :")).add(cfTemplate, 2).empty();
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.message.text") + " :")).add(new JScrollPane(tfText));
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler") + " :")).add(cfHandler).empty(2);
@@ -133,75 +158,49 @@ public class MessageTemplateActionForm extends JPanel {
      *
      */
     private void initListeners() {
-
     }
 
     /**
      *
      */
     private void initState() {
-        if (state == ActionState.CREATE) {
+        if(state == ActionState.CREATE) {
             cfStatus.removeAllItems();
-            cfStatus.addItem("CREATE");
-            cfStatus.setEnabled(false);
-
+            cfStatus.addItem("Create");
+            
             cfHandler.removeAllItems();
-            cfHandler.addItem("CREATED");
+            cfHandler.addItem("Created");
             cfHandler.setEnabled(false);
             
             bNew.setVisible(false);
             bEdit.setVisible(false);
             bDelete.setVisible(false);
             bSaveNew.setVisible(false);
-        } else if (state == ActionState.SHOW || state == ActionState.EDIT) {
-            cfStatus.removeAllItems();
-            cfStatus.addItem("DRAFT");
-            cfStatus.addItem("ACTIVE");
-            cfStatus.addItem("INACTIVE");
-
-            cfHandler.removeAllItems();
-            cfHandler.addItem("NO ACTION");
-            cfHandler.addItem("ACTIVATED");
-            cfHandler.addItem("DEACTIVATED");
-            cfHandler.addItem("DELETED");
-
-            if (state == ActionState.SHOW) {
-                cfStatus.setEnabled(false);
-                cfHandler.setEnabled(false);
-            } else {
-                cfStatus.setEnabled(false);
-                cfStatus.setEnabled(true);
-            }
         }
     }
 
     /**
      *
      */
-    public void initData() {
-        if (state == ActionState.SHOW || state == ActionState.EDIT) {
-            if (object != null) {
-                tfName.setText(object.getName());
-                tfText.setText(object.getText());
-                cfStatus.setSelectedIndex(object.getStatus());
-                cfHandler.setSelectedIndex(0);
-            }
-        }
+    private void initData() {
     }
+  // </editor-fold>
 
-    // </editor-fold>
-    private void save() {
-        if (state == ActionState.CREATE) {
-            object = new MessageTemplate();
-            object.setId(UUID.randomUUID().toString());
-            object.setName(tfName.getText().trim());
-            object.setText(tfText.getText().trim());
-            object.setStatus(0);
-            object.setCreatedBy("SYSTEM");
-            object.setCreatedOn(new Date());
-            object.setModifiedBy("SYSTEM");
-            object.setModifiedOn(new Date());
-            object.setDeletedState(0);
+    class ShowHideAction implements ItemListener {
+
+        private RowGroup group;
+
+        public ShowHideAction(RowGroup group) {
+            this.group = group;
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent event) {
+            if (event.getStateChange() == ItemEvent.SELECTED) {
+                group.show();
+            } else {
+                group.hide();
+            }
         }
     }
 }
