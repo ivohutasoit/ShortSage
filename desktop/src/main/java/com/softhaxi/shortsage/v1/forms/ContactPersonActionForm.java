@@ -1,24 +1,24 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.desktop.HActionForm;
 import com.softhaxi.shortsage.v1.dto.ContactPerson;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Date;
+import java.util.ResourceBundle;
 import java.util.UUID;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
+import javax.swing.JToolBar;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
 import net.java.dev.designgridlayout.RowGroup;
@@ -35,11 +35,17 @@ import org.hibernate.Session;
  * @version 1.0.0
  */
 public class ContactPersonActionForm extends JPanel {
-    
-    private final static ResourceBundle RES_GLOBAL = ResourceBundle.load("global");
-    
+
+    private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
+
     private ContactPerson object;
     private ActionState state;
+    
+    /**
+     * Tool bar items
+     */
+    private JButton bNew, bEdit, bDelete;
+    private JButton bSave, bSaveNew, bCancel;
 
     /**
      * Fields
@@ -72,26 +78,63 @@ public class ContactPersonActionForm extends JPanel {
      * @param state
      */
     public ContactPersonActionForm(ContactPerson object, ActionState state) {
-        super(state, person);
-        
+        this.object = object;
+        this.state = state;
+
         initComponents();
         initListeners();
         initState();
     }
-    
+
     // <editor-fold defaultstate="collapsed" desc="Region Initialization">
-    public void initComponents() {
-        setBorder(new EmptyBorder(0, 2, 2, 0));
+    /**
+     *
+     */
+    private void initComponents() {
+        setLayout(new BorderLayout());
         setPreferredSize(new Dimension(500, 600));
-        
+
         initToolbar();
         initFormPanel();
     }
     
+    /**
+     * 
+     */
     private void initToolbar() {
-        
+        JToolBar pToolbar = new JToolBar();
+        pToolbar.setFloatable(false);
+
+        bNew = new JButton(RES_GLOBAL.getString("label.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        pToolbar.add(bNew);
+
+        bEdit = new JButton(RES_GLOBAL.getString("label.edit"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png")));
+        pToolbar.add(bEdit);
+
+        bSave = new JButton(RES_GLOBAL.getString("label.save"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save.png")));
+        pToolbar.add(bSave);
+
+        bSaveNew = new JButton(RES_GLOBAL.getString("label.save.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save_as.png")));
+        pToolbar.add(bSaveNew);
+        pToolbar.addSeparator();
+
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        pToolbar.add(bDelete);
+
+        bCancel = new JButton(RES_GLOBAL.getString("label.cancel"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
+        pToolbar.add(bCancel);
+
+        add(pToolbar, BorderLayout.NORTH);
     }
     
+    /**
+     * 
+     */
     private void initFormPanel() {
         cfPrefix = new JComboBox(new String[]{
             "Mr.",
@@ -124,21 +167,21 @@ public class ContactPersonActionForm extends JPanel {
         JPanel pForm = new JPanel();
         DesignGridLayout layout = new DesignGridLayout(pForm);
         layout.labelAlignment(LabelAlignment.RIGHT);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.person.prefix") + " :")).add(cfPrefix).empty(5);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.person.name"))).add(tfFName)
-            .add(tfMName)
-            .add(tfLName);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.person.phone") + " :")).add(cfCountry)
-            .add(tfPhone, 3)
-            .empty(2);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.person.email") + " :")).add(tfEmail).empty();
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.person.company") + " :")).add(tfCompany).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.prefix") + " :")).add(cfPrefix).empty(5);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.name"))).add(tfFName)
+                .add(tfMName)
+                .add(tfLName);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.phone") + " :")).add(cfCountry)
+                .add(tfPhone, 3)
+                .empty(2);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.email") + " :")).add(tfEmail).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.company") + " :")).add(tfCompany).empty();
         layout.emptyRow();
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.person.address") + " :")).add(tfAddr1);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.address") + " :")).add(tfAddr1);
         layout.row().grid().add(tfAddr2);
         layout.row().grid().add(tfAddr3);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.person.city") + " :")).add(tfCity).empty();
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.person.zip") + " :")).add(tfZip).empty(5);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.city") + " :")).add(tfCity).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.zip") + " :")).add(tfZip).empty(5);
         //layout.emptyRow();
         //layout.row().grid(new JLabel("Description :")).add(new JScrollPane(fRemark));
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
@@ -146,50 +189,38 @@ public class ContactPersonActionForm extends JPanel {
 
         add(pForm, BorderLayout.CENTER);
     }
-    
+
+    /**
+     *
+     */
     private void initListeners() {
-        
+
     }
 
     /**
      *
      */
-    public void initState() {
-    }
-    
-    public void initData() {
-
-    }
-    
-    // </editor-fold>
-
-    public void save() {
-        if (state == ActionState.CREATE) {
-            object = new ContactPerson();
-            object.setId(UUID.randomUUID().toString());
-            object.setFirstName(fFName.getText().trim());
-            object.setMidName(fMName.getText().trim());
-            object.setLastName(fLName.getText().trim());
-            object.setName(String.format("%s %s %s",
-                    object.getFirstName(), object.getMidName(), object.getLastName()));
-            object.setCountry(cmCountry.getSelectedItem().toString());
-            object.setPhone(fPhone.getText().trim());
-            object.setStatus(1);
-            object.setCreatedBy("SYSTEM");
-            object.setCreatedOn(new Date());
-            object.setModifiedBy(object.getCreatedBy());
-            object.setModifiedOn(object.getCreatedOn());
-            object.setDeletedState(0);
-
-            Session session = HibernateUtil.getSessionFactory().openSession();
-
-            session.beginTransaction();
-            session.saveOrUpdate(object);
-            session.getTransaction().commit();
-            session.close();
-         
+    private void initState() {
+        if(state == ActionState.CREATE) {
+            cfStatus.removeAllItems();
+            cfStatus.addItem("Create");
+            
+            cfHandler.removeAllItems();
+            cfHandler.addItem("Created");
+            cfHandler.setEnabled(false);
+            
+            bNew.setVisible(false);
+            bEdit.setVisible(false);
+            bDelete.setVisible(false);
+            bSaveNew.setVisible(false);
         }
     }
+
+    private void initData() {
+
+    }
+
+    // </editor-fold>
 
     private class RowShowHideAction implements ItemListener {
 

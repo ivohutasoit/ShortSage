@@ -1,5 +1,8 @@
 package com.softhaxi.shortsage.v1.dao;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
 /**
  * References 
  * <ol>

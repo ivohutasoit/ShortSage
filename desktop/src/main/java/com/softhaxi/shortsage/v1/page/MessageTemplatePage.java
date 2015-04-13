@@ -1,14 +1,22 @@
 package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
+import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
+import com.softhaxi.shortsage.v1.forms.GatewayActionForm;
+import com.softhaxi.shortsage.v1.forms.MessageTemplateActionForm;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,7 +35,8 @@ import org.jdesktop.swingx.JXTable;
  * @since 1
  * @version 1.0.0
  */
-public class MessageTemplatePage extends JPanel {
+public class MessageTemplatePage extends JPanel 
+        implements ActionListener {
     
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -45,6 +54,11 @@ public class MessageTemplatePage extends JPanel {
     private JXSearchField tfSearch;
     private JComboBox cfViews;
     private JXTable ttData;
+    
+    /**
+     * Tool bar items
+     */
+    private JButton bNew, bDelete, bRefresh;
     
     private DefaultTableModel mData;
     
@@ -95,16 +109,23 @@ public class MessageTemplatePage extends JPanel {
     private void initCenterPanel() {
         pCenter = new JPanel(new BorderLayout());
         pCenter.setBorder(new EmptyBorder(0, 4, 4, 4));
+        
+        bNew = new JButton(RES_GLOBAL.getString("label.new"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        bRefresh = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png")));
+        
         JToolBar pToolbar = new JToolBar();
         pToolbar.setFloatable(false);
         pToolbar.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
 
-        pToolbar.add(new JButton(RES_GLOBAL.getString("label.new"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png"))));
-        pToolbar.add(new JButton(RES_GLOBAL.getString("label.edit"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
+        
+        
+        pToolbar.add(bNew);
+        //pToolbar.add(new JButton(RES_GLOBAL.getString("label.edit"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
         pToolbar.addSeparator();
-        pToolbar.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png"))));
+        pToolbar.add(bDelete);
         pToolbar.add(Box.createHorizontalGlue());
-        pToolbar.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png"))));
+        pToolbar.add(bRefresh);
 
         pCenter.add(pToolbar, BorderLayout.NORTH);
 
@@ -142,6 +163,7 @@ public class MessageTemplatePage extends JPanel {
      * Initialize listeners for all components of frame
      */
     private void initListeners() {
+        bNew.addActionListener(this);
 //        addComponentListener(new ComponentAdapter() {
 //            @Override
 //            public void componentShown(ComponentEvent e) {
@@ -150,4 +172,44 @@ public class MessageTemplatePage extends JPanel {
 //        });
     }
     // </editor-fold>   
+
+    // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
+    /**
+     * 
+     * @param e 
+     */
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton) {
+            JButton source = (JButton) e.getSource();
+            if(source == bNew) {
+                final JDialog dialog = new JDialog();
+                dialog.setModal(true);
+                dialog.setTitle(RES_GLOBAL.getString("label.new") + " Message Template");
+                MessageTemplateActionForm form = new MessageTemplateActionForm();
+                form.addPropertyChangeListener(new PropertyChangeListener() {
+                    /**
+                     *
+                     * @param evt
+                     */
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+
+                        if (evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
+                            boolean value = (boolean) evt.getNewValue();
+                            if (value == false) {
+                                dialog.dispose();
+                            }
+                        }
+                    }
+                });
+                dialog.add(form);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
+        }
+    }
+    // </editor-fold>
 }

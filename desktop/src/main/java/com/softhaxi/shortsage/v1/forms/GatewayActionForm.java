@@ -383,9 +383,9 @@ public class GatewayActionForm extends JPanel
                     Service.getInstance().removeGateway(modem);
                     hasTest = true;
                 } catch (TimeoutException | GatewayException | IOException | InterruptedException ex) {
-                    Logger.getLogger(NewGatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SMSLibException ex) {
-                    Logger.getLogger(NewGatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             firePropertyChange(PropertyChangeField.CONNECTING.toString(), true, false);

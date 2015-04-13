@@ -3,7 +3,7 @@ package com.softhaxi.shortsage.v1.page;
 import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
 import com.softhaxi.shortsage.v1.dto.Gateway;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
-import com.softhaxi.shortsage.v1.forms.NewGatewayActionForm;
+import com.softhaxi.shortsage.v1.forms.GatewayActionForm;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
@@ -213,7 +213,7 @@ public class GatewaySetupPage extends JPanel
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
                 dialog.setTitle(RES_GLOBAL.getString("label.new") + " Gateway");
-                NewGatewayActionForm form = new NewGatewayActionForm();
+                GatewayActionForm form = new GatewayActionForm();
                 form.addPropertyChangeListener(new PropertyChangeListener() {
                     /**
                      *
