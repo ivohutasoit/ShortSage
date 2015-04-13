@@ -16,29 +16,102 @@ import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
 import org.jdesktop.swingx.JXTextField;
 
-public class MessageTemplateActionForm extends HActionForm<MessageTemplate> {
+public class MessageTemplateActionForm extends JPanel {
+    
+    private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
+    private MessageTemplate object
+    private ActionState = state;
+    
+    /**
+     * Tool bar items
+     */
+    private JButton bNew, bEdit, bDelete;
+    private JButton bSave, bSaveNew, bCancel;
+    private JButton bTest;
+
+    /**
+     * Fields
+     */
     private JXTextField fName;
     private JTextArea fText;
     private JComboBox cmStatus, cmHandler;
+    
+    /**
+     * Database connection
+     */
+    private Session hSession;
 
     public MessageTemplateActionForm() {
-        super();
+        this(null, ActionState.CREATE);
     }
 
-    public MessageTemplateActionForm(MessageTemplate template) {
-        super(template);
+    public MessageTemplateActionForm(MessageTemplate object) {
+        this(null, ActionState.SHOW);
     }
 
-    public MessageTemplateActionForm(ActionState state, MessageTemplate template) {
-        super(state, template);
+    public MessageTemplateActionForm(MessageTemplate object, ActionState state) {
+        this.object = object;
+        this.state = state;
+        
+        initComponents();
+        initListeners();
+        initState();
     }
 
-    @Override
+    // <editor-fold defaultstate="collapsed" desc="Region Initialization">
+    /**
+     * 
+     */
     public void initComponents() {
-        super.initComponents();
         setPreferredSize(new Dimension(450, 250));
         
+        initToolbar();
+        initFormPanel();
+    }
+    
+    /**
+     * 
+     */
+    private void initToolbar() {
+        JToolBar pToolbar = new JToolBar();
+        pToolbar.setFloatable(false);
+
+        bNew = new JButton(RES_GLOBAL.getString("label.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        pToolbar.add(bNew);
+
+        bEdit = new JButton(RES_GLOBAL.getString("label.edit"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png")));
+        pToolbar.add(bEdit);
+
+        bSave = new JButton(RES_GLOBAL.getString("label.save"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save.png")));
+        pToolbar.add(bSave);
+
+        bSaveNew = new JButton(RES_GLOBAL.getString("label.save.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save_as.png")));
+        pToolbar.add(bSaveNew);
+
+        bTest = new JButton(RES_GLOBAL.getString("label.test.gateway"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_modem_connect_16.png")));
+        pToolbar.add(bTest);
+        pToolbar.addSeparator();
+
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        pToolbar.add(bDelete);
+
+        bCancel = new JButton(RES_GLOBAL.getString("label.cancel"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
+        pToolbar.add(bCancel);
+
+        add(pToolbar, BorderLayout.NORTH);
+    }
+    
+    /**
+     * 
+     */
+    private void initFormPanel() {
         fName = new JXTextField("Template Name");
         fText = new JTextArea();
         fText.setRows(3);
@@ -55,8 +128,17 @@ public class MessageTemplateActionForm extends HActionForm<MessageTemplate> {
         
         add(pForm, BorderLayout.CENTER);
     }
+    
+    /**
+     * 
+     */ 
+    private void initListeners() {
+        
+    }
 
-    @Override
+    /**
+     * 
+     */
     public void initState() {
         super.initState();
         if(state == ActionState.CREATE) {
@@ -89,7 +171,9 @@ public class MessageTemplateActionForm extends HActionForm<MessageTemplate> {
         }
     }
 
-    @Override
+    /**
+     * 
+     */
     public void initData() {
         if(state == ActionState.SHOW || state == ActionState.EDIT) {
             if(object != null) {
@@ -101,7 +185,9 @@ public class MessageTemplateActionForm extends HActionForm<MessageTemplate> {
         }
     }
     
-    public void save() {
+    // </editor-fold>
+    
+    private void save() {
         if(state == ActionState.CREATE) {
             object = new MessageTemplate();
             object.setId(UUID.randomUUID().toString());
