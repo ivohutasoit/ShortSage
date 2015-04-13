@@ -61,6 +61,35 @@ public class NewMessageActionForm extends JPanel {
    */
   private void initToolbar() {
     JToolBar pToolbar = new JToolBar();
+    pToolbar.setFloatable(false);
+
+    bNew = new JButton(RES_GLOBAL.getString("label.new"),
+            new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+    pToolbar.add(bNew);
+
+    bEdit = new JButton(RES_GLOBAL.getString("label.edit"),
+            new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png")));
+    pToolbar.add(bEdit);
+
+    bSave = new JButton(RES_GLOBAL.getString("label.save"),
+            new ImageIcon(getClass().getClassLoader().getResource("images/ic_save.png")));
+    pToolbar.add(bSave);
+
+    bSaveNew = new JButton(RES_GLOBAL.getString("label.save.new"),
+            new ImageIcon(getClass().getClassLoader().getResource("images/ic_save_as.png")));
+    pToolbar.add(bSaveNew);
+
+    bTest = new JButton(RES_GLOBAL.getString("label.test.gateway"),
+            new ImageIcon(getClass().getClassLoader().getResource("images/ic_modem_connect_16.png")));
+    pToolbar.add(bTest);
+    pToolbar.addSeparator();
+
+    bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+    pToolbar.add(bDelete);
+
+    bCancel = new JButton(RES_GLOBAL.getString("label.cancel"),
+            new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
+    pToolbar.add(bCancel);
     
     add(pToolbar, BorderLayout.NORTH);
   }
