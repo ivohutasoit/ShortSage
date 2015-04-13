@@ -2,7 +2,7 @@
 ShortSage is a SMS Gateway for generic uses. We give you customable and flexible features for your business.
 Currently, we have focused on first build with some features for basic use by customer.
 
-Some list of task to be completed on desktop implementation are:
+Some list of main task to be completed on desktop implementation are:
 <ol>
 <li>Service for Modem</li>
 <li>Inbox, Outbox, and Bulk Message Page</li>
@@ -14,9 +14,20 @@ Some list of task to be completed on desktop implementation are:
 </ol>
 
 
-Today (13 April 2015) list of task to be completed on desktop implementation are:
+list of task to be completed on desktop implementation are:
 <ol>
-<li>Inbox and Outbox Message Page</li>
-<li>Phone Book Page</li>
-<li>Just In Time and Scheduler sending message</li>
+<li>Inbox and Outbox Message Page
+<ul>
+  <li>ActionListener for all components</li>
+  <li>Load data from database</li>
+  <li>Search Implementation</li>
+</ul>
+</li>
+<li>Just In Time and Scheduler sending message
+<ul>
+<li>Validation on fields</li>
+<li>Send message on background</li>
+<li>Save message to database</li>
+</ul>
+</li>
 </ol>
