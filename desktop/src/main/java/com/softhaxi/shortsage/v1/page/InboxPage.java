@@ -27,7 +27,8 @@ import org.jdesktop.swingx.JXTable;
  * @since 1
  * @version 1.0.0
  */
-public class InboxPage extends JPanel {
+public class InboxPage extends JPanel 
+        implements ActionListener {
 
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -148,6 +149,7 @@ public class InboxPage extends JPanel {
                 loadMessageData();
             }
         });
+        bRefresh.addActionListener(this);
     }
     // </editor-fold>   
     
@@ -205,6 +207,18 @@ public class InboxPage extends JPanel {
             }
         });
         t1.execute();
+    }
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton) {
+            JButton bb = (JButton) e.getSource();
+            if(bb == bRefresh) {
+                loadMessageData();
+            }
+        }
     }
     // </editor-fold>
 }
