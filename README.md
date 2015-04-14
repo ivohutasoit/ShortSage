@@ -33,6 +33,7 @@ Current list of tasks to be completed are:
    * Create, update and delete Contact Group
    * Create, update and delete Contact Person
    * Attact Contact Person to Contact Group
+   * Load data from database
 - Message Template Implementation
    * Create, update and delete message template
    * Double click row table
