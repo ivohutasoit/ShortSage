@@ -3,9 +3,13 @@ package com.softhaxi.shortsage.v1.dto;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Version;
 import org.hibernate.annotations.GenericGenerator;
@@ -18,6 +22,8 @@ import org.hibernate.annotations.GenericGenerator;
  */
 @Entity
 @Table(name = "T0MSSG")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "MGMGFD", discriminatorType = DiscriminatorType.STRING)
 public class Message implements Serializable {
   @Id
   @GeneratedValue(generator="system-uuid")

@@ -1,23 +1,47 @@
 package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
+import com.softhaxi.shortsage.v1.dto.OutboxMessage;
+import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
+import com.softhaxi.shortsage.v1.forms.MessageActionForm;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
+import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.ItemSelectable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.SwingWorker;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import net.java.dev.designgridlayout.DesignGridLayout;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTable;
 
@@ -27,10 +51,10 @@ import org.jdesktop.swingx.JXTable;
  * @since 1
  * @version 1.0.0
  */
-public class OutboxPage extends JPanel 
-        implements ActionListener, ItemListener, 
+public class OutboxPage extends JPanel
+        implements ActionListener, ItemListener,
         ListSelectionListener {
-    
+
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
     private final static String[] COLUMN_NAME = new String[]{
@@ -43,22 +67,27 @@ public class OutboxPage extends JPanel
     private JPanel pNorth;
     private JPanel pCenter;
     private JPanel pSouth;
+    
+    /**
+     * Tool bar items
+     */
+    private JButton bNew, bDelete, bRefresh;
 
     private JXSearchField sfSearch;
     private JComboBox cfViews;
     private JXTable ttData;
-    
+
     /**
      * Data
      */
     private DefaultTableModel mData;
-    private List dMessage;
-    
+    private List<OutboxMessage> dMessage;
+
     /**
      * Database Connection
      */
     private Session hSession;
-    
+
     /**
      * Main Constructor
      */
@@ -67,7 +96,7 @@ public class OutboxPage extends JPanel
         initComponents();
         initListeners();
     }
-    
+
     // <editor-fold defaultstate="collapsed" desc="Region Inititalization">  
     /**
      * Initialize components of the panel
@@ -93,7 +122,7 @@ public class OutboxPage extends JPanel
         DesignGridLayout layout = new DesignGridLayout(pNorth);
         layout.margins(0.5, 0.5, 0.5, 0.5);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.search") + " :"))
-                .add(tfSearch)
+                .add(sfSearch)
                 .grid(new JLabel(RES_GLOBAL.getString("label.view") + " :"))
                 .add(cfViews);
 
@@ -121,7 +150,7 @@ public class OutboxPage extends JPanel
 
         ttData = new JXTable();
         ttData.setEditable(false);
-        
+
         mData = new DefaultTableModel(COLUMN_NAME, 0);
         ttData.setModel(mData);
         ttData.setShowGrid(false);
@@ -130,13 +159,13 @@ public class OutboxPage extends JPanel
         ttData.getColumnModel().getColumn(0).setPreferredWidth(100);
         ttData.getColumnModel().getColumn(1).setPreferredWidth(450);
         ttData.getColumnModel().getColumn(2).setPreferredWidth(80);
-        
+
         JScrollPane sPane = new JScrollPane(ttData);
         HNumberedTable rowTable = new HNumberedTable(ttData);
         sPane.setRowHeaderView(rowTable);
         sPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
                 rowTable.getTableHeader());
-        
+
         pCenter.add(sPane, BorderLayout.CENTER);
 
         add(pCenter, BorderLayout.CENTER);
@@ -164,14 +193,14 @@ public class OutboxPage extends JPanel
         bNew.addActionListener(this);
         bDelete.addActionListener(this);
         bRefresh.addActionListener(this);
-        ttData.getSelectionModel.addListSelectionListener(this);
+        ttData.getSelectionModel().addListSelectionListener(this);
     }
     // </editor-fold>   
-    
+
     // <editor-fold defaultstate="collapsed" desc="Private Methods">
     private synchronized void loadMessageData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
-        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
             @Override
             protected Boolean doInBackground() throws Exception {
                 try {
@@ -190,25 +219,25 @@ public class OutboxPage extends JPanel
             }
 
             @Override
-            protected void done() {
+            protected void done () {
                 if (!isCancelled()) {
-                    mData.removeAllElements();
+                    mData = new DefaultTableModel();
                     Object[] obj = null;
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                    for (InboxMessage message : gData) {
+                    for (OutboxMessage message : dMessage) {
                         obj = new Object[4];
                         obj[0] = message.getContact().equals("") ? message.getGroup() : message.getContact();
                         obj[1] = message.getText();
-                        obj[2] = sdf.format(gateway.getCreatedOn());
-                        obj[3] = mgateway.getStatus() == 1 ? "Draft" : "Sent";
-                        
+                        obj[2] = sdf.format(message.getCreatedOn());
+                        obj[3] = message.getStatus() == 1 ? "Draft" : "Sent";
+
                         mData.addRow(obj);
                         mData.fireTableDataChanged();
                     }
                 }
                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
             }
-        }
+        };
         t1.addPropertyChangeListener(new PropertyChangeListener() {
 
             @Override
@@ -224,19 +253,19 @@ public class OutboxPage extends JPanel
         t1.execute();
     }
     // </editor-fold>
-    
-     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
+
+    // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() instanceof JButton) {
+        if (e.getSource() instanceof JButton) {
             JButton bb = (JButton) e.getSource();
-            if(bb == bRefresh) {
+            if (bb == bRefresh) {
                 loadMessageData();
-            } else if(bb == bNew) {
+            } else if (bb == bNew) {
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
                 dialog.setTitle(RES_GLOBAL.getString("label.new") + " Message");
-                NewMessageActionForm form = new NewMessageActionForm();
+                MessageActionForm form = new MessageActionForm();
                 form.addPropertyChangeListener(new PropertyChangeListener() {
                     /**
                      *
@@ -258,32 +287,31 @@ public class OutboxPage extends JPanel
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-            } else if(bb == bDelete) {
-                JOptionPane.showMessageDialog("Delete Data from Table");
+            } else if (bb == bDelete) {
+                JOptionPane.showMessageDialog(null, "Delete Data from Table");
             }
-        } else if(e.getSource() instanceof JXSearch) {
-           JOptionPane.showMessageDialog("Search Implementation");
+        } else if (e.getSource() instanceof JXSearchField) {
+            JOptionPane.showMessageDialog(null, "Search Implementation");
         }
     }
     // </editor-fold>
-    
-     // <editor-fold defaultstate="collapsed" desc="ItemListener Implementation">
-     @Override
+
+    // <editor-fold defaultstate="collapsed" desc="ItemListener Implementation">
+    @Override
     public void itemStateChanged(ItemEvent e) {
         int state = e.getStateChange();
         System.out.println((state == e.SELECTED) ? "Selected" : "Deselected");
         System.out.println("Item: " + e.getItem());
         ItemSelectable is = e.getItemSelectable();
-        System.out.println(", Selected: " + selectedString(is));
-      }
+    }
       // </editor-fold>
-      
+
     // <editor-fold defaultstate="collapsed" desc="ListSelectionListener Implementation"> 
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (ttData.getSelectedRow() > -1) {
             // print first column value from selected row
-            System.out.println(jTable.getValueAt(ttData.getSelectedRow(), 0).toString());
+            System.out.println(ttData.getValueAt(ttData.getSelectedRow(), 0).toString());
         }
     }
     // </editor-fold>

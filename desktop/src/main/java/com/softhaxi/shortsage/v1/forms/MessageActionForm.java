@@ -1,14 +1,22 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.dto.Message;
+import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
+import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.TextArea;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.IOException;
+import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -20,19 +28,24 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.SwingWorker;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.RowGroup;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXDatePicker;
+import org.smslib.GatewayException;
+import org.smslib.OutboundMessage;
+import org.smslib.Service;
+import org.smslib.TimeoutException;
 
-public class MessageActionForm extends JPanel 
+public class MessageActionForm extends JPanel
         implements ActionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
     private OutboxMessage object;
     private ActionState state;
-    
+
     private boolean running = false;
     /**
      * Tool bar items
@@ -48,10 +61,10 @@ public class MessageActionForm extends JPanel
     private JXDatePicker dfDate;
     private JTextArea tfText;
     private JComboBox cfTemplate, cfStatus, cfHandler;
-    
+
     /**
      * Message
-     */ 
+     */
     private OutboundMessage oMessage;
 
     /**
@@ -62,7 +75,7 @@ public class MessageActionForm extends JPanel
     /**
      *
      */
-    public NewMessageActionForm() {
+    public MessageActionForm() {
         this(null, ActionState.CREATE);
     }
 
@@ -71,7 +84,7 @@ public class MessageActionForm extends JPanel
      * @param object
      * @param state
      */
-    public MessageActionForm(Message object, ActionState state) {
+    public MessageActionForm(OutboxMessage object, ActionState state) {
         this.object = object;
         this.state = state;
 
@@ -170,14 +183,14 @@ public class MessageActionForm extends JPanel
      *
      */
     private void initState() {
-        if(state == ActionState.CREATE) {
+        if (state == ActionState.CREATE) {
             cfStatus.removeAllItems();
             cfStatus.addItem("Create");
-            
+
             cfHandler.removeAllItems();
             cfHandler.addItem("Created");
             cfHandler.setEnabled(false);
-            
+
             bNew.setVisible(false);
             bEdit.setVisible(false);
             bDelete.setVisible(false);
@@ -191,126 +204,137 @@ public class MessageActionForm extends JPanel
     private void initData() {
     }
   // </editor-fold>
-  
-  // <editor-fold defaultstate="collapsed" desc="Private Methods">
-  private void loadTemplateData() {
-          
-  }
-  
-  private boolean isValid() {
-      boolean valid = false;
-      
-      if(cfScheduler.isSelected()) {
-          if(!cfDate.getText().equals("")) {
-              continue;
-          } else {
-              cfDate.setBorder(BorderFactory.createLineBorder(Color.red, 5));
-          }
-      }
-      
-      if(!tfContact.getText().equals("")) {
-          continue;
-      } else {
-          tfContact.setBorder(BorderFactory.createLineBorder(Color.red, 5));
-      }
-      
-      if(!tfText.getText().equals("")) {
-          valid = true;
-      } else {
-          tfText.setBorder(BorderFactory.createLineBorder(Color.red, 5));
-      }
-      
-      return valid;
-  }
-  
-  /**
-   * Send message or scheduler sending message at date given.
-   */ 
-  private synchronized void sendMessage() {
-      if(!isValid()) 
-        return;
-        
-      firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
-      running = true;
-      boolean isScheduler = cfScheduler.isSelected();
-      Date date = dfDate.getDate();
-      oMessage = new OutboundMessage(tfContact.getText().trim(), tfText.getText().trim());      // Only one number 
-                                                                                                // not contact person or group
-    
-      SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
-              @Override
-                protected Boolean doBackground() {
-                        try {
-                                if(isScheduler) {
-                                        Service.getInstance().queueMessageAt(oMessage, date);
-                                } else 
-                                        Service.getInstance().sendMessage(oMessage);
-                               return true;
-                        } catch (Exception e) {
-                                return false;
-                        }
-                }
-                
-                @Override
-                protected void done() {
-                        if(!isCancelled) {
-                                object = new OutboxMessage();
-                                object.setId(oMsg.getId);
-                                running = false;
-                                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
-                        }
-                }
-      }
-      t1.execute();
-  }
-  
-  private synchronized void saveMessage() {
-      if(isValid()) 
-        return;
-        
-      firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
-      // Save Message to database
-      if(running == false) {
-        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
-                
-                @Override
-                protected Boolean doBackground() {
-                        try {
-                                hSession = HubernateUtil.getSessionFactory().openSession();
-                                hSession.getTransaction().begin();
-                                hSession.saveOrUpdate(object);
-                                hSession.getTransaction().commit();
-                                hSession.close();
-                                return true;
-                        } catch (Exception e) {
-                                return false;
-                        }
-                }
-                
-                @Override
-                protected void done() {
-                        if(!isCancelled) {
-                                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
-                        }
-                }
+
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    /**
+     *
+     */
+    private void loadTemplateData() {
+
+    }
+
+    /**
+     *
+     * @return
+     */
+    private boolean isDataValid() {
+        if (cfScheduler.isSelected()) {
+            if (dfDate.getDate().toString().equals("")) {
+                dfDate.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+                return false;
+            }
         }
+
+        if (!tfContact.getText().equals("")) {
+            tfContact.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+            return false;
+        }
+
+        if (tfText.getText().equals("")) {
+            tfText.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Send message or scheduler sending message at date given.
+     */
+    private synchronized void sendMessage() {
+        if (!isDataValid()) {
+            return;
+        }
+
+        firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
+        running = true;
+        final boolean isScheduler = cfScheduler.isSelected();
+        final Date date = dfDate.getDate();
+        oMessage = new OutboundMessage(tfContact.getText().trim(), tfText.getText().trim());      // Only one number 
+        // not contact person or group
+
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() {
+                try {
+                    if (isScheduler) {
+                        Service.getInstance().queueMessageAt(oMessage, date);
+                    } else {
+                        Service.getInstance().sendMessage(oMessage);
+                    }
+                    return true;
+                } catch (TimeoutException | GatewayException | IOException | InterruptedException ex) {
+                    Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    return false;
+                }
+            }
+
+            @Override
+            protected void done() {
+                if (!isCancelled()) {
+                    object = new OutboxMessage();
+                    object.setId(oMessage.getId());
+                    running = false;
+                    firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                }
+            }
+        };
         t1.execute();
-      }
-  }
+    }
+
+    private synchronized void saveMessage() {
+        if (isDataValid()) {
+            return;
+        }
+
+        firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
+        // Save Message to database
+        if (running == false) {
+            SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+
+                @Override
+                protected Boolean doInBackground() {
+                    try {
+                        hSession = HibernateUtil.getSessionFactory().openSession();
+                        hSession.getTransaction().begin();
+                        hSession.saveOrUpdate(object);
+                        hSession.getTransaction().commit();
+                        hSession.close();
+                        return true;
+                    } catch (Exception ex) {
+                        Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                        return false;
+                    }
+                }
+
+                @Override
+                protected void done() {
+                    if (!isCancelled()) {
+                        firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                    }
+                }
+            };
+            t1.execute();
+        }
+    }
   // </editor-fold>
-  
-  // <editor-fold defaultstate="collapsed" desc="Public Methods">
-  public void setContact(String contact) {
-        tfContact.setText(contact)
-  }
+
+    // <editor-fold defaultstate="collapsed" desc="Public Methods">
+    /**
+     * 
+     * @param contact 
+     */
+    public void setContact(String contact) {
+        tfContact.setText(contact);
+    }
   // </editor-fold>
-  
-  // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
-  @Override
-  public void actionPerformed(ActionEvent e) {
-      
-  }
-  // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    }
+    // </editor-fold>
 
     class ShowHideAction implements ItemListener {
 

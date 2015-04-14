@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
@@ -25,6 +27,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
@@ -202,14 +205,16 @@ public class GatewaySetupPage extends JPanel
             }
         });
         ttData.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                         JXTable target = (JXTable) e.getSource();
-                         int row = target.getSelectedRow();
-                         int column = target.getSelectedColumn();
-                         // do some action
-                         }
-                   }
-        }
+                    JXTable target = (JXTable) e.getSource();
+                    int row = target.getSelectedRow();
+                    JOptionPane.showMessageDialog(null, "Clicked row" + row);
+                }
+            }
+        });
     }
     // </editor-fold>   
 
@@ -244,6 +249,7 @@ public class GatewaySetupPage extends JPanel
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
+
             }
         }
     }
