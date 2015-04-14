@@ -35,3 +35,6 @@ Current list of tasks to be completed are:
    * Attact Contact Person to Contact Group
 - Message Template Implementation
    * Create, update and delete message template
+   * Double click row table
+   * Search and view listener
+   * Load from database
