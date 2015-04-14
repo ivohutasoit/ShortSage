@@ -194,6 +194,10 @@ public class MessageActionForm extends JPanel
   // </editor-fold>
   
   // <editor-fold defaultstate="collapsed" desc="Private Methods">
+  private void loadTemplateData() {
+          
+  }
+  
   private boolean isValid() {
       boolean valid = false;
       
