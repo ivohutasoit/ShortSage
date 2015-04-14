@@ -31,7 +31,7 @@ public class NewMessageActionForm extends JPanel
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
-    private Message object;
+    private OutboxMessage object;
     private ActionState state;
     private boolean running = false;
     /**
@@ -48,6 +48,11 @@ public class NewMessageActionForm extends JPanel
     private JXDatePicker dfDate;
     private JTextArea tfText;
     private JComboBox cfTemplate, cfStatus, cfHandler;
+    
+    /**
+     * Message
+     */ 
+    private OutboundMessage oMessage;
 
     /**
      * Database connection
@@ -223,11 +228,36 @@ public class NewMessageActionForm extends JPanel
         
       firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
       running = true;
-      if(cfSheduler.isSelected()) {
-          // Queue Message At
-      } else {
-          // Send Message
+      boolean isScheduler = cfScheduler.isSelected();
+      Date date = dfDate.getDate();
+      oMessage = new OutboundMessage(tfContact.getText().trim(), tfText.getText().trim());      // Only one number 
+                                                                                                // not contact person or group
+    
+      SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
+              @Override
+                protected Boolean doBackground() {
+                        try {
+                                if(isScheduler) {
+                                        Service.getInstance().queueMessageAt(oMessage, date);
+                                } else 
+                                        Service.getInstance().sendMessage(oMessage);
+                               return true;
+                        } catch (Exception e) {
+                                return false;
+                        }
+                }
+                
+                @Override
+                protected void done() {
+                        if(!isCancelled) {
+                                object = new OutboxMessage();
+                                object.setId(oMsg.getId);
+                                running = false;
+                                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                        }
+                }
       }
+      t1.execute();
   }
   
   private synchronized void saveMessage() {
@@ -236,11 +266,21 @@ public class NewMessageActionForm extends JPanel
         
       firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
       // Save Message to database
-      if(running = false) {
+      if(running == false) {
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
                 
+                @Override
                 protected Boolean doBackground() {
-                        return false;
+                        try {
+                                hSession = HubernateUtil.getSessionFactory().openSession();
+                                hSession.getTransaction().begin();
+                                hSession.saveOrUpdate(object);
+                                hSession.getTransaction().commit();
+                                hSession.close();
+                                return true;
+                        } catch (Exception e) {
+                                return false;
+                        }
                 }
                 
                 @Override
