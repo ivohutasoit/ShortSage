@@ -41,3 +41,4 @@ Current list of tasks to be completed are:
    * Double click row table
    * Search and view listener
    * Load from database
+- Gateway Setup Implementation
