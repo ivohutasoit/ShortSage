@@ -201,6 +201,15 @@ public class GatewaySetupPage extends JPanel
                 t1.execute();
             }
         });
+        ttData.addMouseListener(new MouseAdapter() {
+                if (e.getClickCount() == 2) {
+                         JXTable target = (JXTable) e.getSource();
+                         int row = target.getSelectedRow();
+                         int column = target.getSelectedColumn();
+                         // do some action
+                         }
+                   }
+        }
     }
     // </editor-fold>   
 
