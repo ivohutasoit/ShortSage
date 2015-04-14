@@ -155,6 +155,9 @@ public class InboxPage extends JPanel
         bDelete.addActionListener(this);
         bRefresh.addActionListener(this);
         ttData.getSelectionModel.addListSelectionListener(this);
+        ttData.addMouseListener(new MouseAdapter() {
+            
+        });
     }
     // </editor-fold>   
     
