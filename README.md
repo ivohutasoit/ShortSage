@@ -22,12 +22,12 @@ Next features will be included future version of application are:
 
 Current list of tasks to be completed are:
 - Inbox and outbox implementation 
-   * <del>Listener for all components of inbox and outbox page </del> - <em>partial done at 14 April 2015</em>
+   * <del>Listener for all components of inbox and outbox page</del> - <em>partial done at 14 April 2015</em>
    * <del>Read data from database</del> - <em>done but not optimize</em>
 - New message implementation
    * <del>Fields validation rule</del> - <em>partial done at 14 April 2015</em>
-   * <del>Send message both just in time or scheduler - <em>partial done at 14 April 2015</em>
-   * <del>Save message into database - <em>partial done at 14 April 2015</em>
+   * <del>Send message both just in time or scheduler</del> - <em>partial done at 14 April 2015</em>
+   * <del>Save message into database</del> - <em>partial done at 14 April 2015</em>
    * Message template usage
 - Phone Book Implementation
    * Create, update and delete Contact Group
