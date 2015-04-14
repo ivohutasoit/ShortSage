@@ -2,7 +2,6 @@ package com.softhaxi.shortsage.v1.forms;
 
 import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.enums.ActionState;
-import static java.awt.AWTEventMulticaster.add;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
