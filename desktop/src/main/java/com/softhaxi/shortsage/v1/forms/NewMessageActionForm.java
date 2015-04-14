@@ -26,7 +26,8 @@ import net.java.dev.designgridlayout.RowGroup;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXDatePicker;
 
-public class NewMessageActionForm extends JPanel {
+public class NewMessageActionForm extends JPanel 
+        implements ActionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -184,6 +185,64 @@ public class NewMessageActionForm extends JPanel {
      */
     private void initData() {
     }
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="Private Methods">
+  private boolean isValid() {
+      boolean valid = false;
+      
+      if(cfScheduler.isSelected()) {
+          if(!cfDate.getText().equals("")) {
+              continue;
+          } else {
+              cfDate.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+          }
+      }
+      
+      if(!tfContact.getText().equals("")) {
+          continue;
+      } else {
+          tfContact.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+      }
+      
+      if(!tfText.getText().equals("")) {
+          valid = true;
+      } else {
+          tfText.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+      }
+      
+      return valid;
+  }
+  
+  /**
+   * Send message or scheduler sending message at date given.
+   */ 
+  private synchronized void sendMessage() {
+      if(!isValid()) 
+        return;
+        
+      firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
+      if(cfSheduler.isSelected()) {
+          // Queue Message At
+      } else {
+          // Send Message
+      }
+  }
+  
+  private synchronized void saveMessage() {
+      if(isValid()) 
+        return;
+        
+      firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
+      // Save Message to database
+  }
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
+  @Override
+  public void actionPerformed(ActionEvent e) {
+      
+  }
   // </editor-fold>
 
     class ShowHideAction implements ItemListener {
