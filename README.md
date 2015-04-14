@@ -36,11 +36,11 @@ list of task to be completed on desktop implementation are:
   <li>Create, Edit and Delete Group</li>
   <li>Create, Edit adn Delete Contact Person</li>
   <li>Attach Contact Person to Group</li>
-  <ul>
+  </ul>
 </li>
 <li>Message Template Implementation
   <ul>
   <li>Create, Edit and Delete Template</li>
-  <ul>
+  </ul>
 </li>
 </ol>
