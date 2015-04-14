@@ -19,7 +19,7 @@ list of task to be completed on desktop implementation are:
 <li>Inbox and Outbox Message Page
 <ul>
   <li>ActionListener for all components</li>
-  <li>Load data from database</li>
+  <li><del>Load data from database</del></li>
   <li>Search Implementation</li>
 </ul>
 </li>
