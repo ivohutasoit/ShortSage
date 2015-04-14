@@ -2,6 +2,7 @@ package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
 import com.softhaxi.shortsage.v1.dto.Gateway;
+import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.GatewayActionForm;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
@@ -14,8 +15,12 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -41,6 +46,10 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTable;
+import org.smslib.AGateway;
+import org.smslib.SMSLibException;
+import org.smslib.Service;
+import org.smslib.modem.SerialModemGateway;
 
 /**
  *
@@ -187,21 +196,7 @@ public class GatewaySetupPage extends JPanel
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
-                LoadDataTask t1 = new LoadDataTask();
-                t1.addPropertyChangeListener(new PropertyChangeListener() {
-
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())) {
-                            boolean value = (boolean) evt.getNewValue();
-                            if (value == false) {
-                                firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
-                            }
-                        }
-                    }
-                });
-                t1.execute();
+                loadGatewayData();
             }
         });
         ttData.addMouseListener(new MouseAdapter() {
@@ -217,6 +212,93 @@ public class GatewaySetupPage extends JPanel
         });
     }
     // </editor-fold>   
+
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    /**
+     *
+     */
+    private void loadGatewayData() {
+        firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    Query query = hSession.createQuery("from Gateway");
+                    gData = query.list();
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    return true;
+                } catch (Exception ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return false;
+            }
+
+            @Override
+            protected void done() {
+                if (!isCancelled()) {
+                    mData = new DefaultTableModel(COLUMN_NAME, 0);
+                    Object[] obj = null;
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    for (Gateway gateway : gData) {
+                        obj = new Object[7];
+                        obj[0] = gateway.getName();
+                        obj[1] = gateway.getPort();
+                        obj[2] = gateway.getManufacture();
+                        obj[3] = gateway.getModel();
+                        obj[4] = gateway.getProvider();
+                        obj[5] = gateway.getStatus() == 1 ? "Active" : "Inactive";
+                        obj[6] = sdf.format(gateway.getCreatedOn());
+
+                        mData.addRow(obj);
+                        mData.fireTableDataChanged();
+                    }
+                    ttData.setModel(mData);
+                }
+                firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+            }
+        };
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())) {
+                    boolean value = (boolean) evt.getNewValue();
+                    if (value == false) {
+                        firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+                    }
+                }
+            }
+        });
+        t1.execute();
+    }
+    
+    /**
+     * 
+     */
+    private void restartService() {
+        try {
+            List<AGateway> gateways = (List<AGateway>) Service.getInstance().getGateways();
+            
+            Service.getInstance().stopService();
+            for(AGateway gateway : gateways) {
+                Service.getInstance().removeGateway(gateway);
+            }
+            
+            SerialModemGateway modem = null;
+            for (Gateway g : gData) {
+                modem = new SerialModemGateway(g.getId(), g.getPort(), g.getBaudRate(), 
+                        g.getManufacture(), g.getModel());
+                Service.getInstance().addGateway(modem);
+            }
+            Service.getInstance().startService();
+        } catch (SMSLibException | IOException | InterruptedException ex) {
+            Logger.getLogger(GatewaySetupPage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
     @Override
@@ -245,6 +327,13 @@ public class GatewaySetupPage extends JPanel
                         }
                     }
                 });
+                dialog.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        loadGatewayData();
+                        restartService();
+                    }
+                });
                 dialog.add(form);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
@@ -253,48 +342,5 @@ public class GatewaySetupPage extends JPanel
             }
         }
     }
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="Task Classes">  
-    class LoadDataTask extends SwingWorker<Boolean, Void> {
-
-        @Override
-        protected Boolean doInBackground() throws Exception {
-            try {
-                hSession = HibernateUtil.getSessionFactory().openSession();
-                hSession.getTransaction().begin();
-                Query query = hSession.createQuery("from Gateway");
-                gData = query.list();
-                hSession.getTransaction().commit();
-                hSession.close();
-                return true;
-            } catch (Exception ex) {
-                Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return false;
-        }
-
-        @Override
-        protected void done() {
-            if (!isCancelled()) {
-                Object[] obj = null;
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                for (Gateway gateway : gData) {
-                    obj = new Object[7];
-                    obj[0] = gateway.getName();
-                    obj[1] = gateway.getPort();
-                    obj[2] = gateway.getManufacture();
-                    obj[3] = gateway.getModel();
-                    obj[4] = gateway.getProvider();
-                    obj[5] = gateway.getStatus() == 1 ? "Active" : "Inactive";
-                    obj[6] = sdf.format(gateway.getCreatedOn());
-
-                    mData.addRow(obj);
-                    mData.fireTableDataChanged();
-                }
-            }
-            firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
-        }
-    }
-    // </editor-fold>
+    // </editor-fold
 }
