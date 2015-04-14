@@ -142,12 +142,69 @@ public class InboxPage extends JPanel {
      * Initialize listeners for all components of frame
      */
     private void initListeners() {
-//        addComponentListener(new ComponentAdapter() {
-//            @Override
-//            public void componentShown(ComponentEvent e) {
-//                JOptionPane.showMessageDialog(null, "This is dialog from Import Page");
-//            }
-//        });
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                loadMessageData();
+            }
+        });
     }
     // </editor-fold>   
+    
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    private synchronized void loadMessageData() {
+        firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    Query query = hSession.createQuery("from InboxMessage");
+                    dMessage = query.list();
+
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    return true;
+                } catch (Exception ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return false;
+            }
+
+            @Override
+            protected void done() {
+                if (!isCancelled()) {
+                    mData.removeAllElements();
+                    Object[] obj = null;
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    for (InboxMessage message : gData) {
+                        obj = new Object[4];
+                        obj[0] = message.getContact();
+                        obj[1] = message.getText();
+                        obj[2] = sdf.format(gateway.getCreatedOn());
+                        obj[3] = mgateway.getStatus() == 1 ? "Unread" : "Read";
+                        
+                        mData.addRow(obj);
+                        mData.fireTableDataChanged();
+                    }
+                }
+                firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+            }
+        }
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())) {
+                    boolean value = (boolean) evt.getNewValue();
+                    if (value == false) {
+                        firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+                    }
+                }
+            }
+        });
+        t1.execute();
+    }
+    // </editor-fold>
 }
