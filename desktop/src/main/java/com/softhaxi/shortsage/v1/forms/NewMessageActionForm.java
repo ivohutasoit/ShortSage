@@ -33,7 +33,7 @@ public class NewMessageActionForm extends JPanel
 
     private Message object;
     private ActionState state;
-
+    private boolean running = false;
     /**
      * Tool bar items
      */
@@ -222,6 +222,7 @@ public class NewMessageActionForm extends JPanel
         return;
         
       firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
+      running = true;
       if(cfSheduler.isSelected()) {
           // Queue Message At
       } else {
@@ -235,6 +236,22 @@ public class NewMessageActionForm extends JPanel
         
       firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
       // Save Message to database
+      if(running = false) {
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
+                
+                protected Boolean doBackground() {
+                        return false;
+                }
+                
+                @Override
+                protected void done() {
+                        if(!isCancelled) {
+                                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                        }
+                }
+        }
+        t1.execute();
+      }
   }
   // </editor-fold>
   
