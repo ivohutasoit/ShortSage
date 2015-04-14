@@ -18,9 +18,9 @@ list of task to be completed on desktop implementation are:
 <ol>
 <li>Inbox and Outbox Message Page
 <ul>
-  <li>ActionListener for all components</li>
+  <li><del>ActionListener for all components</del></li>
   <li><del>Load data from database</del></li>
-  <li>Search Implementation</li>
+  <li><del>Search Implementation</del></li>
 </ul>
 </li>
 <li>Just In Time and Scheduler sending message
