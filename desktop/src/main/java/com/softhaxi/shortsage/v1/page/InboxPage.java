@@ -28,7 +28,7 @@ import org.jdesktop.swingx.JXTable;
  * @version 1.0.0
  */
 public class InboxPage extends JPanel 
-        implements ActionListener {
+        implements ActionListener, ItemListener {
 
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -43,7 +43,7 @@ public class InboxPage extends JPanel
     private JPanel pCenter;
     private JPanel pSouth;
 
-    private JXSearchField tfSearch;
+    private JXSearchField sfSearch;
     private JComboBox cfViews;
     private JXTable ttData;
 
@@ -75,8 +75,8 @@ public class InboxPage extends JPanel
      */
     private void initNorthPanel() {
         pNorth = new JPanel();
-        tfSearch = new JXSearchField(RES_GLOBAL.getString("label.search.item"));
-        tfSearch.setSearchMode(JXSearchField.SearchMode.REGULAR);
+        sfSearch = new JXSearchField(RES_GLOBAL.getString("label.search.item"));
+        sfSearch.setSearchMode(JXSearchField.SearchMode.REGULAR);
         cfViews = new JComboBox();
         cfViews.addItem("All Items");
 
@@ -149,6 +149,9 @@ public class InboxPage extends JPanel
                 loadMessageData();
             }
         });
+        sfSearch.addActionListener(this);
+        cfViews.addItemListener(this);
+        bDelete.addActionListener(this);
         bRefresh.addActionListener(this);
     }
     // </editor-fold>   
@@ -217,8 +220,22 @@ public class InboxPage extends JPanel
             JButton bb = (JButton) e.getSource();
             if(bb == bRefresh) {
                 loadMessageData();
+            } else if(bb == bDelete) {
+                JOptionPane.showMessageDialog("Delete Data from Table");
             }
+        } else if(e.getSource() instanceof JXSearch) {
+           JOptionPane.showMessageDialog("Search Implementation");
         }
     }
     // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="ItemListener Implementation">
+    public void itemStateChanged(ItemEvent e) {
+        int state = e.getStateChange();
+        System.out.println((state == e.SELECTED) ? "Selected" : "Deselected");
+        System.out.println("Item: " + e.getItem());
+        ItemSelectable is = e.getItemSelectable();
+        System.out.println(", Selected: " + selectedString(is));
+      }
+      // </editor-fold>
 }
