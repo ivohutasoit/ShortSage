@@ -16,7 +16,7 @@ Main features built on this applitions are:
 
 list of task to be completed on desktop implementation are:
 <ol>
-<li>Inbox and Outbox Message Page <em>'''partial done at 14 April 2015'''</em>
+<li>Inbox and Outbox Message Page <em>```partial done at 14 April 2015```</em>
 <ul>
   <li><del>ActionListener for all components</del></li>
   <li><del>Load data from database</del></li>
