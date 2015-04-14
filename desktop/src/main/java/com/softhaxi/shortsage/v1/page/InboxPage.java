@@ -28,7 +28,8 @@ import org.jdesktop.swingx.JXTable;
  * @version 1.0.0
  */
 public class InboxPage extends JPanel 
-        implements ActionListener, ItemListener {
+        implements ActionListener, ItemListener,
+        ListSelectionListener {
 
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -153,6 +154,7 @@ public class InboxPage extends JPanel
         cfViews.addItemListener(this);
         bDelete.addActionListener(this);
         bRefresh.addActionListener(this);
+        ttData.getSelectionModel.addListSelectionListener(this);
     }
     // </editor-fold>   
     
@@ -238,4 +240,14 @@ public class InboxPage extends JPanel
         System.out.println(", Selected: " + selectedString(is));
       }
       // </editor-fold>
+      
+      // <editor-fold defaultstate="collapsed" desc="ListSelectionListener Implementation"> 
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (ttData.getSelectedRow() > -1) {
+            // print first column value from selected row
+            System.out.println(jTable.getValueAt(ttData.getSelectedRow(), 0).toString());
+        }
+    }
+    // </editor-fold>
 }
