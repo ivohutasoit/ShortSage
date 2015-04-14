@@ -33,6 +33,7 @@ public class MessageActionForm extends JPanel
 
     private OutboxMessage object;
     private ActionState state;
+    
     private boolean running = false;
     /**
      * Tool bar items
@@ -292,6 +293,12 @@ public class MessageActionForm extends JPanel
         }
         t1.execute();
       }
+  }
+  // </editor-fold>
+  
+  // <editor-fold defaultstate="collapsed" desc="Public Methods">
+  public void setContact(String contact) {
+        tfContact.setText(contact)
   }
   // </editor-fold>
   
