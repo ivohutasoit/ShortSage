@@ -28,7 +28,8 @@ import org.jdesktop.swingx.JXTable;
  * @version 1.0.0
  */
 public class OutboxPage extends JPanel 
-        implements ActionListener, ItemListener {
+        implements ActionListener, ItemListener, 
+        ListSelectionListener {
     
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -163,6 +164,7 @@ public class OutboxPage extends JPanel
         bNew.addActionListener(this);
         bDelete.addActionListener(this);
         bRefresh.addActionListener(this);
+        ttData.getSelectionModel.addListSelectionListener(this);
     }
     // </editor-fold>   
     
@@ -266,6 +268,7 @@ public class OutboxPage extends JPanel
     // </editor-fold>
     
      // <editor-fold defaultstate="collapsed" desc="ItemListener Implementation">
+     @Override
     public void itemStateChanged(ItemEvent e) {
         int state = e.getStateChange();
         System.out.println((state == e.SELECTED) ? "Selected" : "Deselected");
@@ -274,4 +277,14 @@ public class OutboxPage extends JPanel
         System.out.println(", Selected: " + selectedString(is));
       }
       // </editor-fold>
+      
+    // <editor-fold defaultstate="collapsed" desc="ListSelectionListener Implementation"> 
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (ttData.getSelectedRow() > -1) {
+            // print first column value from selected row
+            System.out.println(jTable.getValueAt(ttData.getSelectedRow(), 0).toString());
+        }
+    }
+    // </editor-fold>
 }
