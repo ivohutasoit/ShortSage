@@ -43,7 +43,7 @@ public class OutboxPage extends JPanel
     private JPanel pCenter;
     private JPanel pSouth;
 
-    private JXSearchField tfSearch;
+    private JXSearchField sfSearch;
     private JComboBox cfViews;
     private JXTable ttData;
     
@@ -84,8 +84,8 @@ public class OutboxPage extends JPanel
      */
     private void initNorthPanel() {
         pNorth = new JPanel();
-        tfSearch = new JXSearchField(RES_GLOBAL.getString("label.search.item"));
-        tfSearch.setSearchMode(JXSearchField.SearchMode.REGULAR);
+        sfSearch = new JXSearchField(RES_GLOBAL.getString("label.search.item"));
+        sfSearch.setSearchMode(JXSearchField.SearchMode.REGULAR);
         cfViews = new JComboBox();
         cfViews.addItem("All Items");
 
@@ -158,6 +158,10 @@ public class OutboxPage extends JPanel
                 loadMessageData();
             }
         });
+        sfSearch.addActionListener(this);
+        bNew.addActionListener(this);
+        bDelete.addActionListener(this);
+        bRefresh.addActionListener(this);
     }
     // </editor-fold>   
     
@@ -225,7 +229,37 @@ public class OutboxPage extends JPanel
             JButton bb = (JButton) e.getSource();
             if(bb == bRefresh) {
                 loadMessageData();
+            } else if(bb == bNew) {
+                final JDialog dialog = new JDialog();
+                dialog.setModal(true);
+                dialog.setTitle(RES_GLOBAL.getString("label.new") + " Message");
+                NewMessageActionForm form = new NewMessageActionForm();
+                form.addPropertyChangeListener(new PropertyChangeListener() {
+                    /**
+                     *
+                     * @param evt
+                     */
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+
+                        if (evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
+                            boolean value = (boolean) evt.getNewValue();
+                            if (value == false) {
+                                dialog.dispose();
+                            }
+                        }
+                    }
+                });
+                dialog.add(form);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            } else if(bb == bDelete) {
+                JOptionPane.showMessageDialog("Delete Data from Table");
             }
+        } else if(e.getSource() instanceof JXSearch) {
+           JOptionPane.showMessageDialog("Search Implementation");
         }
     }
     // </editor-fold>
