@@ -28,7 +28,7 @@ import org.jdesktop.swingx.JXTable;
  * @version 1.0.0
  */
 public class OutboxPage extends JPanel 
-        implements ActionListener {
+        implements ActionListener, ItemListener {
     
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -159,6 +159,7 @@ public class OutboxPage extends JPanel
             }
         });
         sfSearch.addActionListener(this);
+        cfViews.addItemListener(this);
         bNew.addActionListener(this);
         bDelete.addActionListener(this);
         bRefresh.addActionListener(this);
@@ -263,4 +264,14 @@ public class OutboxPage extends JPanel
         }
     }
     // </editor-fold>
+    
+     // <editor-fold defaultstate="collapsed" desc="ItemListener Implementation">
+    public void itemStateChanged(ItemEvent e) {
+        int state = e.getStateChange();
+        System.out.println((state == e.SELECTED) ? "Selected" : "Deselected");
+        System.out.println("Item: " + e.getItem());
+        ItemSelectable is = e.getItemSelectable();
+        System.out.println(", Selected: " + selectedString(is));
+      }
+      // </editor-fold>
 }
