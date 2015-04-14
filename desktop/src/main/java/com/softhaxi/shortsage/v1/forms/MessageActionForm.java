@@ -26,7 +26,7 @@ import net.java.dev.designgridlayout.RowGroup;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXDatePicker;
 
-public class NewMessageActionForm extends JPanel 
+public class MessageActionForm extends JPanel 
         implements ActionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
@@ -71,7 +71,7 @@ public class NewMessageActionForm extends JPanel
      * @param object
      * @param state
      */
-    public NewMessageActionForm(Message object, ActionState state) {
+    public MessageActionForm(Message object, ActionState state) {
         this.object = object;
         this.state = state;
 
