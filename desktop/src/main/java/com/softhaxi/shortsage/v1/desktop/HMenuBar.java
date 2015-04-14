@@ -1,7 +1,7 @@
 package com.softhaxi.shortsage.v1.desktop;
 
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
-import com.softhaxi.shortsage.v1.forms.NewMessageActionForm;
+import com.softhaxi.shortsage.v1.forms.MessageActionForm;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -131,7 +131,7 @@ public class HMenuBar extends JMenuBar
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
                 dialog.setTitle(RES_GLOBAL.getString("label.new") + " Message");
-                NewMessageActionForm form = new NewMessageActionForm();
+                MessageActionForm form = new MessageActionForm();
                 form.addPropertyChangeListener(new PropertyChangeListener() {
                     /**
                      *
