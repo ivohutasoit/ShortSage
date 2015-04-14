@@ -26,7 +26,7 @@ Current list of tasks to be completed are:
    * <del>Load data from database</del> - <em>done but not optimize</em>
 - New message implementation
    * <del>Fields validation form</del> - <em>partial done at 14 April 2015</em>
-   * <del>Send message both just in time or scheduler</del> - <em>partial done at 14 April 2015</em>
+   * <del>Send message both just in time and scheduler</del> - <em>partial done at 14 April 2015</em>
    * <del>Save message into database</del> - <em>partial done at 14 April 2015</em>
    * Message template usage
 - Phone Book Implementation
