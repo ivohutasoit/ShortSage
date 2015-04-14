@@ -25,9 +25,9 @@ list of task to be completed on desktop implementation are:
 </li>
 <li>Just In Time and Scheduler sending message
 <ul>
-<li>Validation on fields</li>
-<li>Send message on background</li>
-<li>Save message to database</li>
+<li><del>Validation fields</del></li>
+<li>Send message background</li>
+<li>Save message into database</li>
 </ul>
 </li>
 </ol>
