@@ -27,7 +27,8 @@ import org.jdesktop.swingx.JXTable;
  * @since 1
  * @version 1.0.0
  */
-public class OutboxPage extends JPanel {
+public class OutboxPage extends JPanel 
+        implements ActionListener {
     
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -46,7 +47,16 @@ public class OutboxPage extends JPanel {
     private JComboBox cfViews;
     private JXTable ttData;
     
+    /**
+     * Data
+     */
     private DefaultTableModel mData;
+    private List dMessage;
+    
+    /**
+     * Database Connection
+     */
+    private Session hSession;
     
     /**
      * Main Constructor
@@ -100,7 +110,7 @@ public class OutboxPage extends JPanel {
         pToolbar.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
 
         pToolbar.add(new JButton(RES_GLOBAL.getString("label.new"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png"))));
-        pToolbar.add(new JButton(RES_GLOBAL.getString("label.edit"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
+        //pToolbar.add(new JButton(RES_GLOBAL.getString("label.edit"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
         pToolbar.addSeparator();
         pToolbar.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png"))));
         pToolbar.add(Box.createHorizontalGlue());
@@ -142,12 +152,81 @@ public class OutboxPage extends JPanel {
      * Initialize listeners for all components of frame
      */
     private void initListeners() {
-//        addComponentListener(new ComponentAdapter() {
-//            @Override
-//            public void componentShown(ComponentEvent e) {
-//                JOptionPane.showMessageDialog(null, "This is dialog from Import Page");
-//            }
-//        });
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                loadMessageData();
+            }
+        });
     }
     // </editor-fold>   
+    
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    private synchronized void loadMessageData() {
+        firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    Query query = hSession.createQuery("from OutboxMessage");
+                    dMessage = query.list();
+
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    return true;
+                } catch (Exception ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return false;
+            }
+
+            @Override
+            protected void done() {
+                if (!isCancelled()) {
+                    mData.removeAllElements();
+                    Object[] obj = null;
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    for (InboxMessage message : gData) {
+                        obj = new Object[4];
+                        obj[0] = message.getContact().equals("") ? message.getGroup() : message.getContact();
+                        obj[1] = message.getText();
+                        obj[2] = sdf.format(gateway.getCreatedOn());
+                        obj[3] = mgateway.getStatus() == 1 ? "Draft" : "Sent";
+                        
+                        mData.addRow(obj);
+                        mData.fireTableDataChanged();
+                    }
+                }
+                firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+            }
+        }
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())) {
+                    boolean value = (boolean) evt.getNewValue();
+                    if (value == false) {
+                        firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+                    }
+                }
+            }
+        });
+        t1.execute();
+    }
+    // </editor-fold>
+    
+     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton) {
+            JButton bb = (JButton) e.getSource();
+            if(bb == bRefresh) {
+                loadMessageData();
+            }
+        }
+    }
+    // </editor-fold>
 }
