@@ -84,22 +84,10 @@ public class InboxPage extends JPanel
      * Main Constructor
      */
     public InboxPage() {
-        setVisible(false);
-        initComponents();
-        initListeners();
+        setLayout(new BorderLayout());
     }
 
     // <editor-fold defaultstate="collapsed" desc="Region Inititalization">  
-    /**
-     * Initialize components of the panel
-     */
-    private void initComponents() {
-        setLayout(new BorderLayout());
-
-        initNorthPanel();
-        initCenterPanel();
-        initSouthPanel();
-    }
 
     /**
      *
@@ -174,10 +162,21 @@ public class InboxPage extends JPanel
      * Initialize listeners for all components of frame
      */
     private void initListeners() {
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent e) {
-                loadMessageData();
+        addContainerListener(new ContainarAdapter() {
+            public void componentAdded(ContainerEvent e) {
+                //initNorthPanel();
+                initCenterPanel();
+                //initSouthPanel();
+                initListeners();
+                
+                // Optimize load data
+                TimerTask task = new TimerTask() {
+                   public void run() {
+                      loadMessageData();
+                   }
+                }
+                Timer timer = new Timer();
+                timer.schedule(task, 200);
             }
         });
         sfSearch.addActionListener(this);
@@ -186,8 +185,31 @@ public class InboxPage extends JPanel
         bRefresh.addActionListener(this);
         ttData.getSelectionModel().addListSelectionListener(this);
         ttData.addMouseListener(new MouseAdapter() {
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/develop
         });
+    }
+    
+    private void initTableModel() {
+        if (mData.getRowCount() > 0) {
+            for (int i = mData.getRowCount() - 1; i > -1; i--) {
+                mData.removeRow(i);
+            }
+        }
+        Object[] obj = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        for (InboxMessage message : dMessage) {
+        obj = new Object[4];
+        obj[0] = message.getContact();
+        obj[1] = message.getText();
+        obj[2] = sdf.format(message.getCreatedOn());
+        obj[3] = message.getStatus() == 1 ? "Unread" : "Read";
+        
+        mData.addRow(obj);
+        mData.fireTableDataChanged();
+        }
     }
     // </editor-fold>   
 
@@ -198,12 +220,27 @@ public class InboxPage extends JPanel
             @Override
             protected Boolean doInBackground() throws Exception {
                 try {
+                    Service service = Service.getInstance();
                     hSession = HibernateUtil.getSessionFactory().openSession();
-                    hSession.getTransaction().begin();
-                    Query query = hSession.createQuery("from InboxMessage");
+                    InboxMessage diMsg = null;
+                    if(service.getServiceStatus() == ServiceStatus.STARTED) {
+                        hSession.getTransaction().begin();
+                        List<InboundMessage> mMessage = new ArrayList<InboundMessage>();
+                        service.readMessages(msgList, MessageClasses.ALL);
+                        for (InboundMessage msg : msgList) {
+                           System.out.println(msg);
+                           diMsg = new InboxMessage();
+                           // init data
+                           // save to database
+                           hSession.saveOrUpdate(diMsg);
+                           service.deleteMessage(msg);
+                        }
+                        hSession.getTransaction().commit();   
+                    } 
+                    
+                    Query query = hSession.createQuery("from InboxMessage order by createdon desc");
                     dMessage = query.list();
 
-                    hSession.getTransaction().commit();
                     hSession.close();
                     return true;
                 } catch (Exception ex) {
@@ -216,6 +253,7 @@ public class InboxPage extends JPanel
             @Override
             protected void done() {
                 if (!isCancelled()) {
+<<<<<<< HEAD
                     mData = new DefaultTableModel(COLUMN_NAME, 0);
                     Object[] obj = null;
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
@@ -229,6 +267,9 @@ public class InboxPage extends JPanel
                         mData.addRow(obj);
                         mData.fireTableDataChanged();
                     }
+=======
+                    initTableModel():
+>>>>>>> origin/develop
                 }
                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
             }

@@ -3,7 +3,7 @@ ShortSage is a SMS Gateway for generic uses. We give you customable and flexible
 Currently, we have focused on first build with some features for basic use by customer.
 
 Current main features built on this version of application are:
-- Backgroound Service of Modem
+- Background Service of Modem
 - Dashboard Application
 - Message folder for inbox and outbox messages
 - Phone book of contact person and group
@@ -11,7 +11,8 @@ Current main features built on this version of application are:
 - Gateway modem setup
 
 Limitation on this version are:
-
+- Modem service only can restart by restart application
+- Adding new gateway cannot apply until application restarted
 
 Next features will be included future version of application are:
 - Import from any format files with user definition columns
