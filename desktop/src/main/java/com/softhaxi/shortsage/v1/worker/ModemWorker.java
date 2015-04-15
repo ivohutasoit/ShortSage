@@ -35,9 +35,8 @@ public class ModemWorker extends SwingWorker<Boolean, Integer> {
             service.getServiceStatus() == ServiceStatus.STARTING) {
           service.stopService();
           // how if i use this class instance????
+          Thread.sleep(8000);
         }
-        
-        Thread.sleep(8000);
         
         if(service.getServiceStatus() == ServiceStatus.STOPPED) {
           if(modem == null) {
