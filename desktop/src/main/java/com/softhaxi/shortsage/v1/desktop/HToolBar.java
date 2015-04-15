@@ -2,17 +2,23 @@ package com.softhaxi.shortsage.v1.desktop;
 
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.MessageActionForm;
+import com.softhaxi.shortsage.v1.util.ModemUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JToolBar;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
+import org.smslib.Service;
 
 /**
  *
@@ -20,9 +26,9 @@ import javax.swing.border.EmptyBorder;
  * @since 1
  * @version 1.0.0
  */
-public class HToolBar extends JToolBar 
-    implements ActionListener {
-    
+public class HToolBar extends JToolBar
+        implements ActionListener {
+
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
     private JButton biMessage;
@@ -30,28 +36,28 @@ public class HToolBar extends JToolBar
 
     public HToolBar() {
         setBorder(new EmptyBorder(0, 2, 0, 2));
-        
-        biMessage = new JButton(RES_GLOBAL.getString("label.new.message"),
-                new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+
+        biMessage = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
         add(biMessage);
+
         add(Box.createHorizontalGlue());
 
         biLogout = new JButton(RES_GLOBAL.getString("label.user.logout"),
                 new ImageIcon(getClass().getClassLoader().getResource("images/ic_logout.png")));
         add(biLogout);
-        
+
         initListeners();
     }
-    
+
     private void initListeners() {
         biMessage.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() instanceof JButton) {
+        if (e.getSource() instanceof JButton) {
             JButton source = (JButton) e.getSource();
-            if(source == biMessage) {
+            if (source == biMessage) {
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
                 dialog.setTitle(RES_GLOBAL.getString("label.new") + " Message");

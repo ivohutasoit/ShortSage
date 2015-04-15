@@ -25,6 +25,8 @@ public class HibernateUtil {
                     .addPackage("com.softhaxi.shortsage.v1.dto")
                     .addAnnotatedClass(Gateway.class)
                     .addAnnotatedClass(Message.class)
+                    .addAnnotatedClass(InboxMessage.class)
+                    .addAnnotatedClass(OutboxMessage.class)
                     .addAnnotatedClass(Contact.class)
                     .addAnnotatedClass(ContactPerson.class)
                     .addAnnotatedClass(ContactGroup.class)

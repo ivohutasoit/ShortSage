@@ -49,7 +49,7 @@ import org.jdesktop.swingx.JXTable;
  * @since 1
  * @version 1.0.0
  */
-public class InboxPage extends JPanel 
+public class InboxPage extends JPanel
         implements ActionListener, ItemListener,
         ListSelectionListener {
 
@@ -70,14 +70,14 @@ public class InboxPage extends JPanel
      * Tool bar items
      */
     private JButton bNew, bDelete, bRefresh;
-    
+
     private JXSearchField sfSearch;
     private JComboBox cfViews;
     private JXTable ttData;
 
     private DefaultTableModel mData;
     private List<InboxMessage> dMessage;
-    
+
     private Session hSession;
 
     /**
@@ -186,11 +186,11 @@ public class InboxPage extends JPanel
         bRefresh.addActionListener(this);
         ttData.getSelectionModel().addListSelectionListener(this);
         ttData.addMouseListener(new MouseAdapter() {
-            
+
         });
     }
     // </editor-fold>   
-    
+
     // <editor-fold defaultstate="collapsed" desc="Private Methods">
     private synchronized void loadMessageData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
@@ -210,13 +210,13 @@ public class InboxPage extends JPanel
                     Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
                     return false;
                 }
-                
+
             }
 
             @Override
             protected void done() {
                 if (!isCancelled()) {
-                    mData = new DefaultTableModel();
+                    mData = new DefaultTableModel(COLUMN_NAME, 0);
                     Object[] obj = null;
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     for (InboxMessage message : dMessage) {
@@ -225,7 +225,7 @@ public class InboxPage extends JPanel
                         obj[1] = message.getText();
                         obj[2] = sdf.format(message.getCreatedOn());
                         obj[3] = message.getStatus() == 1 ? "Unread" : "Read";
-                        
+
                         mData.addRow(obj);
                         mData.fireTableDataChanged();
                     }
@@ -233,7 +233,7 @@ public class InboxPage extends JPanel
                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
             }
         };
-        
+
         t1.addPropertyChangeListener(new PropertyChangeListener() {
 
             @Override
@@ -249,23 +249,23 @@ public class InboxPage extends JPanel
         t1.execute();
     }
     // </editor-fold>
-    
+
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() instanceof JButton) {
+        if (e.getSource() instanceof JButton) {
             JButton bb = (JButton) e.getSource();
-            if(bb == bRefresh) {
+            if (bb == bRefresh) {
                 loadMessageData();
-            } else if(bb == bDelete) {
+            } else if (bb == bDelete) {
                 JOptionPane.showMessageDialog(null, "Delete Data from Table");
             }
-        } else if(e.getSource() instanceof JXSearchField) {
-           JOptionPane.showMessageDialog(null, "Search Implementation");
+        } else if (e.getSource() instanceof JXSearchField) {
+            JOptionPane.showMessageDialog(null, "Search Implementation");
         }
     }
     // </editor-fold>
-    
+
     // <editor-fold defaultstate="collapsed" desc="ItemListener Implementation">
     @Override
     public void itemStateChanged(ItemEvent e) {
@@ -273,10 +273,10 @@ public class InboxPage extends JPanel
         System.out.println((state == ItemEvent.SELECTED) ? "Selected" : "Deselected");
         System.out.println("Item: " + e.getItem());
 //        ItemSelectable is = e.getItemSelectable();
-      }
-      // </editor-fold>
-      
-      // <editor-fold defaultstate="collapsed" desc="ListSelectionListener Implementation"> 
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ListSelectionListener Implementation"> 
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (ttData.getSelectedRow() > -1) {

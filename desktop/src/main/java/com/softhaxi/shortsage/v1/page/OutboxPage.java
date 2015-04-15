@@ -221,7 +221,7 @@ public class OutboxPage extends JPanel
             @Override
             protected void done () {
                 if (!isCancelled()) {
-                    mData = new DefaultTableModel();
+                    mData = new DefaultTableModel(COLUMN_NAME, 0);
                     Object[] obj = null;
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     for (OutboxMessage message : dMessage) {

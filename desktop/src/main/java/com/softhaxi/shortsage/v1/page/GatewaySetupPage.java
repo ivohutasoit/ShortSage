@@ -278,26 +278,26 @@ public class GatewaySetupPage extends JPanel
     /**
      * 
      */
-    private void restartService() {
-        try {
-            List<AGateway> gateways = (List<AGateway>) Service.getInstance().getGateways();
-            
-            Service.getInstance().stopService();
-            for(AGateway gateway : gateways) {
-                Service.getInstance().removeGateway(gateway);
-            }
-            
-            SerialModemGateway modem = null;
-            for (Gateway g : gData) {
-                modem = new SerialModemGateway(g.getId(), g.getPort(), g.getBaudRate(), 
-                        g.getManufacture(), g.getModel());
-                Service.getInstance().addGateway(modem);
-            }
-            Service.getInstance().startService();
-        } catch (SMSLibException | IOException | InterruptedException ex) {
-            Logger.getLogger(GatewaySetupPage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+//    private void restartService() {
+//        try {
+//            List<AGateway> gateways = (List<AGateway>) Service.getInstance().getGateways();
+//            
+//            Service.getInstance().stopService();
+//            for(AGateway gateway : gateways) {
+//                Service.getInstance().removeGateway(gateway);
+//            }
+//            
+//            SerialModemGateway modem = null;
+//            for (Gateway g : gData) {
+//                modem = new SerialModemGateway(g.getId(), g.getPort(), g.getBaudRate(), 
+//                        g.getManufacture(), g.getModel());
+//                Service.getInstance().addGateway(modem);
+//            }
+//            Service.getInstance().startService();
+//        } catch (SMSLibException | IOException | InterruptedException ex) {
+//            Logger.getLogger(GatewaySetupPage.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
@@ -331,7 +331,6 @@ public class GatewaySetupPage extends JPanel
                     @Override
                     public void windowClosed(WindowEvent e) {
                         loadGatewayData();
-                        restartService();
                     }
                 });
                 dialog.add(form);
