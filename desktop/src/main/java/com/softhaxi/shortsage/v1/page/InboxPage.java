@@ -164,9 +164,9 @@ public class InboxPage extends JPanel
     private void initListeners() {
         addContainerListener(new ContainarAdapter() {
             public void componentAdded(ContainerEvent e) {
-                initNorthPanel();
+                //initNorthPanel();
                 initCenterPanel();
-                initSouthPanel();
+                //initSouthPanel();
                 initListeners();
                 
                 // Optimize load data
@@ -186,6 +186,26 @@ public class InboxPage extends JPanel
         ttData.getSelectionModel().addListSelectionListener(this);
         ttData.addMouseListener(new MouseAdapter() {
         });
+    }
+    
+    private void initTableModel() {
+        if (mData.getRowCount() > 0) {
+            for (int i = mData.getRowCount() - 1; i > -1; i--) {
+                mData.removeRow(i);
+            }
+        }
+        Object[] obj = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        for (InboxMessage message : dMessage) {
+        obj = new Object[4];
+        obj[0] = message.getContact();
+        obj[1] = message.getText();
+        obj[2] = sdf.format(message.getCreatedOn());
+        obj[3] = message.getStatus() == 1 ? "Unread" : "Read";
+        
+        mData.addRow(obj);
+        mData.fireTableDataChanged();
+        }
     }
     // </editor-fold>   
     
@@ -214,19 +234,7 @@ public class InboxPage extends JPanel
             @Override
             protected void done() {
                 if (!isCancelled()) {
-                    mData = new DefaultTableModel();
-                    Object[] obj = null;
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                    for (InboxMessage message : dMessage) {
-                        obj = new Object[4];
-                        obj[0] = message.getContact();
-                        obj[1] = message.getText();
-                        obj[2] = sdf.format(message.getCreatedOn());
-                        obj[3] = message.getStatus() == 1 ? "Unread" : "Read";
-                        
-                        mData.addRow(obj);
-                        mData.fireTableDataChanged();
-                    }
+                    initTableModel():
                 }
                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
             }
