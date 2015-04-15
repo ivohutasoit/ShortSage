@@ -84,22 +84,10 @@ public class InboxPage extends JPanel
      * Main Constructor
      */
     public InboxPage() {
-        setVisible(false);
-        initComponents();
-        initListeners();
+        setLayout(new BorderLayout());
     }
 
     // <editor-fold defaultstate="collapsed" desc="Region Inititalization">  
-    /**
-     * Initialize components of the panel
-     */
-    private void initComponents() {
-        setLayout(new BorderLayout());
-
-        initNorthPanel();
-        initCenterPanel();
-        initSouthPanel();
-    }
 
     /**
      *
@@ -174,10 +162,21 @@ public class InboxPage extends JPanel
      * Initialize listeners for all components of frame
      */
     private void initListeners() {
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentShown(ComponentEvent e) {
-                loadMessageData();
+        addContainerListener(new ContainarAdapter() {
+            public void componentAdded(ContainerEvent e) {
+                initNorthPanel();
+                initCenterPanel();
+                initSouthPanel();
+                initListeners();
+                
+                // Optimize load data
+                TimerTask task = new TimerTask() {
+                   public void run() {
+                      loadMessageData();
+                   }
+                }
+                Timer timer = new Timer();
+                timer.schedule(task, 200);
             }
         });
         sfSearch.addActionListener(this);
@@ -186,7 +185,6 @@ public class InboxPage extends JPanel
         bRefresh.addActionListener(this);
         ttData.getSelectionModel().addListSelectionListener(this);
         ttData.addMouseListener(new MouseAdapter() {
-            
         });
     }
     // </editor-fold>   
