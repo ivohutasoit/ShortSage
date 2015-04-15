@@ -216,12 +216,27 @@ public class InboxPage extends JPanel
             @Override
             protected Boolean doInBackground() throws Exception {
                 try {
+                    Service service = Service.getInstance();
                     hSession = HibernateUtil.getSessionFactory().openSession();
-                    hSession.getTransaction().begin();
-                    Query query = hSession.createQuery("from InboxMessage");
+                    InboxMessage diMsg = null;
+                    if(service.getServiceStatus() == ServiceStatus.STARTED) {
+                        hSession.getTransaction().begin();
+                        List<InboundMessage> mMessage = new ArrayList<InboundMessage>();
+                        service.readMessages(msgList, MessageClasses.ALL);
+                        for (InboundMessage msg : msgList) {
+                           System.out.println(msg);
+                           diMsg = new InboxMessage();
+                           // init data
+                           // save to database
+                           hSession.saveOrUpdate(diMsg);
+                           service.deleteMessage(msg);
+                        }
+                        hSession.getTransaction().commit();   
+                    } 
+                    
+                    Query query = hSession.createQuery("from InboxMessage order by createdon desc");
                     dMessage = query.list();
 
-                    hSession.getTransaction().commit();
                     hSession.close();
                     return true;
                 } catch (Exception ex) {
