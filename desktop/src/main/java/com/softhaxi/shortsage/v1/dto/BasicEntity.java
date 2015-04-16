@@ -21,6 +21,8 @@ public class BasicEntity implements Serializable {
   
   protected String name;
   
+  protected String remark;
+  
   protected int stateCode;
   
   protected int statusCode;
