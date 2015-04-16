@@ -1,7 +1,6 @@
 package com.softhaxi.shortsage.v1;
 
 import com.softhaxi.shortsage.v1.stage.HostWindow;
-import com.softhaxi.shortsage.v1.util.Verificator;
 
 /**
  * Reference <a href="http://www.jroller.com/gfx/entry/wait_with_style_in_swing">Wait Frame</a>
