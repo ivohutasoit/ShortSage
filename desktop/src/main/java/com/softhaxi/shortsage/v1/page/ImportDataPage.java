@@ -27,7 +27,8 @@ import org.jdesktop.swingx.JXTable;
  * @since 1
  * @version 1.0.0
  */
-public class ImportDataPage extends JPanel {
+public class ImportDataPage extends JPanel 
+    import ActionListener, ItemListener, ListSelectionListener {
 
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -55,21 +56,15 @@ public class ImportDataPage extends JPanel {
      */
     public ImportDataPage() {
         setVisible(false);
-        initComponents();
+        setLayout(new BorderLayout());
+        
+        initNorthPanel();
+        initCenterPanel();
+        initSouthPanel();
         initListeners();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Region Inititalization">  
-    /**
-     * Initialize components of the panel
-     */
-    private void initComponents() {
-        setLayout(new BorderLayout());
-
-        initNorthPanel();
-        initCenterPanel();
-        initSouthPanel();
-    }
 
     /**
      *
@@ -146,12 +141,18 @@ public class ImportDataPage extends JPanel {
      * Initialize listeners for all components of frame
      */
     private void initListeners() {
-//        addComponentListener(new ComponentAdapter() {
-//            @Override
-//            public void componentShown(ComponentEvent e) {
-//                JOptionPane.showMessageDialog(null, "This is dialog from Import Page");
-//            }
-//        });
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                loadDataTable();
+            }
+        });
     }
-    // </editor-fold>   
+    // </editor-fold>  
+    
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    private void loadDataTable() {
+        
+    }
+    // </editor-fold>
 }
