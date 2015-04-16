@@ -29,44 +29,44 @@ public class Message implements Serializable {
   @GeneratedValue(generator="system-uuid")
   @GenericGenerator(name="system-uuid", strategy = "uuid")
   @Column(name = "MGMGID", unique = true)
-  private String id;
+  protected String id;
   
   @Column(name = "MGCPID", length = 100)
-  private String contact;
+  protected String contact;
   
   @Column(name = "MGCGID", length = 100)
-  private String group;
+  protected String group;
   
   @Column(name = "MSTEXT")
-  private String text;
+  protected String text;
   
   @Column(name = "MSDATE")
-  private Date date;
+  protected Date date;
   
   @Column(name = "MSFLDR", length = 100)
-  private String folder;
+  protected String folder;
   
   @Column(name = "MSRCST")
-  private int status;
+  protected int status;
   
   @Column(name = "MSCRON")
-  private Date createdOn;
+  protected Date createdOn;
   
   @Column(name = "MSCRBY", length = 100)
-  private String createdBy;
+  protected String createdBy;
   
   @Column(name = "MSMDON")
-  private Date modifiedOn;
+  protected Date modifiedOn;
   
   @Column(name = "MSMDBY", length = 100)
-  private String modifiedBy;
+  protected String modifiedBy;
   
   @Column(name = "MSDLST")
-  private int deleteState;
+  protected int deleteState;
   
   @Version
   @Column(name="MGVRSN")
-  private Integer version;
+  protected Integer version;
 
     /**
      * @return the id

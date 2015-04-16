@@ -35,7 +35,7 @@ public class MainApp {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Verificator.checkPortList();
+//                Verificator.checkPortList();
                 HostWindow.getInstance().setVisible(true);
             }
         });

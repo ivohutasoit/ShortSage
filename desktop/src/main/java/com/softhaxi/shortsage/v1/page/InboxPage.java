@@ -9,14 +9,16 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -30,18 +32,30 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import net.java.dev.designgridlayout.DesignGridLayout;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTable;
+import org.smslib.GatewayException;
+import org.smslib.InboundMessage;
+import org.smslib.InboundMessage.MessageClasses;
+import org.smslib.Service;
+import org.smslib.Service.ServiceStatus;
+import org.smslib.TimeoutException;
 
 /**
  *
@@ -84,11 +98,15 @@ public class InboxPage extends JPanel
      * Main Constructor
      */
     public InboxPage() {
+        setVisible(false);
         setLayout(new BorderLayout());
+        initNorthPanel();
+        initCenterPanel();
+        initSouthPanel();
+        initListeners();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Region Inititalization">  
-
     /**
      *
      */
@@ -162,36 +180,35 @@ public class InboxPage extends JPanel
      * Initialize listeners for all components of frame
      */
     private void initListeners() {
-        addContainerListener(new ContainarAdapter() {
-            public void componentAdded(ContainerEvent e) {
-                //initNorthPanel();
-                initCenterPanel();
-                //initSouthPanel();
-                initListeners();
-                
-                // Optimize load data
-                TimerTask task = new TimerTask() {
-                   public void run() {
-                      loadMessageData();
-                   }
-                }
-                Timer timer = new Timer();
-                timer.schedule(task, 200);
+        addComponentListener(new ComponentListener() {
+
+            @Override
+            public void componentResized(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                loadMessageData();
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+
             }
         });
         sfSearch.addActionListener(this);
         cfViews.addItemListener(this);
-        bDelete.addActionListener(this);
-        bRefresh.addActionListener(this);
+//        bRefresh.addActionListener(this);
         ttData.getSelectionModel().addListSelectionListener(this);
-        ttData.addMouseListener(new MouseAdapter() {
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/develop
-        });
     }
-    
+
     private void initTableModel() {
         if (mData.getRowCount() > 0) {
             for (int i = mData.getRowCount() - 1; i > -1; i--) {
@@ -201,14 +218,14 @@ public class InboxPage extends JPanel
         Object[] obj = null;
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         for (InboxMessage message : dMessage) {
-        obj = new Object[4];
-        obj[0] = message.getContact();
-        obj[1] = message.getText();
-        obj[2] = sdf.format(message.getCreatedOn());
-        obj[3] = message.getStatus() == 1 ? "Unread" : "Read";
-        
-        mData.addRow(obj);
-        mData.fireTableDataChanged();
+            obj = new Object[4];
+            obj[0] = message.getContact();
+            obj[1] = message.getText();
+            obj[2] = message.getCreatedOn();
+            obj[3] = message.getStatus() == 1 ? "Unread" : "Read";
+
+            mData.addRow(obj);
+            mData.fireTableDataChanged();
         }
     }
     // </editor-fold>   
@@ -223,27 +240,36 @@ public class InboxPage extends JPanel
                     Service service = Service.getInstance();
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     InboxMessage diMsg = null;
-                    if(service.getServiceStatus() == ServiceStatus.STARTED) {
+                    if (service.getServiceStatus() == ServiceStatus.STARTED) {
                         hSession.getTransaction().begin();
                         List<InboundMessage> mMessage = new ArrayList<InboundMessage>();
-                        service.readMessages(msgList, MessageClasses.ALL);
-                        for (InboundMessage msg : msgList) {
-                           System.out.println(msg);
-                           diMsg = new InboxMessage();
-                           // init data
-                           // save to database
-                           hSession.saveOrUpdate(diMsg);
-                           service.deleteMessage(msg);
+                        service.readMessages(mMessage, MessageClasses.ALL);
+                        for (InboundMessage msg : mMessage) {
+                            System.out.println(msg);
+                            diMsg = new InboxMessage();
+                            diMsg.setId(msg.getId());
+                            diMsg.setContact(msg.getOriginator());
+                            diMsg.setText(msg.getText());
+                            diMsg.setCreatedOn(new Date());
+                            diMsg.setCreatedBy("SYSTEM");
+                            diMsg.setModifiedOn(diMsg.getCreatedOn());
+                            diMsg.setModifiedBy(diMsg.getCreatedBy());
+                            // init data
+                            // save to database
+                            hSession.saveOrUpdate(diMsg);
+                            service.deleteMessage(msg);
                         }
-                        hSession.getTransaction().commit();   
-                    } 
-                    
-                    Query query = hSession.createQuery("from InboxMessage order by createdon desc");
+                        hSession.getTransaction().commit();
+                    }
+
+                    Query query = hSession.createQuery("from Message m where type(m) = InboxMessage");
+                    Criteria criteria = hSession.createCriteria(InboxMessage.class);
+                    criteria.addOrder(Order.desc("MGCRON"));
                     dMessage = query.list();
 
                     hSession.close();
                     return true;
-                } catch (Exception ex) {
+                } catch (HibernateException | TimeoutException | GatewayException | IOException | InterruptedException ex) {
                     Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
                     return false;
                 }
@@ -253,23 +279,7 @@ public class InboxPage extends JPanel
             @Override
             protected void done() {
                 if (!isCancelled()) {
-<<<<<<< HEAD
-                    mData = new DefaultTableModel(COLUMN_NAME, 0);
-                    Object[] obj = null;
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                    for (InboxMessage message : dMessage) {
-                        obj = new Object[4];
-                        obj[0] = message.getContact();
-                        obj[1] = message.getText();
-                        obj[2] = sdf.format(message.getCreatedOn());
-                        obj[3] = message.getStatus() == 1 ? "Unread" : "Read";
-
-                        mData.addRow(obj);
-                        mData.fireTableDataChanged();
-                    }
-=======
-                    initTableModel():
->>>>>>> origin/develop
+                    initTableModel();
                 }
                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
             }
@@ -321,8 +331,26 @@ public class InboxPage extends JPanel
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (ttData.getSelectedRow() > -1) {
-            // print first column value from selected row
-            System.out.println(ttData.getValueAt(ttData.getSelectedRow(), 0).toString());
+            ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+            
+            InboxMessage message = null;
+
+            if (lsm.isSelectionEmpty()) {
+                System.out.println(" <none>");
+            } else {
+                // Find out which indexes are selected.
+                int minIndex = lsm.getMinSelectionIndex();
+                int maxIndex = lsm.getMaxSelectionIndex();
+                for (int i = minIndex; i <= maxIndex; i++) {
+                    if (lsm.isSelectedIndex(i)) {
+                        System.out.println(" " + i);
+                        message = dMessage.get(i);
+                        
+                        System.out.println(message.getId());
+                    }
+                }
+            }
+            System.out.println();
         }
     }
     // </editor-fold>
