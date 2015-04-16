@@ -1,6 +1,7 @@
 package com.softhaxi.shortsage.v1.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -8,9 +9,12 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * References
@@ -21,14 +25,14 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "T0MSSG")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @DiscriminatorColumn(
         name = "MGMGFD",
         discriminatorType = DiscriminatorType.STRING
 )
 @DiscriminatorValue(value = "MSSG")
 @AttributeOverrides({
-    @AttributeOverride(name = "id",
+    @AttributeOverride(name = "id", 
             column = @Column(name = "MGMGID", unique = true)),
     @AttributeOverride(name = "name",
             column = @Column(name = "MGMGNA", nullable = false, length = 100)),
@@ -54,15 +58,12 @@ import javax.persistence.Table;
 public class ModemMessage extends BasicEntity
         implements Serializable {
 
-    @Column(name = "MGCNTC", nullable = false)
-    private String contact;
-
-    @Column(name = "MGTEXT", nullable = false)
-    private String text;
+    protected String text;
 
     /**
      * @return the text
      */
+    @Column(name = "MGTEXT", nullable = false)
     public String getText() {
         return text;
     }
