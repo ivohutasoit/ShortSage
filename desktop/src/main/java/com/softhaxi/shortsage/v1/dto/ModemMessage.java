@@ -51,13 +51,23 @@ import javax.persistence.Table;
 })
 public class ModemMessage extends BasicEntity
         implements Serializable {
+                
+    @Column(name = "MGMDID")
+    private String modemId;
 
     @Column(name = "MGCNTC", nullable = false)
     private String contact;
 
     @Column(name = "MGTEXT", nullable = false)
     private String text;
-
+    
+    /**
+     * Constructor
+     */ 
+    public ModemMessage() {
+        super();
+    }
+    
     /**
      * @return the text
      */
