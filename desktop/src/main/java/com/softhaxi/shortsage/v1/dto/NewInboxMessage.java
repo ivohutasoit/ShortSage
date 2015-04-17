@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "T1INMG")
 @DiscriminatorValue("INBX")
-public class InboundMessage extends ModemMessage
+public class NewInboxMessage extends ModemMessage
     implements Serializable {
     
 }
