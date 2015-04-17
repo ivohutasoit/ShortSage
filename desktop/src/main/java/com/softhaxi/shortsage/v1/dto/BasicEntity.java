@@ -49,6 +49,14 @@ public class BasicEntity implements Serializable {
 
     @Version
     private int version;
+    
+    /**
+     * 
+     */ 
+    public BasicEntity() {
+        this.status = 1;
+        this.deletedState = 0;
+    }
 
     /**
      * @return the id
