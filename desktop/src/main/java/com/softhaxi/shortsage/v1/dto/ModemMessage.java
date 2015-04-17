@@ -52,8 +52,14 @@ import javax.persistence.Table;
 public class ModemMessage extends BasicEntity
         implements Serializable {
                 
-    @Column(name = "MGMDID")
-    private String modemId;
+    @Column(name = "MGRFID")
+    private String refId;
+    
+    @Colmn(name = "MGGWID")
+    private String gatewayId;
+    
+    @Column(name = "MGDATE")
+    private Date date;
 
     @Column(name = "MGCNTC", nullable = false)
     private String contact;
