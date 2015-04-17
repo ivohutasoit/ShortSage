@@ -33,9 +33,7 @@ public class BasicEntity implements Serializable {
 
     private String remark;
 
-    private int stateCode;
-
-    private int statusCode;
+    private int status;
 
     private String createdBy;
 
@@ -109,17 +107,17 @@ public class BasicEntity implements Serializable {
     }
 
     /**
-     * @return the statusCode
+     * @return the status
      */
-    public int getStatusCode() {
-        return statusCode;
+    public int getStatus() {
+        return status;
     }
 
     /**
-     * @param statusCode the statusCode to set
+     * @param status the status to set
      */
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     /**
