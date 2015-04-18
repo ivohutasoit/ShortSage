@@ -1,5 +1,6 @@
 package com.softhaxi.shortsage.v1.util;
 
+import com.softhaxi.shortsage.v1.dto.Gateway;
 import com.softhaxi.shortsage.v1.dto.Message;
 import com.softhaxi.shortsage.v1.dto.InboxMessage;
 import com.softhaxi.shortsage.v1.dto.OutboxMessage;
@@ -25,6 +26,7 @@ public class HibernateUtil {
                     .addAnnotatedClass(Message.class)
                     .addAnnotatedClass(InboxMessage.class)
                     .addAnnotatedClass(OutboxMessage.class)
+                    .addAnnotatedClass(Gateway.class)
                     //.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
                     //.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect")
                     .setProperty("hibernate.dialect", "org.hibernate.dialect.DerbyDialect")
