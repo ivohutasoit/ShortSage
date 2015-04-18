@@ -35,7 +35,7 @@ import javax.persistence.TemporalType;
     @AttributeOverride(name = "id",
             column = @Column(name = "MGMGID", unique = true)),
     @AttributeOverride(name = "name",
-            column = @Column(name = "MGMGNA", nullable = false, length = 100)),
+            column = @Column(name = "MGMGNA", length = 100)),
     @AttributeOverride(name = "remark",
             column = @Column(name = "MGRMRK")),
     @AttributeOverride(name = "status",
