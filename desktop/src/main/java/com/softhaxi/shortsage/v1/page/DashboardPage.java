@@ -287,7 +287,7 @@ public class DashboardPage extends JPanel {
             try {
                 hSession = HibernateUtil.getSessionFactory().openSession();
                 hSession.getTransaction().begin();
-                Query query = hSession.createQuery("from Gateway");
+                Query query = hSession.getNamedQuery("Gateway.All");
                 gData = query.list();
                 hSession.getTransaction().commit();
                 hSession.close();

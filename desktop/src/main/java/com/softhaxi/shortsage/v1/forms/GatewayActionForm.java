@@ -395,7 +395,7 @@ public class GatewayActionForm extends JPanel
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     hSession.getTransaction().begin();
-                    hSession.saveOrUpdate(object);
+                    hSession.save(object);
                     hSession.getTransaction().commit();
                     hSession.close();
                     saved = true;
