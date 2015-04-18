@@ -10,6 +10,8 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -48,6 +50,10 @@ import javax.persistence.Table;
             column = @Column(name = "GWDLST")),
     @AttributeOverride(name = "version",
             column = @Column(name = "GWVRSN"))
+})
+@NamedQueries({
+    @NamedQuery(name = "Gateway.All", query = "from Gateway a where a.deletedState = 0"),
+    @NamedQuery(name = "Gateway.Id", query = "from Gateway a where a.id = :id")
 })
 public class Gateway extends BasicEntity
         implements Serializable {

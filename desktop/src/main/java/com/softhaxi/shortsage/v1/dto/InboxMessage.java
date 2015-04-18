@@ -17,8 +17,8 @@ import javax.persistence.Table;
 @Table(name = "T1INMG")
 @DiscriminatorValue("INBX")
 @NamedQueries({
-    @NamedQuery(name = "Inbox.All", query = "from NewInboxMessage a where a.deletedState = 0"),
-    @NamedQuery(name = "Inbox.Id", query = "from NewInboxMessage a where a.id = :id")
+    @NamedQuery(name = "Inbox.All", query = "from InboxMessage a where a.deletedState = 0"),
+    @NamedQuery(name = "Inbox.Id", query = "from InboxMessage a where a.id = :id")
 })
 public class InboxMessage extends Message
     implements Serializable {

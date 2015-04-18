@@ -18,8 +18,8 @@ import javax.persistence.Table;
 @Table(name = "T1INMG")
 @DiscriminatorValue("OTBX")
 @NamedQueries({
-    @NamedQuery(name = "Outbox.All", query = "from NewOutboxMessage a where a.deletedState = 0"),
-    @NamedQuery(name = "Outbox.Id", query = "from NewOutboxMessage a where a.id = :id")
+    @NamedQuery(name = "Outbox.All", query = "from OutboxMessage a where a.deletedState = 0"),
+    @NamedQuery(name = "Outbox.Id", query = "from OutboxMessage a where a.id = :id")
 })
 public class OutboxMessage extends Message
         implements Serializable {
