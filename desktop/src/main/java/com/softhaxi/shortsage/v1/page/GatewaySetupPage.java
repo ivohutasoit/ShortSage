@@ -2,7 +2,6 @@ package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
 import com.softhaxi.shortsage.v1.dto.Gateway;
-import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.GatewayActionForm;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
@@ -17,10 +16,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -46,10 +43,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTable;
-import org.smslib.AGateway;
-import org.smslib.SMSLibException;
-import org.smslib.Service;
-import org.smslib.modem.SerialModemGateway;
 
 /**
  *
@@ -250,7 +243,7 @@ public class GatewaySetupPage extends JPanel
                         obj[3] = gateway.getModel();
                         obj[4] = gateway.getProvider();
                         obj[5] = gateway.getStatus() == 1 ? "Active" : "Inactive";
-                        obj[6] = sdf.format(gateway.getCreatedOn());
+                        obj[6] = sdf.format(gateway.getCreatedDate());
 
                         mData.addRow(obj);
                         mData.fireTableDataChanged();

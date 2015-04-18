@@ -268,8 +268,7 @@ public class DashboardPage extends JPanel {
                     tfManufacture.setText(g.getManufacture());
                     tfModel.setText(g.getModel());
                     tfProvider.setText(g.getProvider());
-                    tfCCenter.setText(g.getMessageCenter());
-                    tfCBalance.setText(g.getCheckBalance());
+                    tfCBalance.setText(g.getNumberBalance());
                     tfSerial.setText(g.getSerial());
                     tfISMI.setText(g.getIsmi());
                     return;

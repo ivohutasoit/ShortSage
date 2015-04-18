@@ -377,12 +377,11 @@ public class GatewayActionForm extends JPanel
         object.setIsmi(tfISMI.getText().trim());
         object.setSerial(tfSerial.getText().trim());
         object.setProvider(tfProvider.getText().trim());
-        object.setMessageCenter(tfCCenter.getText().trim());
-        object.setCheckBalance(tfCBalance.getText().trim());
+        object.setNumberBalance(tfCBalance.getText().trim());
         object.setCreatedBy("SYSTEM");
-        object.setCreatedOn(new Date());
+        object.setCreatedDate(new Date());
         object.setModifiedBy(object.getCreatedBy());
-        object.setModifiedOn(object.getCreatedOn());
+        object.setModifiedDate(object.getCreatedDate());
 
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
 
