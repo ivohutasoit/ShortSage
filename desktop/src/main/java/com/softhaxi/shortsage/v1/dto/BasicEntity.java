@@ -101,20 +101,6 @@ public class BasicEntity implements Serializable {
     }
 
     /**
-     * @return the stateCode
-     */
-    public int getStateCode() {
-        return stateCode;
-    }
-
-    /**
-     * @param stateCode the stateCode to set
-     */
-    public void setStateCode(int stateCode) {
-        this.stateCode = stateCode;
-    }
-
-    /**
      * @return the status
      */
     public int getStatus() {

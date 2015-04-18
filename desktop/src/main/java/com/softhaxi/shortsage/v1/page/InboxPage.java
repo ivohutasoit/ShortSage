@@ -15,10 +15,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -37,25 +34,16 @@ import javax.swing.SwingWorker;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import net.java.dev.designgridlayout.DesignGridLayout;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTable;
-import org.smslib.GatewayException;
 import org.smslib.InboundMessage;
-import org.smslib.InboundMessage.MessageClasses;
-import org.smslib.Service;
-import org.smslib.Service.ServiceStatus;
-import org.smslib.TimeoutException;
 
 /**
  *
@@ -221,8 +209,9 @@ public class InboxPage extends JPanel
             obj = new Object[4];
             obj[0] = message.getContact();
             obj[1] = message.getText();
-            obj[2] = message.getCreatedOn();
-            obj[3] = message.getStatus() == 1 ? "Unread" : "Read";
+            obj[2] = message.getDate();
+            obj[3] = message.getStatus() == 1 ? InboundMessage.MessageClasses.UNREAD.toString() : 
+                    InboundMessage.MessageClasses.READ.toString();
 
             mData.addRow(obj);
             mData.fireTableDataChanged();
@@ -237,40 +226,38 @@ public class InboxPage extends JPanel
             @Override
             protected Boolean doInBackground() throws Exception {
                 try {
-                    Service service = Service.getInstance();
+//                    Service service = Service.getInstance();
                     hSession = HibernateUtil.getSessionFactory().openSession();
-                    InboxMessage diMsg = null;
-                    if (service.getServiceStatus() == ServiceStatus.STARTED) {
-                        hSession.getTransaction().begin();
-                        List<InboundMessage> mMessage = new ArrayList<InboundMessage>();
-                        service.readMessages(mMessage, MessageClasses.ALL);
-                        for (InboundMessage msg : mMessage) {
-                            System.out.println(msg);
-                            diMsg = new InboxMessage();
-                            diMsg.setId(msg.getId());
-                            diMsg.setContact(msg.getOriginator());
-                            diMsg.setText(msg.getText());
-                            diMsg.setCreatedOn(new Date());
-                            diMsg.setCreatedBy("SYSTEM");
-                            diMsg.setModifiedOn(diMsg.getCreatedOn());
-                            diMsg.setModifiedBy(diMsg.getCreatedBy());
-                            // init data
-                            // save to database
-                            hSession.saveOrUpdate(diMsg);
-                            service.deleteMessage(msg);
-                        }
-                        hSession.getTransaction().commit();
-                    }
+//                    InboxMessage diMsg = null;
+//                    if (service.getServiceStatus() == ServiceStatus.STARTED) {
+//                        hSession.getTransaction().begin();
+//                        List<InboundMessage> mMessage = new ArrayList<InboundMessage>();
+//                        service.readMessages(mMessage, MessageClasses.ALL);
+//                        for (InboundMessage msg : mMessage) {
+//                            System.out.println(msg);
+//                            diMsg = new InboxMessage();
+//                            diMsg.setId(msg.getId());
+//                            diMsg.setContact(msg.getOriginator());
+//                            diMsg.setText(msg.getText());
+//                            diMsg.setCreatedOn(new Date());
+//                            diMsg.setCreatedBy("SYSTEM");
+//                            diMsg.setModifiedOn(diMsg.getCreatedOn());
+//                            diMsg.setModifiedBy(diMsg.getCreatedBy());
+//                            // init data
+//                            // save to database
+//                            hSession.saveOrUpdate(diMsg);
+//                            service.deleteMessage(msg);
+//                        }
+//                        hSession.getTransaction().commit();
+//                    }
 
-                    Query query = hSession.createQuery("from Message m where type(m) = InboxMessage");
-                    Criteria criteria = hSession.createCriteria(InboxMessage.class);
-                    criteria.addOrder(Order.desc("MGCRON"));
+                    Query query = hSession.getNamedQuery("Inbox.All");
                     dMessage = query.list();
 
                     hSession.close();
                     return true;
-                } catch (HibernateException | TimeoutException | GatewayException | IOException | InterruptedException ex) {
-                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (HibernateException ex) {
+                    Logger.getLogger(InboxPage.class.getName()).log(Level.SEVERE, null, ex);
                     return false;
                 }
 

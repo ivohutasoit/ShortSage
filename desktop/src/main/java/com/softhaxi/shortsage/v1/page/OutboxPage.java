@@ -2,6 +2,7 @@ package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
 import com.softhaxi.shortsage.v1.dto.OutboxMessage;
+import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.MessageActionForm;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
@@ -44,6 +45,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTable;
+import org.smslib.OutboundMessage;
 
 /**
  *
@@ -190,9 +192,9 @@ public class OutboxPage extends JPanel
         });
         sfSearch.addActionListener(this);
         cfViews.addItemListener(this);
-        bNew.addActionListener(this);
-        bDelete.addActionListener(this);
-        bRefresh.addActionListener(this);
+        //bNew.addActionListener(this);
+        //bDelete.addActionListener(this);
+        //bRefresh.addActionListener(this);
         ttData.getSelectionModel().addListSelectionListener(this);
     }
     // </editor-fold>   
@@ -206,7 +208,7 @@ public class OutboxPage extends JPanel
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     hSession.getTransaction().begin();
-                    Query query = hSession.createQuery("from OutboxMessage");
+                    Query query = hSession.getNamedQuery("Outbox.All");
                     dMessage = query.list();
 
                     hSession.getTransaction().commit();
@@ -226,10 +228,12 @@ public class OutboxPage extends JPanel
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     for (OutboxMessage message : dMessage) {
                         obj = new Object[4];
-                        obj[0] = message.getContact().equals("") ? message.getGroup() : message.getContact();
+                        obj[0] = message.getContact();
                         obj[1] = message.getText();
-                        obj[2] = sdf.format(message.getCreatedOn());
-                        obj[3] = message.getStatus() == 1 ? "Draft" : "Sent";
+                        obj[2] = sdf.format(message.getDate());
+                        obj[3] = message.getStatus() == 1 ? OutboundMessage.MessageStatuses.UNSENT.toString() :
+                                message.getStatus() == 2 ? OutboundMessage.MessageStatuses.SENT.toString() :
+                                OutboundMessage.MessageStatuses.FAILED.toString();
 
                         mData.addRow(obj);
                         mData.fireTableDataChanged();
