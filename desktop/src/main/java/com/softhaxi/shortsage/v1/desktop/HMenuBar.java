@@ -81,12 +81,12 @@ public class HMenuBar extends JMenuBar
         miConnect = new JMenuItem(RES_GLOBAL.getString("label.modem.connect"), KeyEvent.VK_C);
         miConnect.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
         miConnect.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/ic_modem_connect_16.png")));
-        mhFile.add(miConnect);
+        //mhFile.add(miConnect);
 
         miDisconnect = new JMenuItem(RES_GLOBAL.getString("label.modem.disconnect"), KeyEvent.VK_D);
         miDisconnect.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
         miDisconnect.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/ic_modem_disconnect_16.png")));
-        mhFile.add(miDisconnect);
+        //mhFile.add(miDisconnect);
 
         mhFile.addSeparator();
 
