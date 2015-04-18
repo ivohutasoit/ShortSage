@@ -201,8 +201,8 @@ public class GatewayActionForm extends JPanel
                 .add(tfBattery);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.provider") + " :"))
                 .add(tfProvider, 2).empty();
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.ccenter") + " :"))
-                .add(tfCCenter, 2).empty(2);
+//        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.ccenter") + " :"))
+//                .add(tfCCenter, 2).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.cbalance") + " :"))
                 .add(tfCBalance).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :"))

@@ -5,6 +5,7 @@ import com.softhaxi.shortsage.v1.modem.impl.CallNotification;
 import com.softhaxi.shortsage.v1.modem.impl.InboundNotification;
 import com.softhaxi.shortsage.v1.modem.impl.OrphanedMessageNotification;
 import com.softhaxi.shortsage.v1.modem.impl.OutboundNotification;
+import com.softhaxi.shortsage.v1.modem.impl.USSDNotification;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -46,12 +47,13 @@ public class ModemUtil {
 
             service.setOutboundMessageNotification(new OutboundNotification());
             service.setInboundMessageNotification(new InboundNotification());
+            service.setUSSDNotification(new USSDNotification());
             service.setCallNotification(new CallNotification());
             service.setOrphanedMessageNotification(new OrphanedMessageNotification());
 
             for (Gateway gateway : dGateway) {
                 if (service.getGateway(gateway.getId()) == null) {
-                    modem = new SerialModemGateway(gateway.getId(), gateway.getPort(), gateway.getBaudRate(),
+                    modem = new SerialModemGateway(gateway.getName(), gateway.getPort(), gateway.getBaudRate(),
                             "", "");
                     modem.setInbound(true);
                     modem.setOutbound(true);

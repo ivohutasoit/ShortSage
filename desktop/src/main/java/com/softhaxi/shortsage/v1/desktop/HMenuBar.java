@@ -3,12 +3,14 @@ package com.softhaxi.shortsage.v1.desktop;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.MessageActionForm;
 import com.softhaxi.shortsage.v1.stage.HostWindow;
+import com.softhaxi.shortsage.v1.util.AppUtil;
 import com.softhaxi.shortsage.v1.util.ModemUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -19,6 +21,7 @@ import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
@@ -43,6 +46,7 @@ public class HMenuBar extends JMenuBar
     private JMenuItem miConnect;
     private JMenuItem miDisconnect;
     private JMenuItem miUser;
+    private JMenuItem miRestart;
     private JMenuItem miExit;
 
     private JMenu mhEdit;
@@ -92,6 +96,11 @@ public class HMenuBar extends JMenuBar
         mhFile.add(miUser);
 
         mhFile.addSeparator();
+        
+        miRestart = new JMenuItem(RES_GLOBAL.getString("label.restart"), KeyEvent.VK_R);
+        miRestart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+        mhFile.add(miRestart);
+        add(mhFile);
 
         miExit = new JMenuItem(RES_GLOBAL.getString("label.exit"), KeyEvent.VK_X);
         mhFile.add(miExit);
@@ -124,6 +133,7 @@ public class HMenuBar extends JMenuBar
         miMessage.addActionListener(this);
         miConnect.addActionListener(this);
         miDisconnect.addActionListener(this);
+        miRestart.addActionListener(this);
     }
 
     private void initState() {
@@ -238,6 +248,18 @@ public class HMenuBar extends JMenuBar
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
+            } else if(source == miRestart) {
+                try {
+                    AppUtil.restart(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(null, "Restarting Applicaition!");
+                        }
+                    });
+                } catch (IOException ex) {
+                    Logger.getLogger(HMenuBar.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }

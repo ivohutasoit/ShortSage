@@ -16,6 +16,8 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -44,6 +46,9 @@ import org.hibernate.Session;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTable;
 import org.smslib.InboundMessage;
+import org.smslib.InboundMessage.MessageClasses;
+import org.smslib.Service;
+import org.smslib.Service.ServiceStatus;
 
 /**
  *
@@ -226,30 +231,34 @@ public class InboxPage extends JPanel
             @Override
             protected Boolean doInBackground() throws Exception {
                 try {
-//                    Service service = Service.getInstance();
+                    Service service = Service.getInstance();
                     hSession = HibernateUtil.getSessionFactory().openSession();
-//                    InboxMessage diMsg = null;
-//                    if (service.getServiceStatus() == ServiceStatus.STARTED) {
-//                        hSession.getTransaction().begin();
-//                        List<InboundMessage> mMessage = new ArrayList<InboundMessage>();
-//                        service.readMessages(mMessage, MessageClasses.ALL);
-//                        for (InboundMessage msg : mMessage) {
-//                            System.out.println(msg);
-//                            diMsg = new InboxMessage();
-//                            diMsg.setId(msg.getId());
-//                            diMsg.setContact(msg.getOriginator());
-//                            diMsg.setText(msg.getText());
-//                            diMsg.setCreatedOn(new Date());
-//                            diMsg.setCreatedBy("SYSTEM");
-//                            diMsg.setModifiedOn(diMsg.getCreatedOn());
-//                            diMsg.setModifiedBy(diMsg.getCreatedBy());
-//                            // init data
-//                            // save to database
-//                            hSession.saveOrUpdate(diMsg);
-//                            service.deleteMessage(msg);
-//                        }
-//                        hSession.getTransaction().commit();
-//                    }
+                    InboxMessage diMsg = null;
+                    if (service.getServiceStatus() == ServiceStatus.STARTED) {
+                        hSession.getTransaction().begin();
+                        List<InboundMessage> mMessage = new ArrayList<InboundMessage>();
+                        service.readMessages(mMessage, MessageClasses.ALL);
+                        for (InboundMessage msg : mMessage) {
+                            System.out.println(msg);
+                            diMsg = new InboxMessage();
+                            diMsg.setName(msg.getUuid());
+                            diMsg.setDate(msg.getDate());
+                            diMsg.setRefId(msg.getId());
+                            diMsg.setGatewayId(msg.getGatewayId());
+                            diMsg.setContact(msg.getOriginator());
+                            diMsg.setText(msg.getText());
+                            diMsg.setCenter(msg.getSmscNumber());
+                            diMsg.setCreatedDate(new Date());
+                            diMsg.setCreatedBy("SYSTEM");
+                            diMsg.setModifiedDate(diMsg.getCreatedDate());
+                            diMsg.setModifiedBy(diMsg.getCreatedBy());
+                            // init data
+                            // save to database
+                            hSession.save(diMsg);
+                            service.deleteMessage(msg);
+                        }
+                        hSession.getTransaction().commit();
+                    }
 
                     Query query = hSession.getNamedQuery("Inbox.All");
                     dMessage = query.list();
