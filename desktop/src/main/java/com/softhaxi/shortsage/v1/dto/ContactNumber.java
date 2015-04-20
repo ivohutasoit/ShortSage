@@ -12,15 +12,30 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "D0CTNB")
-public class ContactNumber implements Serializable {
+@AttributeOverrides({
+    @AttributeOverride(name = "id",
+            column = @Column(name = "CNCNID", unique = true)),
+    @AttributeOverride(name = "remark",
+            column = @Column(name = "CNRMRK")),
+    @AttributeOverride(name = "status",
+            column = @Column(name = "CNRCST")),
+    @AttributeOverride(name = "createdBy",
+            column = @Column(name = "CNCRBY")),
+    @AttributeOverride(name = "createdDate",
+            column = @Column(name = "CNCRDT")),
+    @AttributeOverride(name = "modifiedBy",
+            column = @Column(name = "CNMFBY")),
+    @AttributeOverride(name = "modifiedDate",
+            column = @Column(name = "CNMFDT")),
+    @AttributeOverride(name = "deletedState",
+            column = @Column(name = "CNDLST")),
+    @AttributeOverride(name = "version",
+            column = @Column(name = "CNVRSN"))
+})
+public class ContactNumber extends BasicEntity
+    implements Serializable {
 
-    @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    @Column(name = "CNCNID", unique = true)
-    private String id;
-
-    @Column(name = "CNCPID")
+    @Column(name = "CNCCID")
     private String person;
 
     @Column(name = "CNFELD", length = 100)
@@ -28,26 +43,4 @@ public class ContactNumber implements Serializable {
 
     @Column(name = "CNMAIN")
     private int main;
-
-    @Column(name = "CNRCTS")
-    private int status;
-
-    @Column(name = "CNCRBY", length = 100)
-    private String createdBy;
-
-    @Column(name = "CNCRON")
-    private Date createdOn;
-
-    @Column(name = "CNMDBY", length = 100)
-    private String modifiedBy;
-
-    @Column(name = "CNMDON")
-    private Date modifiedOn;
-
-    @Column(name = "CNDLST")
-    private int deleteState;
-
-    @Version
-    @Column(name = "CNVRSN")
-    private Integer version;
 }
