@@ -2,6 +2,7 @@ package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
 import com.softhaxi.shortsage.v1.dto.Gateway;
+import com.softhaxi.shortsage.v1.dto.MessageTemplate;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.GatewayActionForm;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
@@ -21,6 +22,7 @@ import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -191,7 +193,7 @@ public class GatewaySetupPage extends JPanel
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                loadGatewayData();
+                loadData();
             }
         });
         ttData.addMouseListener(new MouseAdapter() {
@@ -212,7 +214,7 @@ public class GatewaySetupPage extends JPanel
     /**
      *
      */
-    private void loadGatewayData() {
+    private void loadData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
             @Override
@@ -269,6 +271,48 @@ public class GatewaySetupPage extends JPanel
         });
         t1.execute();
     }
+    
+    /**
+     * 
+     * @param template 
+     */
+    private void deleteData(final Gateway gateway) {
+        firePropertyChange(PropertyChangeField.DELETING.toString(), false, true);
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+           @Override
+           protected Boolean doInBackground() {
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    hSession.delete(gateway);
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    return true;
+                } catch (Exception ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return false;
+           }
+        };
+        
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+           @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("state".equals(evt.getPropertyName())
+                 && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                    try {
+                        if(t1.get() == true) {
+                            firePropertyChange(PropertyChangeField.DELETING.toString(), true, false);
+                            loadData();
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(MessageTemplatePage.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                 }
+            }
+        });
+        t1.execute();
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
@@ -301,7 +345,7 @@ public class GatewaySetupPage extends JPanel
                 dialog.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosed(WindowEvent e) {
-                        loadGatewayData();
+                        loadData();
                     }
                 });
                 dialog.add(form);
@@ -321,9 +365,10 @@ public class GatewaySetupPage extends JPanel
                         "Gateway", JOptionPane.YES_NO_OPTION);
                 if(result == JOptionPane.YES_OPTION) {
                   // running delete 
+                    deleteData(gateway);
                 }
             } else if(source == bRefresh) {
-                loadGatewayData();
+                loadData();
             }
         }
     }
