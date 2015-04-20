@@ -140,7 +140,7 @@ public class GatewaySetupPage extends JPanel
         bRefresh = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png")));
 
         pToolbar.add(bNew);
-        pToolbar.add(bEdit);
+        //pToolbar.add(bEdit);
         pToolbar.addSeparator();
         pToolbar.add(bDelete);
         pToolbar.add(Box.createHorizontalGlue());
