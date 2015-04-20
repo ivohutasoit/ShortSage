@@ -186,6 +186,7 @@ public class GatewaySetupPage extends JPanel
      */
     private void initListeners() {
         bNew.addActionListener(this);
+        bDelete.addActionListener(this);
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
@@ -331,6 +332,19 @@ public class GatewaySetupPage extends JPanel
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
 
+            } if(source == bDelete) {
+                if(ttData.getSelectedRow() == -1) {
+                   JOptionPane.showMessageDialog(null, "No data selected to be deleted.", "Gateway", JOptionPane.WARNING_MESSAGE);
+                   return;
+                }
+                
+                Gateway gateway = dGateway.get(ttData.getSelectedRow());
+                
+                int result = JOptionPane.showConfirmDialog(null, "Delete Gateway " + gateway.getName() + "?", 
+                        "Gateway", JOptionPane.YES_NO_OPTION);
+                if(result == JOptionPane.YES_OPTION) {
+                  // running delete 
+                }
             }
         }
     }
