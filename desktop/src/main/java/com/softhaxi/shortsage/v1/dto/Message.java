@@ -34,8 +34,6 @@ import javax.persistence.TemporalType;
 @AttributeOverrides({
     @AttributeOverride(name = "id",
             column = @Column(name = "MGMGID", unique = true)),
-    @AttributeOverride(name = "name",
-            column = @Column(name = "MGMGNA", length = 100)),
     @AttributeOverride(name = "remark",
             column = @Column(name = "MGRMRK")),
     @AttributeOverride(name = "status",
@@ -55,6 +53,9 @@ import javax.persistence.TemporalType;
 })
 public class Message extends BasicEntity
         implements Serializable {
+    
+    private String name;
+
     @Column(name = "MGRFID")
     private String refId;
     
@@ -73,6 +74,20 @@ public class Message extends BasicEntity
     
     @Column(name = "MGCNTR")
     private String center;
+    
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
     /**
      * @return the refId
