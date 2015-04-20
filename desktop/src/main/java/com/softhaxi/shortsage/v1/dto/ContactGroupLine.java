@@ -21,8 +21,6 @@ import org.hibernate.annotations.GenericGenerator;
 @AttributeOverrides({
     @AttributeOverride(name = "id",
             column = @Column(name = "GGGLID", unique = true)),
-    @AttributeOverride(name = "name",
-            column = @Column(name = "GLGLNA", length = 100)),
     @AttributeOverride(name = "remark",
             column = @Column(name = "GLRMRK")),
     @AttributeOverride(name = "status",
