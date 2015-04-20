@@ -58,6 +58,9 @@ import javax.persistence.Table;
 public class Gateway extends BasicEntity
         implements Serializable {
     
+    @Column(name = "GWGWNA", length = 100, nullable = false)
+    private String name;
+    
     @Column(name = "GWPORT", length = 10, nullable = false)
     private String port;
 
@@ -82,6 +85,20 @@ public class Gateway extends BasicEntity
     @Column(name = "GWNOBL")
     private String numberBalance;
 
+        /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+    
     /**
      * @return the port
      */

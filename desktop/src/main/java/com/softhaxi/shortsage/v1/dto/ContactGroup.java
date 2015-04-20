@@ -13,11 +13,7 @@ import javax.persistence.NamedQuery;
  * @version 1.0.0
  */
 @Entity
-<<<<<<< HEAD
 @DiscriminatorValue("CGRP")
-=======
-@DiscriminatorValue("GCRP")
->>>>>>> origin/develop
 @NamedQueries({
     @NamedQuery(name = "ContactGroup.All", query = "from ContactGroup a where a.deletedState = 0"),
     @NamedQuery(name = "ContactGroup.Id", query = "from ContactGroup a where a.id = :id")

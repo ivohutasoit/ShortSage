@@ -1,7 +1,6 @@
 package com.softhaxi.shortsage.v1.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -9,13 +8,9 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
-import javax.persistence.Version;
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  *
@@ -26,21 +21,12 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 @Table(name = "M0CNTC")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-<<<<<<< HEAD
 @DiscriminatorColumn(name = "CCCCTY", 
         discriminatorType = DiscriminatorType.STRING)
-=======
-@DiscriminatorColumn(name = "CCCCTY", discriminatorType = DiscriminatorType.STRING)
->>>>>>> origin/develop
 @DiscriminatorValue(value = "CNTC")
 @AttributeOverrides({
     @AttributeOverride(name = "id",
             column = @Column(name = "CCCCID", unique = true)),
-<<<<<<< HEAD
-    @AttributeOverride(name = "name",
-            column = @Column(name = "CCCCNA", length = 100)),
-=======
->>>>>>> origin/develop
     @AttributeOverride(name = "remark",
             column = @Column(name = "CCRMRK")),
     @AttributeOverride(name = "status",
@@ -59,11 +45,22 @@ import org.hibernate.annotations.GenericGenerator;
             column = @Column(name = "CCVRSN"))
 })
 public class Contact extends BasicEntity
-<<<<<<< HEAD
-    implements Serializable {
-=======
         implements Serializable {
     @Column(name = "CCCCNA", length = 100)
     private String name;
->>>>>>> origin/develop
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+    
 }

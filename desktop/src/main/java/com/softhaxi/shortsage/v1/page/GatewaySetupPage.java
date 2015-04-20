@@ -78,7 +78,7 @@ public class GatewaySetupPage extends JPanel
     private JXTable ttData;
 
     private DefaultTableModel mData;
-    private List<Gateway> gData;
+    private List<Gateway> data;
     private Session hSession;
 
     /**
@@ -221,7 +221,7 @@ public class GatewaySetupPage extends JPanel
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     hSession.getTransaction().begin();
                     Query query = hSession.getNamedQuery("Gateway.All");
-                    gData = query.list();
+                    data = query.list();
                     hSession.getTransaction().commit();
                     hSession.close();
                     return true;
@@ -237,7 +237,7 @@ public class GatewaySetupPage extends JPanel
                     mData = new DefaultTableModel(COLUMN_NAME, 0);
                     Object[] obj = null;
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                    for (Gateway gateway : gData) {
+                    for (Gateway gateway : data) {
                         obj = new Object[7];
                         obj[0] = gateway.getName();
                         obj[1] = gateway.getPort();
@@ -315,7 +315,7 @@ public class GatewaySetupPage extends JPanel
                    return;
                 }
                 
-                Gateway gateway = dGateway.get(ttData.getSelectedRow());
+                Gateway gateway = data.get(ttData.getSelectedRow());
                 
                 int result = JOptionPane.showConfirmDialog(null, "Delete Gateway " + gateway.getName() + "?", 
                         "Gateway", JOptionPane.YES_NO_OPTION);

@@ -1,31 +1,51 @@
 package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
+import com.softhaxi.shortsage.v1.dto.InboxMessage;
+import com.softhaxi.shortsage.v1.dto.MessageTemplate;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
-import com.softhaxi.shortsage.v1.forms.GatewayActionForm;
 import com.softhaxi.shortsage.v1.forms.MessageTemplateActionForm;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
+import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import net.java.dev.designgridlayout.DesignGridLayout;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTable;
 
@@ -36,7 +56,7 @@ import org.jdesktop.swingx.JXTable;
  * @version 1.0.0
  */
 public class MessageTemplatePage extends JPanel 
-        implements ActionListener, ItemListener {
+        implements ActionListener, ItemListener, ListSelectionListener {
     
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -51,7 +71,7 @@ public class MessageTemplatePage extends JPanel
     private JPanel pCenter;
     private JPanel pSouth;
 
-    private JXSearchField tfSearch;
+    private JXSearchField sfSearch;
     private JComboBox cfViews;
     private JXTable ttData;
     
@@ -63,7 +83,7 @@ public class MessageTemplatePage extends JPanel
     private DefaultTableModel mData;
     
     private Session hSession;
-    private List data;
+    private List<MessageTemplate> data;
     
     /**
      * Main Constructor
@@ -91,15 +111,15 @@ public class MessageTemplatePage extends JPanel
      */
     private void initNorthPanel() {
         pNorth = new JPanel();
-        tfSearch = new JXSearchField(RES_GLOBAL.getString("label.search.item"));
-        tfSearch.setSearchMode(JXSearchField.SearchMode.REGULAR);
+        sfSearch = new JXSearchField(RES_GLOBAL.getString("label.search.item"));
+        sfSearch.setSearchMode(JXSearchField.SearchMode.REGULAR);
         cfViews = new JComboBox();
         cfViews.addItem("All Items");
 
         DesignGridLayout layout = new DesignGridLayout(pNorth);
         layout.margins(0.5, 0.5, 0.5, 0.5);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.search") + " :"))
-                .add(tfSearch)
+                .add(sfSearch)
                 .grid(new JLabel(RES_GLOBAL.getString("label.view") + " :"))
                 .add(cfViews);
 
@@ -194,7 +214,7 @@ public class MessageTemplatePage extends JPanel
     // <editor-fold defaultstate="collapsed" desc="Private Methods">
     private void loadData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
-        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
            @Override
            protected Boolean doInBackground() {
                 try {
@@ -230,16 +250,22 @@ public class MessageTemplatePage extends JPanel
                     ttData.setModel(mData);
                 }
             }
-        }
+        };
         
         t1.addPropertyChangeListener(new PropertyChangeListener() {
            @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                if ("state".equals(event.getPropertyName())
-                 && SwingWorker.StateValue.DONE == event.getNewValue()) {
-                     if(t1.get() == true) {
-                        firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);   
-                     }
+                if ("state".equals(evt.getPropertyName())
+                 && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                    try {
+                        if(t1.get() == true) {
+                            firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+                        }
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MessageTemplatePage.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ExecutionException ex) {
+                        Logger.getLogger(MessageTemplatePage.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                  }
             }
         });
@@ -320,7 +346,7 @@ public class MessageTemplatePage extends JPanel
         if (ttData.getSelectedRow() > -1) {
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
             
-            InboxMessage message = null;
+            MessageTemplate template = null;
 
             if (lsm.isSelectionEmpty()) {
                 System.out.println(" <none>");
@@ -331,9 +357,9 @@ public class MessageTemplatePage extends JPanel
                 for (int i = minIndex; i <= maxIndex; i++) {
                     if (lsm.isSelectedIndex(i)) {
                         System.out.println(" " + i);
-                        message = dMessage.get(i);
+                        template = data.get(i);
                         
-                        System.out.println(message.getId());
+                        System.out.println(template.getId());
                     }
                 }
             }

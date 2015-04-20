@@ -121,6 +121,6 @@ public class ContactPerson extends Contact
     
     @Override
     public String toString() {
-        return getName();
+        return super.getName();
     }
 }

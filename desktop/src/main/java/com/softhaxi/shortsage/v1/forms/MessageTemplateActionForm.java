@@ -2,19 +2,30 @@ package com.softhaxi.shortsage.v1.forms;
 
 import com.softhaxi.shortsage.v1.dto.MessageTemplate;
 import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
+import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
-import java.util.Date;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+import javax.swing.SwingWorker;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
 import org.hibernate.Session;
@@ -134,7 +145,7 @@ public class MessageTemplateActionForm extends JPanel
      *
      */
     private void initListeners() {
-        bNew.addActionListener(this);
+        bSave.addActionListener(this);
     }
 
     /**
@@ -191,7 +202,11 @@ public class MessageTemplateActionForm extends JPanel
     }
     // </editor-fold>
     
-    // <editor-fold defaultstate="collapsed" desc="Private Metjods">
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    /**
+     * 
+     * @return 
+     */
     private boolean isValidModel() {
         if (tfName.getText().equals("")) {
             tfName.setBorder(BorderFactory.createLineBorder(Color.red, 1));
@@ -206,6 +221,9 @@ public class MessageTemplateActionForm extends JPanel
         return true;
     }
     
+    /**
+     * 
+     */
     private void create() {
         firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
         
@@ -213,7 +231,7 @@ public class MessageTemplateActionForm extends JPanel
         object.setName(tfName.getText().trim());
         object.setText(tfText.getText().trim());
         
-        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
 
             /**
              *
@@ -243,11 +261,15 @@ public class MessageTemplateActionForm extends JPanel
              */
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                if ("state".equals(event.getPropertyName())
-                         && SwingWorker.StateValue.DONE == event.getNewValue()) {
-                    firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
-                    if (t1.get() == true) {
-                        JOptionPane.showMessageDialog(null, "Saving new template successfull", "New Message Template", JOptionPane.INFORMATION_MESSAGE);
+                if ("state".equals(evt.getPropertyName())
+                         && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                    try {
+                        firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                        if (t1.get() == true) {
+                            JOptionPane.showMessageDialog(null, "Saving new template successfull", "New Message Template", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(MessageTemplateActionForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
                  }
             }
@@ -259,5 +281,21 @@ public class MessageTemplateActionForm extends JPanel
         
     }
     // </editor-fold>
-    
+
+    // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton) {
+            JButton bb = (JButton) e.getSource();
+            
+            if(bb == bSave) {
+                if(!isValidModel()) {
+                    return;
+                }
+                
+                create();
+            }
+        }
+    }
+    // </editor-fold>
 }

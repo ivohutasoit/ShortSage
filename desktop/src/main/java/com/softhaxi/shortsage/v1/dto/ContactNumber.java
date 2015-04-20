@@ -1,14 +1,11 @@
 package com.softhaxi.shortsage.v1.dto;
 
 import java.io.Serializable;
-import java.util.Date;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Version;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "D0CTNB")
@@ -43,4 +40,46 @@ public class ContactNumber extends BasicEntity
 
     @Column(name = "CNMAIN")
     private int main;
+
+    /**
+     * @return the person
+     */
+    public String getPerson() {
+        return person;
+    }
+
+    /**
+     * @param person the person to set
+     */
+    public void setPerson(String person) {
+        this.person = person;
+    }
+
+    /**
+     * @return the field
+     */
+    public String getField() {
+        return field;
+    }
+
+    /**
+     * @param field the field to set
+     */
+    public void setField(String field) {
+        this.field = field;
+    }
+
+    /**
+     * @return the main
+     */
+    public int getMain() {
+        return main;
+    }
+
+    /**
+     * @param main the main to set
+     */
+    public void setMain(int main) {
+        this.main = main;
+    }
 }
