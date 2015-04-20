@@ -17,6 +17,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
@@ -208,6 +210,7 @@ public class MessageTemplatePage extends JPanel
                 }
             }
         });
+        ttData.getSelectionModel().addListSelectionListener(this);
     }
     // </editor-fold>   
     
@@ -261,9 +264,49 @@ public class MessageTemplatePage extends JPanel
                         if(t1.get() == true) {
                             firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
                         }
-                    } catch (InterruptedException ex) {
+                    } catch (InterruptedException | ExecutionException ex) {
                         Logger.getLogger(MessageTemplatePage.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (ExecutionException ex) {
+                    }
+                 }
+            }
+        });
+        t1.execute();
+    }
+    
+    /**
+     * 
+     * @param template 
+     */
+    private void deleteData(final MessageTemplate template) {
+        firePropertyChange(PropertyChangeField.DELETING.toString(), false, true);
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+           @Override
+           protected Boolean doInBackground() {
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    hSession.delete(template);
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    return true;
+                } catch (Exception ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return false;
+           }
+        };
+        
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+           @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("state".equals(evt.getPropertyName())
+                 && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                    try {
+                        if(t1.get() == true) {
+                            firePropertyChange(PropertyChangeField.DELETING.toString(), true, false);
+                            loadData();
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
                         Logger.getLogger(MessageTemplatePage.class.getName()).log(Level.SEVERE, null, ex);
                     }
                  }
@@ -304,6 +347,12 @@ public class MessageTemplatePage extends JPanel
                         }
                     }
                 });
+                dialog.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        loadData();
+                    }
+                });
                 dialog.add(form);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
@@ -320,6 +369,7 @@ public class MessageTemplatePage extends JPanel
                         "Gateway", JOptionPane.YES_NO_OPTION);
                 if(result == JOptionPane.YES_OPTION) {
                   // running delete 
+                    deleteData(template);
                 }
             } else if(source == bRefresh) {
                 loadData();
@@ -337,6 +387,7 @@ public class MessageTemplatePage extends JPanel
         System.out.println((state == ItemEvent.SELECTED) ? "Selected" : "Deselected");
         System.out.println("Item: " + e.getItem());
 //        ItemSelectable is = e.getItemSelectable();
+        JOptionPane.showMessageDialog(null, "Search Implementation for " + e.getItem());
     }
     // </editor-fold>
 

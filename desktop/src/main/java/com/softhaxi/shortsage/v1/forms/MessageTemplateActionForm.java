@@ -124,9 +124,11 @@ public class MessageTemplateActionForm extends JPanel
      *
      */
     private void initFormPanel() {
-        tfName = new JXTextField("Template Name");
+        tfName = new JXTextField(RES_GLOBAL.getString("label.template.name"));
         tfText = new JTextArea();
         tfText.setRows(3);
+        tfText.setLineWrap(true);
+        tfText.setFont(tfName.getFont());
         cfStatus = new JComboBox();
         cfHandler = new JComboBox();
 
