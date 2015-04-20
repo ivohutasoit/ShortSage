@@ -55,6 +55,10 @@ public class BasicEntity implements Serializable {
      */ 
     public BasicEntity() {
         this.status = 1;
+        this.createdDate = new Date();
+        this.createdBy = "SYSTEM";
+        this.modifiedDate = createdDate;
+        this.modifiedBy = createdBy;
         this.deletedState = 0;
     }
 
