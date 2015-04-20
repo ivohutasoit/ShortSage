@@ -197,7 +197,6 @@ public class PhoneBookPage extends JPanel
      */
     private void loadingData() {
         loadGroupData();
-        loadGroupData();
     }
 
     /**
@@ -248,7 +247,7 @@ public class PhoneBookPage extends JPanel
                 if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())) {
                     boolean value = (boolean) evt.getNewValue();
                     if (value == false) {
-                        firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+                        loadContactData();
                     }
                 }
             }

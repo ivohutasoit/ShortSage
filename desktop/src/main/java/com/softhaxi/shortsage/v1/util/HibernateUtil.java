@@ -1,9 +1,6 @@
 package com.softhaxi.shortsage.v1.util;
 
-import com.softhaxi.shortsage.v1.dto.Gateway;
-import com.softhaxi.shortsage.v1.dto.Message;
-import com.softhaxi.shortsage.v1.dto.InboxMessage;
-import com.softhaxi.shortsage.v1.dto.OutboxMessage;
+import com.softhaxi.shortsage.v1.dto.*;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -26,6 +23,9 @@ public class HibernateUtil {
                     .addAnnotatedClass(Message.class)
                     .addAnnotatedClass(InboxMessage.class)
                     .addAnnotatedClass(OutboxMessage.class)
+                    .addAnnotatedClass(Contact.class)
+                    .addAnnotatedClass(ContactPerson.class)
+                    .addAnnotatedClass(ContactGroup.class)
                     .addAnnotatedClass(Gateway.class)
                     //.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
                     //.setProperty("hibernate.dialect", "org.hibernate.dialect.HSQLDialect")
@@ -38,8 +38,8 @@ public class HibernateUtil {
                     .setProperty("hibernate.connection.url", "jdbc:derby:shsg01;create=true")
                     .setProperty("hibernate.connection.username", "admin")
                     .setProperty("hibernate.connection.password", "admin")
-                    .setProperty("hibernate.show_sql", "true");
-                    //.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+                    .setProperty("hibernate.show_sql", "true")
+                    .setProperty("hibernate.hbm2ddl.auto", "create-drop");
             sessionFactory = config.buildSessionFactory();
         } catch (Throwable ex) {
             System.err.println("Initial SessionFactory creation failed." + ex);

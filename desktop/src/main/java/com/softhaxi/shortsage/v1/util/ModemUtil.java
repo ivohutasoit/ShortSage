@@ -45,28 +45,29 @@ public class ModemUtil {
             hSession.getTransaction().commit();
             hSession.close();
 
-            service.setOutboundMessageNotification(new OutboundNotification());
-            service.setInboundMessageNotification(new InboundNotification());
-            service.setUSSDNotification(new USSDNotification());
-            service.setCallNotification(new CallNotification());
-            service.setOrphanedMessageNotification(new OrphanedMessageNotification());
+            if (!dGateway.isEmpty()) {
+                service.setOutboundMessageNotification(new OutboundNotification());
+                service.setInboundMessageNotification(new InboundNotification());
+                service.setUSSDNotification(new USSDNotification());
+                service.setCallNotification(new CallNotification());
+                service.setOrphanedMessageNotification(new OrphanedMessageNotification());
 
-            for (Gateway gateway : dGateway) {
-                if (service.getGateway(gateway.getId()) == null) {
-                    modem = new SerialModemGateway(gateway.getName(), gateway.getPort(), gateway.getBaudRate(),
-                            "", "");
-                    modem.setInbound(true);
-                    modem.setOutbound(true);
-                    service.addGateway(modem);
+                for (Gateway gateway : dGateway) {
+                    if (service.getGateway(gateway.getId()) == null) {
+                        modem = new SerialModemGateway(gateway.getName(), gateway.getPort(), gateway.getBaudRate(),
+                                "", "");
+                        modem.setInbound(true);
+                        modem.setOutbound(true);
+                        service.addGateway(modem);
+                    }
                 }
+
+                service.startService();
+                return service.getServiceStatus() == ServiceStatus.STARTED;
+            } else {
+                return true;
             }
 
-            //Session session = HibernateUtil.getSessionFactory().openSession();
-            //Query query = session.session.createQuery("from " + Gateway.class.getName());
-            service.startService();
-            return service.getServiceStatus() == ServiceStatus.STARTED;
-            //for(Gateway gateway : query.list()) {
-            //}
         } catch (SMSLibException | IOException | InterruptedException ex) {
             Logger.getLogger(ModemUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -86,9 +87,9 @@ public class ModemUtil {
                 return true;
             }
             List<AGateway> gateways = (List<AGateway>) service.getGateways();
-            
+
             service.stopService();
-            
+
             for (AGateway gateway : gateways) {
                 service.removeGateway(gateway);
                 System.out.println(gateway.getStatus().toString());
