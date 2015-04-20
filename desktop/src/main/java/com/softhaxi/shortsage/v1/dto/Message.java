@@ -2,120 +2,119 @@ package com.softhaxi.shortsage.v1.dto;
 
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Table;
-import javax.persistence.Version;
-import org.hibernate.annotations.GenericGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
- * 
- * @author Ivo Hutasoit
- * @since 1
- * @version 1.0.0
+ * References
+ * <ul>
+ * <li>http://stackoverflow.com/questions/5257921/hibernate-how-override-an-attribute-from-mapped-super-class</li>
+ * </ul>
+ *
  */
 @Entity
 @Table(name = "T0MSSG")
-public class Message implements Serializable {
-  @Id
-  @GeneratedValue(generator="system-uuid")
-  @GenericGenerator(name="system-uuid", strategy = "uuid")
-  @Column(name = "MGMGID", unique = true)
-  private String id;
-  
-  @Column(name = "MGCPID", length = 100)
-  private String contact;
-  
-  @Column(name = "MGCGID", length = 100)
-  private String group;
-  
-  @Column(name = "MSTEXT")
-  private String text;
-  
-  @Column(name = "MSDATE")
-  private Date date;
-  
-  @Column(name = "MSFLDR", length = 100)
-  private String folder;
-  
-  @Column(name = "MSRCST")
-  private int status;
-  
-  @Column(name = "MSCRON")
-  private Date createdOn;
-  
-  @Column(name = "MSCRBY", length = 100)
-  private String createdBy;
-  
-  @Column(name = "MSMDON")
-  private Date modifiedOn;
-  
-  @Column(name = "MSMDBY", length = 100)
-  private String modifiedBy;
-  
-  @Column(name = "MSDLST")
-  private int deleteState;
-  
-  @Version
-  @Column(name="MGVRSN")
-  private Integer version;
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(
+        name = "MGMGFD",
+        discriminatorType = DiscriminatorType.STRING
+)
+@DiscriminatorValue(value = "MSSG")
+@AttributeOverrides({
+    @AttributeOverride(name = "id",
+            column = @Column(name = "MGMGID", unique = true)),
+    @AttributeOverride(name = "remark",
+            column = @Column(name = "MGRMRK")),
+    @AttributeOverride(name = "status",
+            column = @Column(name = "MGRCST")),
+    @AttributeOverride(name = "createdBy",
+            column = @Column(name = "MGCRBY")),
+    @AttributeOverride(name = "createdDate",
+            column = @Column(name = "MGCRDT")),
+    @AttributeOverride(name = "modifiedBy",
+            column = @Column(name = "MGMFBY")),
+    @AttributeOverride(name = "modifiedDate",
+            column = @Column(name = "MGMFDT")),
+    @AttributeOverride(name = "deletedState",
+            column = @Column(name = "MGDLST")),
+    @AttributeOverride(name = "version",
+            column = @Column(name = "MGVRSN"))
+})
+public class Message extends BasicEntity
+        implements Serializable {
+    @Column(name = "MGMGNA", length = 100)
+    private String name;
 
+    @Column(name = "MGRFID")
+    private String refId;
+    
+    @Column(name = "MGGWID")
+    private String gatewayId;
+    
+    @Column(name = "MGDATE")
+    @Temporal(TemporalType.DATE)
+    private Date date;
+
+    @Column(name = "MGCNTC")
+    private String contact;
+
+    @Column(name = "MGTEXT", nullable = false)
+    private String text;
+    
+    @Column(name = "MGCNTR")
+    private String center;
+    
     /**
-     * @return the id
+     * @return the name
      */
-    public String getId() {
-        return id;
+    public String getName() {
+        return name;
     }
 
     /**
-     * @param id the id to set
+     * @param name the name to set
      */
-    public void setId(String id) {
-        this.id = id;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
-     * @return the contact
+     * @return the refId
      */
-    public String getContact() {
-        return contact;
+    public String getRefId() {
+        return refId;
     }
 
     /**
-     * @param contact the contact to set
+     * @param refId the refId to set
      */
-    public void setContact(String contact) {
-        this.contact = contact;
+    public void setRefId(String refId) {
+        this.refId = refId;
     }
 
     /**
-     * @return the group
+     * @return the gatewayId
      */
-    public String getGroup() {
-        return group;
+    public String getGatewayId() {
+        return gatewayId;
     }
 
     /**
-     * @param group the group to set
+     * @param gatewayId the gatewayId to set
      */
-    public void setGroup(String group) {
-        this.group = group;
-    }
-
-    /**
-     * @return the text of message
-     */
-    public String getText() {
-        return text;
-    }
-
-    /**
-     * @param text the text of message to set
-     */
-    public void setText(String text) {
-        this.text = text;
+    public void setGatewayId(String gatewayId) {
+        this.gatewayId = gatewayId;
     }
 
     /**
@@ -133,116 +132,45 @@ public class Message implements Serializable {
     }
 
     /**
-     * @return the folder
+     * @return the contact
      */
-    public String getFolder() {
-        return folder;
+    public String getContact() {
+        return contact;
     }
 
     /**
-     * @param folder the folder to set
+     * @param contact the contact to set
      */
-    public void setFolder(String folder) {
-        this.folder = folder;
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     /**
-     * @return the status
+     * @return the text
      */
-    public int getStatus() {
-        return status;
+    public String getText() {
+        return text;
     }
 
     /**
-     * @param status the status to set
+     * @param text the text to set
      */
-    public void setStatus(int status) {
-        this.status = status;
+    public void setText(String text) {
+        this.text = text;
     }
 
     /**
-     * @return the createdOn
+     * @return the center
      */
-    public Date getCreatedOn() {
-        return createdOn;
+    public String getCenter() {
+        return center;
     }
 
     /**
-     * @param createdOn the createdOn to set
+     * @param center the center to set
      */
-    public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
+    public void setCenter(String center) {
+        this.center = center;
     }
-
-    /**
-     * @return the createdBy
-     */
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    /**
-     * @param createdBy the createdBy to set
-     */
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    /**
-     * @return the modifiedOn
-     */
-    public Date getModifiedOn() {
-        return modifiedOn;
-    }
-
-    /**
-     * @param modifiedOn the modifiedOn to set
-     */
-    public void setModifiedOn(Date modifiedOn) {
-        this.modifiedOn = modifiedOn;
-    }
-
-    /**
-     * @return the modifiedBy
-     */
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-
-    /**
-     * @param modifiedBy the modifiedBy to set
-     */
-    public void setModifiedBy(String modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
-
-    /**
-     * @return the deleteState
-     */
-    public int getDeleteState() {
-        return deleteState;
-    }
-
-    /**
-     * @param deleteState the deleteState to set
-     */
-    public void setDeleteState(int deleteState) {
-        this.deleteState = deleteState;
-    }
-
-    /**
-     * @return the version
-     */
-    public Integer getVersion() {
-        return version;
-    }
-
-    /**
-     * @param version the version to set
-     */
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-  
-  
+    
 }

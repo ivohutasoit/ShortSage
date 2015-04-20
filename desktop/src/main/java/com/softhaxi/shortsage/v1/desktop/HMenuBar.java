@@ -1,20 +1,29 @@
 package com.softhaxi.shortsage.v1.desktop;
 
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
-import com.softhaxi.shortsage.v1.forms.NewMessageActionForm;
+import com.softhaxi.shortsage.v1.forms.MessageActionForm;
+import com.softhaxi.shortsage.v1.stage.HostWindow;
+import com.softhaxi.shortsage.v1.util.AppUtil;
+import com.softhaxi.shortsage.v1.util.ModemUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import org.jdesktop.swingx.JXSearchField;
 import org.smslib.Service;
@@ -25,7 +34,7 @@ import org.smslib.Service;
  * @since 1
  * @verison 1.0.0
  */
-public class HMenuBar extends JMenuBar 
+public class HMenuBar extends JMenuBar
         implements ActionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
@@ -34,8 +43,10 @@ public class HMenuBar extends JMenuBar
      */
     private JMenu mhFile;
     private JMenuItem miMessage;
-    private JMenuItem miModem;
+    private JMenuItem miConnect;
+    private JMenuItem miDisconnect;
     private JMenuItem miUser;
+    private JMenuItem miRestart;
     private JMenuItem miExit;
 
     private JMenu mhEdit;
@@ -44,16 +55,17 @@ public class HMenuBar extends JMenuBar
     private JXSearchField mtSearch;
 
     /**
-     * 
+     *
      */
     public HMenuBar() {
         initComponents();
         initListeners();
+        initState();
     }
-    
+
     // <editor-fold defaultstate="collapsed" desc="Region Initialization">
     /**
-     * 
+     *
      */
     private void initComponents() {
         setBorder(new EmptyBorder(0, 2, 0, 2));
@@ -66,10 +78,15 @@ public class HMenuBar extends JMenuBar
         miMessage.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
         mhFile.add(miMessage);
 
-        miModem = new JMenuItem(RES_GLOBAL.getString("label.modem.connect"), KeyEvent.VK_C);
-        miModem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
-        miModem.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/ic_modem_connect_16.png")));
-        mhFile.add(miModem);
+        miConnect = new JMenuItem(RES_GLOBAL.getString("label.modem.connect"), KeyEvent.VK_C);
+        miConnect.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+        miConnect.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/ic_modem_connect_16.png")));
+        //mhFile.add(miConnect);
+
+        miDisconnect = new JMenuItem(RES_GLOBAL.getString("label.modem.disconnect"), KeyEvent.VK_D);
+        miDisconnect.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+        miDisconnect.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/ic_modem_disconnect_16.png")));
+        //mhFile.add(miDisconnect);
 
         mhFile.addSeparator();
 
@@ -79,6 +96,11 @@ public class HMenuBar extends JMenuBar
         mhFile.add(miUser);
 
         mhFile.addSeparator();
+        
+        miRestart = new JMenuItem(RES_GLOBAL.getString("label.restart"), KeyEvent.VK_R);
+        miRestart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+        mhFile.add(miRestart);
+        add(mhFile);
 
         miExit = new JMenuItem(RES_GLOBAL.getString("label.exit"), KeyEvent.VK_X);
         mhFile.add(miExit);
@@ -103,35 +125,108 @@ public class HMenuBar extends JMenuBar
         mtSearch.setMaximumSize(mtSearch.getPreferredSize());
         add(mtSearch);
     }
-    
+
     /**
-     * 
+     *
      */
     private void initListeners() {
         miMessage.addActionListener(this);
-        miModem.addActionListener(this);
+        miConnect.addActionListener(this);
+        miDisconnect.addActionListener(this);
+        miRestart.addActionListener(this);
+    }
+
+    private void initState() {
+        if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STARTED) {
+            miConnect.setVisible(false);
+            miDisconnect.setEnabled(true);
+            miDisconnect.setVisible(true);
+        } else if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STARTING) {
+            miConnect.setEnabled(false);
+            miConnect.setVisible(true);
+            miDisconnect.setVisible(false);
+        } else if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPING) {
+            miDisconnect.setEnabled(false);
+            miDisconnect.setVisible(true);
+            miConnect.setVisible(false);
+        } else {
+            miDisconnect.setVisible(false);
+            miConnect.setEnabled(true);
+            miConnect.setVisible(true);
+        }
     }
     // </editor-fold>
 
     /**
-     * 
-     * @param e 
+     *
+     * @param e
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() instanceof JMenuItem) {
+        if (e.getSource() instanceof JMenuItem) {
             JMenuItem source = (JMenuItem) e.getSource();
-            if(source == miModem) {
-                if(Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPED) {
-                    firePropertyChange(PropertyChangeField.CONNECTING.toString(), false, true);
-                    
-//                    firePropertyChange(PropertyChangeField.CONNECTING.toString(), true, false);
-                }
-            } else if(source == miMessage) {
+            if (source == miConnect) {
+                miConnect.setEnabled(false);
+                firePropertyChange(PropertyChangeField.CONNECTING.toString(), false, true);
+
+                final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        return ModemUtil.start();
+                    }
+
+                    @Override
+                    protected void done() {
+                        if (!isCancelled()) {
+
+                        }
+                        firePropertyChange(PropertyChangeField.CONNECTING.toString(), true, false);
+                    }
+                };
+                t1.addPropertyChangeListener(new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+                        initState();
+                    }
+                });
+                t1.execute();
+            } else if (source == miDisconnect) {
+                miDisconnect.setEnabled(false);
+                firePropertyChange(PropertyChangeField.DISCONNECTING.toString(), false, true);
+                final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+
+                        return ModemUtil.stop();
+
+                    }
+
+                    @Override
+                    protected void done() {
+                        if (!isCancelled()) {
+
+                        }
+                        firePropertyChange(PropertyChangeField.DISCONNECTING.toString(), true, false);
+                    }
+                };
+                t1.addPropertyChangeListener(new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+                        initState();
+                    }
+                });
+                t1.execute();
+            } else if (source == miMessage) {
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
                 dialog.setTitle(RES_GLOBAL.getString("label.new") + " Message");
-                NewMessageActionForm form = new NewMessageActionForm();
+                MessageActionForm form = new MessageActionForm();
                 form.addPropertyChangeListener(new PropertyChangeListener() {
                     /**
                      *
@@ -153,6 +248,18 @@ public class HMenuBar extends JMenuBar
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
+            } else if(source == miRestart) {
+                try {
+                    AppUtil.restart(new Runnable() {
+                        
+                        @Override
+                        public void run() {
+                            JOptionPane.showMessageDialog(null, "Restarting Applicaition!");
+                        }
+                    });
+                } catch (IOException ex) {
+                    Logger.getLogger(HMenuBar.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }

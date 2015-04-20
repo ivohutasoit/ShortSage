@@ -6,6 +6,7 @@ import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.page.DashboardPage;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,8 +18,10 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -30,7 +33,6 @@ import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.smslib.GatewayException;
 import org.smslib.SMSLibException;
@@ -48,13 +50,6 @@ public class GatewayActionForm extends JPanel
         implements ActionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
-    private static final String[] STATUS_NAME = new String[]{
-        "Active",
-        "Inactive",};
-    private static final String[] HANDLER_NAME = new String[]{
-        "Activated",
-        "Deactivated"
-    };
 
     private Gateway object;
     private ActionState state;
@@ -76,7 +71,6 @@ public class GatewayActionForm extends JPanel
     /**
      * Testing connection
      */
-    private static boolean hasTest = false;
     private SerialModemGateway modem;
 
     /**
@@ -207,8 +201,8 @@ public class GatewayActionForm extends JPanel
                 .add(tfBattery);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.provider") + " :"))
                 .add(tfProvider, 2).empty();
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.ccenter") + " :"))
-                .add(tfCCenter, 2).empty(2);
+//        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.ccenter") + " :"))
+//                .add(tfCCenter, 2).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.cbalance") + " :"))
                 .add(tfCBalance).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :"))
@@ -249,6 +243,8 @@ public class GatewayActionForm extends JPanel
             bNew.setVisible(false);
             bEdit.setVisible(false);
             bDelete.setVisible(false);
+            
+            bSave.setEnabled(false);
         }
     }
 
@@ -261,168 +257,206 @@ public class GatewayActionForm extends JPanel
 
     // </editor-fold>  
     
+    // <editor-fold defaultstate="collapsed" desc="private Methods"> 
+    private boolean isDataValid(int index) {
+        if (index == 1) {
+            if (tfProvider.getText().equals("")) {
+                tfProvider.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+                return false;
+            }
+
+            if (tfCBalance.getText().equals("")) {
+                tfCBalance.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+                return false;
+            }
+        }
+        if (tfName.getText().equals("")) {
+            tfName.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+            return false;
+        } else {
+            tfName.setBorder(BorderFactory.createLineBorder(Color.gray, 1));
+        }
+
+        if (tfPort.getText().equals("")) {
+            tfPort.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+            return false;
+        } else {
+            tfName.setBorder(BorderFactory.createLineBorder(Color.gray, 1));
+        }
+
+        return true;
+    }
+
+    /**
+     *
+     */
+    private void connect() {
+        firePropertyChange(PropertyChangeField.CONNECTING.toString(), false, true);
+        modem = new SerialModemGateway(tfName.getText().trim(),
+                tfPort.getText().trim(),
+                Integer.parseInt(cfRate.getSelectedItem().toString()),
+                tfManufacture.getText().trim(),
+                tfModel.getText().trim());
+
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                try {
+                    if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STARTED
+                            || Service.getInstance().getServiceStatus() == Service.ServiceStatus.STARTING) {
+                        Service.getInstance().stopService();
+                    }
+
+                    if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPED) {
+                        Service.getInstance().addGateway(modem);
+                        Service.getInstance().startService();
+                    }
+                    return true;
+                } catch (SMSLibException | IOException | InterruptedException ex) {
+                    Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    return false;
+                }
+            }
+
+            @Override
+            protected void done() {
+                if (!isCancelled()) {
+                    try {
+                        if (get() == true) {
+                            tfManufacture.setText(modem.getManufacturer());
+                            tfModel.setText(modem.getModel());
+                            tfSerial.setText(modem.getSerialNo());
+                            tfISMI.setText(modem.getImsi());
+                            tfSignal.setText(String.valueOf(modem.getSignalLevel()));
+                            tfBattery.setText(String.valueOf(modem.getBatteryLevel()));
+                            tfCCenter.setText(modem.getSmscNumber());
+
+                            Service.getInstance().stopService();
+                            Service.getInstance().removeGateway(modem);
+                            bSave.setEnabled(true);
+                        }
+                    } catch (TimeoutException | GatewayException | IOException | InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SMSLibException ex) {
+                        Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                firePropertyChange(PropertyChangeField.CONNECTING.toString(), true, false);
+            }
+        };
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+            /**
+             *
+             * @param evt
+             */
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals(PropertyChangeField.CONNECTING.toString())) {
+                    firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+                }
+            }
+        });
+        t1.execute();
+
+    }
+
+    /**
+     *
+     */
+    private void save() {
+        firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
+
+        object = new Gateway();
+        object.setId(UUID.randomUUID().toString());
+        object.setName(tfName.getText().trim());
+        object.setPort(tfPort.getText().trim());
+        object.setManufacture(tfManufacture.getText().trim());
+        object.setModel(tfModel.getText().trim());
+        object.setBaudRate(Integer.parseInt(cfRate.getSelectedItem().toString()));
+        object.setIsmi(tfISMI.getText().trim());
+        object.setSerial(tfSerial.getText().trim());
+        object.setProvider(tfProvider.getText().trim());
+        object.setNumberBalance(tfCBalance.getText().trim());
+        object.setCreatedBy("SYSTEM");
+        object.setCreatedDate(new Date());
+        object.setModifiedBy(object.getCreatedBy());
+        object.setModifiedDate(object.getCreatedDate());
+
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+
+            /**
+             *
+             * @return @throws Exception
+             */
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                boolean saved = false;
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    hSession.save(object);
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    saved = true;
+                } catch (Exception ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return saved;
+            }
+
+            @Override
+            protected void done() {
+                if (!isCancelled()) {
+                    try {
+                        if (get() == true) {
+
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+            }
+        };
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+            /**
+             *
+             * @param evt
+             */
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
+                    firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+                    if (((boolean) evt.getNewValue()) == false) {
+                        JOptionPane.showMessageDialog(null, "Saving new modem successfull", "New Gateway", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
+        t1.execute();
+
+    }
+    // </editor-fold>
+
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton source = (JButton) e.getSource();
             if (source == bTest) {
-                if (tfName.getText().equals("") || tfPort.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null, "Field cannot be null", "New Gateway", JOptionPane.ERROR_MESSAGE);
+                if (!isDataValid(0)) {
                     return;
                 }
-                firePropertyChange(PropertyChangeField.CONNECTING.toString(), false, true);
-                modem = new SerialModemGateway(tfName.getText().trim(),
-                        tfPort.getText().trim(),
-                        Integer.parseInt(cfRate.getSelectedItem().toString()),
-                        tfManufacture.getText().trim(),
-                        tfModel.getText().trim());
-                ConnectingTask t1 = new ConnectingTask();
-                t1.addPropertyChangeListener(new PropertyChangeListener() {
-                    /**
-                     *
-                     * @param evt
-                     */
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if (evt.getPropertyName().equals(PropertyChangeField.CONNECTING.toString())) {
-                            firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
-                        }
-                    }
-                });
-                t1.execute();
+                connect();
+
             } else if (source == bSave) {
-                if (!hasTest) {
-                    bTest.doClick();
+                if (!isDataValid(1)) {
                     return;
                 }
-
-                if (tfCBalance.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null, "Field Balance Number be null", "New Gateway", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                object = new Gateway();
-                object.setId(UUID.randomUUID().toString());
-                object.setName(tfName.getText().trim());
-                object.setPort(tfPort.getText().trim());
-                object.setManufacture(tfManufacture.getText().trim());
-                object.setModel(tfModel.getText().trim());
-                object.setBaudRate(Integer.parseInt(cfRate.getSelectedItem().toString()));
-                object.setIsmi(tfISMI.getText().trim());
-                object.setSerial(tfSerial.getText().trim());
-                object.setProvider(tfProvider.getText().trim());
-                object.setMessageCenter(tfCCenter.getText().trim());
-                object.setCheckBalance(tfCBalance.getText().trim());
-                object.setCreatedBy("SYSTEM");
-                object.setCreatedOn(new Date());
-                object.setModifiedBy(object.getCreatedBy());
-                object.setModifiedOn(object.getCreatedOn());
-
-                SavingTask t1 = new SavingTask();
-                t1.addPropertyChangeListener(new PropertyChangeListener() {
-                    /**
-                     *
-                     * @param evt
-                     */
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if (evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
-                            firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
-                            if (((boolean) evt.getNewValue()) == false) {
-                                JOptionPane.showMessageDialog(null, "Saving new modem successfull", "New Gateway", JOptionPane.INFORMATION_MESSAGE);
-                            }
-                        }
-                    }
-                });
-                t1.execute();
+                save();
             }
         }
     }
     // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="Task Classes">  
-    /**
-     *
-     */
-    class ConnectingTask extends SwingWorker<Boolean, Void> {
-
-        @Override
-        protected Boolean doInBackground() throws Exception {
-            boolean connect = false;
-            try {
-                if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STARTED
-                        || Service.getInstance().getServiceStatus() == Service.ServiceStatus.STARTING) {
-                    Service.getInstance().stopService();
-                }
-
-                if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPED) {
-                    Service.getInstance().addGateway(modem);
-                    Service.getInstance().startService();
-                    connect = true;
-                }
-            } catch (SMSLibException | IOException | InterruptedException ex) {
-
-            }
-            return connect;
-        }
-
-        @Override
-        protected void done() {
-            if (!isCancelled()) {
-                try {
-                    tfManufacture.setText(modem.getManufacturer());
-                    tfModel.setText(modem.getModel());
-                    tfSerial.setText(modem.getSerialNo());
-                    tfISMI.setText(modem.getImsi());
-                    tfSignal.setText(String.valueOf(modem.getSignalLevel()));
-                    tfBattery.setText(String.valueOf(modem.getBatteryLevel()));
-                    tfCCenter.setText(modem.getSmscNumber());
-
-                    Service.getInstance().stopService();
-                    Service.getInstance().removeGateway(modem);
-                    hasTest = true;
-                } catch (TimeoutException | GatewayException | IOException | InterruptedException ex) {
-                    Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SMSLibException ex) {
-                    Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            firePropertyChange(PropertyChangeField.CONNECTING.toString(), true, false);
-        }
-    }
-
-    /**
-     *
-     */
-    class SavingTask extends SwingWorker<Boolean, Void> {
-
-        /**
-         *
-         * @return @throws Exception
-         */
-        @Override
-        protected Boolean doInBackground() throws Exception {
-            boolean saved = false;
-            try {
-                hSession = HibernateUtil.getSessionFactory().openSession();
-                hSession.getTransaction().begin();
-                hSession.saveOrUpdate(object);
-                hSession.getTransaction().commit();
-                hSession.close();
-                saved = true;
-            } catch (Exception ex) {
-                Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return saved;
-        }
-
-        @Override
-        protected void done() {
-            if (!isCancelled()) {
-                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
-            }
-        }
-    }
-    // </editor-fold> 
 }

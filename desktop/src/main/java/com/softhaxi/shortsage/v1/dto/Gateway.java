@@ -1,19 +1,18 @@
 package com.softhaxi.shortsage.v1.dto;
 
 import java.io.Serializable;
-import java.util.Date;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.Version;
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  * Gateway of modem to be save as data on database.
@@ -22,94 +21,71 @@ import org.hibernate.annotations.GenericGenerator;
  * @since 1
  * @version 1.0.0
  */
-@NamedQueries({
-    @NamedQuery(name = "@Hql_Gateway_All", query = "from Gateway")})
 @Entity
-@Table(name = "G0MDGT")
-@NamedNativeQueries({
-    @NamedNativeQuery(name="@Sql.Gateway.All", query = "select * from G0MDGT")})
-public class Gateway implements Serializable {
-
-    @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    @Column(name = "MGMGID", unique = true)
-    private String id;
-
-    @Column(name = "MGMGNA", length = 100, nullable = false)
+@Table(name = "M0GTWY")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(
+        name = "GWGWTY",
+        discriminatorType = DiscriminatorType.STRING
+)
+@DiscriminatorValue(value = "MODM")
+@AttributeOverrides({
+    @AttributeOverride(name = "id",
+            column = @Column(name = "GWGWID", unique = true)),
+    @AttributeOverride(name = "name",
+            column = @Column(name = "GWGWNA", nullable = false, length = 100)),
+    @AttributeOverride(name = "remark",
+            column = @Column(name = "GWRMRK")),
+    @AttributeOverride(name = "status",
+            column = @Column(name = "GWRCST")),
+    @AttributeOverride(name = "createdBy",
+            column = @Column(name = "GWCRBY")),
+    @AttributeOverride(name = "createdDate",
+            column = @Column(name = "GWCRDT")),
+    @AttributeOverride(name = "modifiedBy",
+            column = @Column(name = "GWMFBY")),
+    @AttributeOverride(name = "modifiedDate",
+            column = @Column(name = "GWMFDT")),
+    @AttributeOverride(name = "deletedState",
+            column = @Column(name = "GWDLST")),
+    @AttributeOverride(name = "version",
+            column = @Column(name = "GWVRSN"))
+})
+@NamedQueries({
+    @NamedQuery(name = "Gateway.All", query = "from Gateway a where a.deletedState = 0"),
+    @NamedQuery(name = "Gateway.Id", query = "from Gateway a where a.id = :id")
+})
+public class Gateway extends BasicEntity
+        implements Serializable {
+    
+    @Column(name = "GWGWNA", length = 100, nullable = false)
     private String name;
-
-    @Column(name = "MGPORT", length = 10, nullable = false)
+    
+    @Column(name = "GWPORT", length = 10, nullable = false)
     private String port;
 
-    @Column(name = "MGBDRT")
+    @Column(name = "GWBDRT")
     private int baudRate;
-
-    @Column(name = "MGMNFR", length = 100)
+    
+    @Column(name = "GWMNFR", length = 100)
     private String manufacture;
 
-    @Column(name = "MGMODL", length = 100)
+    @Column(name = "GWMODL", length = 100)
     private String model;
     
-    @Column(name = "MGSRAL")
+    @Column(name = "GWSRAL")
     private String serial;
     
-    @Column(name = "MGISMI")
+    @Column(name = "GWISMI")
     private String ismi;
 
-    @Column(name = "MGPVDR")
+    @Column(name = "GWPVDR")
     private String provider;
 
-    @Column(name = "MGMSCE")
-    private String messageCenter;
+    @Column(name = "GWNOBL")
+    private String numberBalance;
 
-    @Column(name = "MGCHBL")
-    private String checkBalance;
-
-    @Column(name = "MGRCTS")
-    private int status;
-
-    @Column(name = "MGCRBY", length = 100)
-    private String createdBy;
-
-    @Column(name = "MGCRON")
-    @Temporal(javax.persistence.TemporalType.DATE)
-    private Date createdOn;
-
-    @Column(name = "MGMDBY", length = 100)
-    private String modifiedBy;
-
-    @Column(name = "MGMDON")
-    @Temporal(javax.persistence.TemporalType.DATE)
-    private Date modifiedOn;
-
-    @Column(name = "MGDLST")
-    private int deletedState;
-
-    @Version
-    @Column(name = "MGVRSN")
-    private Integer version;
-
-    public Gateway() {
-        status = 1;
-        deletedState = 0;
-    }
-
-    /**
-     * @return the id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
+        /**
      * @return the name
      */
     public String getName() {
@@ -122,7 +98,7 @@ public class Gateway implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-
+    
     /**
      * @return the port
      */
@@ -138,14 +114,14 @@ public class Gateway implements Serializable {
     }
 
     /**
-     * @return the rate
+     * @return the baudRate
      */
     public int getBaudRate() {
         return baudRate;
     }
 
     /**
-     * @param baudRate the rate to set
+     * @param baudRate the baudRate to set
      */
     public void setBaudRate(int baudRate) {
         this.baudRate = baudRate;
@@ -222,128 +198,16 @@ public class Gateway implements Serializable {
     }
 
     /**
-     * @return the messageCenter
+     * @return the numberBalance
      */
-    public String getMessageCenter() {
-        return messageCenter;
+    public String getNumberBalance() {
+        return numberBalance;
     }
 
     /**
-     * @param messageCenter the messageCenter to set
+     * @param numberBalance the numberBalance to set
      */
-    public void setMessageCenter(String messageCenter) {
-        this.messageCenter = messageCenter;
-    }
-
-    /**
-     * @return the checkBalance
-     */
-    public String getCheckBalance() {
-        return checkBalance;
-    }
-
-    /**
-     * @param checkBalance the checkBalance to set
-     */
-    public void setCheckBalance(String checkBalance) {
-        this.checkBalance = checkBalance;
-    }
-
-    /**
-     * @return the status
-     */
-    public int getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    /**
-     * @return the createdBy
-     */
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    /**
-     * @param createdBy the createdBy to set
-     */
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    /**
-     * @return the createdOn
-     */
-    public Date getCreatedOn() {
-        return createdOn;
-    }
-
-    /**
-     * @param createdOn the createdOn to set
-     */
-    public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    /**
-     * @return the modifiedBy
-     */
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-
-    /**
-     * @param modifiedBy the modifiedBy to set
-     */
-    public void setModifiedBy(String modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
-
-    /**
-     * @return the modifiedOn
-     */
-    public Date getModifiedOn() {
-        return modifiedOn;
-    }
-
-    /**
-     * @param modifiedOn the modifiedOn to set
-     */
-    public void setModifiedOn(Date modifiedOn) {
-        this.modifiedOn = modifiedOn;
-    }
-
-    /**
-     * @return the deletedState
-     */
-    public int getDeletedState() {
-        return deletedState;
-    }
-
-    /**
-     * @param deletedState the deletedState to set
-     */
-    public void setDeletedState(int deletedState) {
-        this.deletedState = deletedState;
-    }
-
-    /**
-     * @return the version
-     */
-    public Integer getVersion() {
-        return version;
-    }
-
-    /**
-     * @param version the version to set
-     */
-    public void setVersion(Integer version) {
-        this.version = version;
+    public void setNumberBalance(String numberBalance) {
+        this.numberBalance = numberBalance;
     }
 }

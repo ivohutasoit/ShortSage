@@ -5,9 +5,15 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 @Entity
-@DiscriminatorValue("PRSN")
+@DiscriminatorValue("CPRN")
+@NamedQueries({
+    @NamedQuery(name = "ContactPerson.All", query = "from ContactPerson a where a.deletedState = 0"),
+    @NamedQuery(name = "ContactPerson.Id", query = "from ContactPerson a where a.id = :id")
+})
 public class ContactPerson extends Contact 
     implements Serializable {
     
@@ -115,6 +121,6 @@ public class ContactPerson extends Contact
     
     @Override
     public String toString() {
-        return name;
+        return super.getName();
     }
 }

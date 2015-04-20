@@ -1,26 +1,38 @@
 package com.softhaxi.shortsage.v1.dto;
 
 import java.io.Serializable;
-import java.util.Date;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Version;
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "D0CTNB")
-public class ContactNumber implements Serializable {
+@AttributeOverrides({
+    @AttributeOverride(name = "id",
+            column = @Column(name = "CNCNID", unique = true)),
+    @AttributeOverride(name = "remark",
+            column = @Column(name = "CNRMRK")),
+    @AttributeOverride(name = "status",
+            column = @Column(name = "CNRCST")),
+    @AttributeOverride(name = "createdBy",
+            column = @Column(name = "CNCRBY")),
+    @AttributeOverride(name = "createdDate",
+            column = @Column(name = "CNCRDT")),
+    @AttributeOverride(name = "modifiedBy",
+            column = @Column(name = "CNMFBY")),
+    @AttributeOverride(name = "modifiedDate",
+            column = @Column(name = "CNMFDT")),
+    @AttributeOverride(name = "deletedState",
+            column = @Column(name = "CNDLST")),
+    @AttributeOverride(name = "version",
+            column = @Column(name = "CNVRSN"))
+})
+public class ContactNumber extends BasicEntity
+    implements Serializable {
 
-    @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    @Column(name = "CNCNID", unique = true)
-    private String id;
-
-    @Column(name = "CNCPID")
+    @Column(name = "CNCCID")
     private String person;
 
     @Column(name = "CNFELD", length = 100)
@@ -29,25 +41,45 @@ public class ContactNumber implements Serializable {
     @Column(name = "CNMAIN")
     private int main;
 
-    @Column(name = "CNRCTS")
-    private int status;
+    /**
+     * @return the person
+     */
+    public String getPerson() {
+        return person;
+    }
 
-    @Column(name = "CNCRBY", length = 100)
-    private String createdBy;
+    /**
+     * @param person the person to set
+     */
+    public void setPerson(String person) {
+        this.person = person;
+    }
 
-    @Column(name = "CNCRON")
-    private Date createdOn;
+    /**
+     * @return the field
+     */
+    public String getField() {
+        return field;
+    }
 
-    @Column(name = "CNMDBY", length = 100)
-    private String modifiedBy;
+    /**
+     * @param field the field to set
+     */
+    public void setField(String field) {
+        this.field = field;
+    }
 
-    @Column(name = "CNMDON")
-    private Date modifiedOn;
+    /**
+     * @return the main
+     */
+    public int getMain() {
+        return main;
+    }
 
-    @Column(name = "CNDLST")
-    private int deleteState;
-
-    @Version
-    @Column(name = "CNVRSN")
-    private Integer version;
+    /**
+     * @param main the main to set
+     */
+    public void setMain(int main) {
+        this.main = main;
+    }
 }

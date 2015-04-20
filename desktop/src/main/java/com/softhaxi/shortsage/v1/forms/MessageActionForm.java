@@ -1,318 +1,356 @@
 package com.softhaxi.shortsage.v1.forms;
 
-import com.softhaxi.shortsage.v1.desktop.HActionForm;
-import com.softhaxi.shortsage.v1.dto.Message;
+import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.ActionState;
-import com.toedter.calendar.JDateChooser;
+import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
+import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
+import java.util.Date;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.control.DatePicker;
-import javax.swing.ButtonGroup;
-import javax.swing.GroupLayout;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
-import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
-import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
-import net.sourceforge.jdatepicker.impl.UtilDateModel;
+import net.java.dev.designgridlayout.DesignGridLayout;
+import net.java.dev.designgridlayout.RowGroup;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXDatePicker;
 import org.smslib.GatewayException;
 import org.smslib.OutboundMessage;
-import org.smslib.SMSLibException;
 import org.smslib.Service;
+import org.smslib.TimeoutException;
 
-public class MessageActionForm extends HActionForm<Message>
+public class MessageActionForm extends JPanel
         implements ActionListener {
 
-    private final static String[] STATUS_LIST = {
-        "CREATED",
-        "DRAFT",
-        "SENT",
-        "FAILED",
-        "OBSOLETED",
-        "UNREAD",
-        "READ",
-        "REPLIED"
-    };
+    private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
-    private final static String[] HANDLE_LIST = {
-        "CREATE",
-        "SEND IMMEDIATELY",
-        "RESEND",
-        "UNSEND"
-    };
+    private OutboxMessage object;
+    private ActionState state;
 
-    private JRadioButton rImmidiate;
-    private JRadioButton rSchedule;
-    private JTextField tContact;
-    private JDateChooser cDate;
-    private JDatePickerImpl tDate;
-    private JTextArea tText;
-    private JComboBox<String> cStatus;
-    private JComboBox<String> cHandler;
-    private DatePicker dDate;
-    private JXDatePicker cxDate;
+    private boolean running = false;
+    /**
+     * Tool bar items
+     */
+    private JButton bNew, bEdit, bDelete, bReply;
+    private JButton bSave, bSaveNew, bCancel;
 
-    private JButton bReply;
-    private JDialog dLoading;
+    /**
+     * Fields
+     */
+    private JCheckBox cfScheduler;
+    private JTextField tfContact;
+    private JXDatePicker dfDate;
+    private JTextArea tfText;
+    private JComboBox cfTemplate, cfStatus, cfHandler;
 
-    private Session session;
-    private SendMessageTask t1 = null;
+    /**
+     * Message
+     */
+    private OutboundMessage oMessage;
 
+    /**
+     * Database connection
+     */
+    private Session hSession;
+
+    /**
+     *
+     */
     public MessageActionForm() {
-        super();
+        this(null, ActionState.CREATE);
     }
 
-    public MessageActionForm(Message object) {
-        super(object);
+    /**
+     *
+     * @param object
+     * @param state
+     */
+    public MessageActionForm(OutboxMessage object, ActionState state) {
+        this.object = object;
+        this.state = state;
+
+        initComponents();
+        initListeners();
+        initState();
     }
 
-    public MessageActionForm(ActionState state, Message message) {
-        super(state, message);
+    // <editor-fold defaultstate="collapsed" desc="Region Initialization">
+    /**
+     *
+     */
+    private void initComponents() {
+        setLayout(new BorderLayout());
+        setPreferredSize(new Dimension(500, 300));
+
+        initToolbar();
+        initFormPanel();
     }
 
-    @Override
-    public void initComponents() {
-        super.initComponents();
-        setPreferredSize(new Dimension(450, 300));
+    /**
+     *
+     */
+    private void initToolbar() {
+        JToolBar pToolbar = new JToolBar();
+        pToolbar.setFloatable(false);
 
-        bReply = new JButton("Reply");
-        tBar.add(bReply, 4);
+        bNew = new JButton(RES_GLOBAL.getString("label.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        pToolbar.add(bNew);
 
+        bEdit = new JButton(RES_GLOBAL.getString("label.edit"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png")));
+        pToolbar.add(bEdit);
+
+        bSave = new JButton(RES_GLOBAL.getString("label.save"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save.png")));
+        pToolbar.add(bSave);
+
+        bSaveNew = new JButton(RES_GLOBAL.getString("label.save.new"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_save_as.png")));
+        pToolbar.add(bSaveNew);
+        pToolbar.addSeparator();
+
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        pToolbar.add(bDelete);
+
+        bCancel = new JButton(RES_GLOBAL.getString("label.cancel"),
+                new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
+        pToolbar.add(bCancel);
+
+        add(pToolbar, BorderLayout.NORTH);
+    }
+
+    /**
+     *
+     */
+    private void initFormPanel() {
         JPanel pForm = new JPanel();
-        GroupLayout lForm = new GroupLayout(pForm);
-        pForm.setLayout(lForm);
-        lForm.setAutoCreateGaps(true);
-        lForm.setAutoCreateContainerGaps(true);
 
-        rImmidiate = new JRadioButton("JIT Sending");
-        rImmidiate.addItemListener(new ItemListener() {
+        cfScheduler = new JCheckBox(RES_GLOBAL.getString("label.message.scheduler"));
+        cfScheduler.setForeground(Color.blue);
+        tfContact = new JTextField();
+        dfDate = new JXDatePicker();
+        tfText = new JTextArea();
+        tfText.setRows(3);
+        tfText.setFont(tfContact.getFont());
+        cfTemplate = new JComboBox();
+        cfStatus = new JComboBox();
+        cfStatus.setEnabled(false);
+        cfHandler = new JComboBox();
 
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cxDate.setEnabled(!rImmidiate.isSelected());
-            }
-        });
-        rSchedule = new JRadioButton("Schedule Sending");
-        rSchedule.addItemListener(new ItemListener() {
+        DesignGridLayout layout = new DesignGridLayout(pForm);
+        RowGroup rgScheduler = new RowGroup();
+        cfScheduler.setSelected(true);
+        cfScheduler.addItemListener(new ShowHideAction(rgScheduler));
 
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                cxDate.setEnabled(rSchedule.isSelected());
-            }
-        });
+        layout.row().left().add(cfScheduler, new JSeparator()).fill();
+        layout.row().group(rgScheduler).grid(new JLabel(RES_GLOBAL.getString("label.message.date"))).add(dfDate).empty(2);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.name") + " :")).add(tfContact, 2).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.template.name") + " :")).add(cfTemplate, 2).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.message.text") + " :")).add(new JScrollPane(tfText));
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler") + " :")).add(cfHandler).empty(2);
 
-        JLabel lSend = new JLabel("Send Type:");
-        ButtonGroup bGroup = new ButtonGroup();
-        bGroup.add(rImmidiate);
-        bGroup.add(rSchedule);
-
-        JLabel lContact = new JLabel("Contact:");
-        tContact = new JTextField();
-
-        JLabel lDate = new JLabel("Transaction Date:");
-        cDate = new JDateChooser();
-        tDate = new JDatePickerImpl(new JDatePanelImpl(new UtilDateModel()));
-        cxDate = new JXDatePicker();
-
-        JLabel lStatus = new JLabel("Message Status:");
-        cStatus = new JComboBox(STATUS_LIST);
-
-        JLabel lHandler = new JLabel("Handler:");
-        cHandler = new JComboBox(HANDLE_LIST);
-
-        JLabel lText = new JLabel("Message:");
-        tText = new JTextArea();
-        tText.setWrapStyleWord(true);
-        tText.setFont(lText.getFont());
-        JScrollPane pText = new JScrollPane(tText, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-        lForm.setHorizontalGroup(lForm.createSequentialGroup()
-                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(lSend)
-                        .addComponent(lContact)
-                        .addComponent(lDate)
-                        .addComponent(lStatus)
-                        .addComponent(lHandler)
-                        .addComponent(lText))
-                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(rImmidiate)
-                        .addComponent(rSchedule)
-                        .addComponent(tContact)
-                        .addComponent(cxDate)
-                        .addComponent(cStatus)
-                        .addComponent(cHandler)
-                        .addComponent(pText))
-        );
-        lForm.setVerticalGroup(lForm.createSequentialGroup()
-                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(lSend)
-                        .addComponent(rImmidiate))
-                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(rSchedule))
-                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(lContact)
-                        .addComponent(tContact))
-                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(lDate)
-                        .addComponent(cxDate))
-                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(lStatus)
-                        .addComponent(cStatus))
-                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(lHandler)
-                        .addComponent(cHandler))
-                .addGroup(lForm.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                        .addComponent(lText)
-                        .addComponent(pText))
-        );
         add(pForm, BorderLayout.CENTER);
-
-        bSave.addActionListener(this);
     }
 
-    @Override
-    public void initState() {
-        super.initState();
-        if (object != null) {
-            if (!object.getFolder().equalsIgnoreCase("INBOX")
-                    && (state == ActionState.CREATE || state == ActionState.EDIT)) {
-                bReply.setVisible(false);
-            } else {
-                bReply.setVisible(true);
-            }
-        } else {
-            if (state == ActionState.CREATE) {
-                cStatus.setEnabled(false);
-                cHandler.setEnabled(false);
-                rImmidiate.setSelected(true);
-            }
-            bReply.setVisible(false);
+    /**
+     *
+     */
+    private void initListeners() {
+    }
+
+    /**
+     *
+     */
+    private void initState() {
+        if (state == ActionState.CREATE) {
+            cfStatus.removeAllItems();
+            cfStatus.addItem("Create");
+
+            cfHandler.removeAllItems();
+            cfHandler.addItem("Created");
+            cfHandler.setEnabled(false);
+
+            bNew.setVisible(false);
+            bEdit.setVisible(false);
+            bDelete.setVisible(false);
+            bSaveNew.setVisible(false);
         }
     }
 
-    @Override
-    public void initData() {
+    /**
+     *
+     */
+    private void initData() {
+    }
+  // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    /**
+     *
+     */
+    private void loadTemplateData() {
+
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        if (e.getSource() instanceof JButton) {
-            JButton bs = (JButton) e.getSource();
-            if (bs == bSave || bs == bSaveNew) {
-
-                if (rImmidiate.isSelected()) {
-                    if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPED
-                            || Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPING) {
-                        JOptionPane.showMessageDialog(null, "GSM Service not running!", "Send Message", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                }
-
-//                dLoading = new JDialog(null, "Message", ModalityType.APPLICATION_MODAL);
-//                JProgressBar progressBar = new JProgressBar();
-//                progressBar.setIndeterminate(true);
-//                JPanel panel = new JPanel(new BorderLayout());
-//                panel.add(progressBar, BorderLayout.CENTER);
-//                panel.add(new JLabel("Please wait......."), BorderLayout.PAGE_START);
-//                dLoading.add(panel);
-//                dLoading.pack();
-//                dLoading.setLocationRelativeTo(null);
-//                dLoading.setVisible(true);
-//                dLoading.setUndecorated(true);
-
-                SaveMessageTask t2 = new SaveMessageTask();
-
-                t2.addPropertyChangeListener(new PropertyChangeListener() {
-
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if (evt.getPropertyName().equals("state")) {
-                            if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                                //dLoading.dispose();
-                            }
-                        }
-                    }
-                });
-
-                if (rImmidiate.isSelected()) {
-                    t1 = new SendMessageTask();
-                    t1.addPropertyChangeListener(new PropertyChangeListener() {
-                        @Override
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            if (evt.getPropertyName().equals("state")) {
-                                if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                                    try {
-                                        if (t1.get() == true) {
-                                            //dLoading.dispose();
-                                            //dLoading.setVisible(false);
-                                        }
-                                    } catch (InterruptedException | ExecutionException ex) {
-                                        Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
-                                }
-                            }
-                        }
-                    });
-                    t1.execute();
-                }
-
-                if (t1 == null) {
-                    t2.execute();
-                }
+    /**
+     *
+     * @return
+     */
+    private boolean isDataValid() {
+        if (cfScheduler.isSelected()) {
+            if (dfDate.getDate().toString().equals("")) {
+                dfDate.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+                return false;
             }
         }
-    }
 
-    private class SendMessageTask extends SwingWorker<Boolean, Void> {
-
-        @Override
-        protected Boolean doInBackground() throws Exception {
-            try {
-                OutboundMessage msg = new OutboundMessage(tContact.getText().trim(), tText.getText().trim());
-
-                boolean res = Service.getInstance().sendMessage(msg);
-                System.out.println(msg);
-
-                return res;
-            } catch (GatewayException ex) {
-                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SMSLibException ex) {
-                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException | InterruptedException ex) {
-                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            //}
+        if (!tfContact.getText().equals("")) {
+            tfContact.setBorder(BorderFactory.createLineBorder(Color.red, 5));
             return false;
         }
 
+        if (tfText.getText().equals("")) {
+            tfText.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+            return false;
+        }
+
+        return true;
     }
 
-    private class SaveMessageTask extends SwingWorker<Integer, Void> {
+    /**
+     * Send message or scheduler sending message at date given.
+     */
+    private synchronized void sendMessage() {
+        if (!isDataValid()) {
+            return;
+        }
+
+        firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
+        running = true;
+        final boolean isScheduler = cfScheduler.isSelected();
+        final Date date = dfDate.getDate();
+        oMessage = new OutboundMessage(tfContact.getText().trim(), tfText.getText().trim());      // Only one number 
+        // not contact person or group
+
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() {
+                try {
+                    if (isScheduler) {
+                        Service.getInstance().queueMessageAt(oMessage, date);
+                    } else {
+                        Service.getInstance().sendMessage(oMessage);
+                    }
+                    return true;
+                } catch (TimeoutException | GatewayException | IOException | InterruptedException ex) {
+                    Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    return false;
+                }
+            }
+
+            @Override
+            protected void done() {
+                if (!isCancelled()) {
+                    object = new OutboxMessage();
+                    object.setId(oMessage.getId());
+                    running = false;
+                    firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                }
+            }
+        };
+        t1.execute();
+    }
+
+    private synchronized void saveMessage() {
+        if (isDataValid()) {
+            return;
+        }
+
+        firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
+        // Save Message to database
+        if (running == false) {
+            SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+
+                @Override
+                protected Boolean doInBackground() {
+                    try {
+                        hSession = HibernateUtil.getSessionFactory().openSession();
+                        hSession.getTransaction().begin();
+                        hSession.saveOrUpdate(object);
+                        hSession.getTransaction().commit();
+                        hSession.close();
+                        return true;
+                    } catch (Exception ex) {
+                        Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                        return false;
+                    }
+                }
+
+                @Override
+                protected void done() {
+                    if (!isCancelled()) {
+                        firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                    }
+                }
+            };
+            t1.execute();
+        }
+    }
+  // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Public Methods">
+    /**
+     * 
+     * @param contact 
+     */
+    public void setContact(String contact) {
+        tfContact.setText(contact);
+    }
+  // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    }
+    // </editor-fold>
+
+    class ShowHideAction implements ItemListener {
+
+        private RowGroup group;
+
+        public ShowHideAction(RowGroup group) {
+            this.group = group;
+        }
 
         @Override
-        protected Integer doInBackground() throws Exception {
-            return -1;
+        public void itemStateChanged(ItemEvent event) {
+            if (event.getStateChange() == ItemEvent.SELECTED) {
+                group.show();
+            } else {
+                group.hide();
+            }
         }
     }
 }

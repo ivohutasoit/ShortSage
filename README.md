@@ -2,21 +2,44 @@
 ShortSage is a SMS Gateway for generic uses. We give you customable and flexible features for your business.
 Currently, we have focused on first build with some features for basic use by customer.
 
-Some list of task to be completed on desktop implementation are:
-<ol>
-<li>Service for Modem</li>
-<li>Inbox, Outbox, and Bulk Message Page</li>
-<li>Contact Person, Group, and Message Template Page</li>
-<li>Just In Time and Scheduler sending message</li>
-<li>Import and Duplicate Detection Data</li>
-<li>Dashboard Application</li>
-<li>Settings Menu</li>
-</ol>
+Current main features built on this version of application are:
+- Background Service of Modem
+- Dashboard Application
+- Message folder for inbox and outbox messages
+- Phone book of contact person and group
+- Send, reply and schedule message(s)
+- Gateway modem setup
 
+Limitation on this version are:
+- Modem service only can restart by restart application
+- Adding new gateway cannot apply until application restarted
 
-Today (13 April 2015) list of task to be completed on desktop implementation are:
-<ol>
-<li>Inbox and Outbox Message Page</li>
-<li>Phone Book Page</li>
-<li>Just In Time and Scheduler sending message</li>
-</ol>
+Next features will be included future version of application are:
+- Import from any format files with user definition columns
+- Export data to any format files
+- Duplicate detection for contact group, person and message template
+- Menu and program setup
+- Plugin and extension utility
+
+Current list of tasks to be completed are:
+- Inbox and outbox implementation 
+   * <del>Listener for all components of inbox and outbox page</del> - <em>partial done at 14 April 2015</em>
+   * <del>Load data from database</del> - <em>done but not optimize</em>
+- New message implementation
+   * <del>Fields validation form</del> - <em>partial done at 14 April 2015</em>
+   * <del>Send message both just in time and scheduler</del> - <em>partial done at 14 April 2015</em>
+   * <del>Save message into database</del> - <em>partial done at 14 April 2015</em>
+   * Message template usage
+- Phone Book Implementation
+   * Create, update and delete Contact Group
+   * Create, update and delete Contact Person
+   * Fields Validation form both contact group and contact person
+   * Attact Contact Person to Contact Group
+   * Load data from database
+- Message Template Implementation
+   * <del>Create, update and delete message template</del> - <em>partial done at 20 April 2015</em>
+   * <del>Fields Validation form</del> - <em>partial done at 20 April 2015</em>
+   * <del>Double click row table</del> - <em>partial done at 20 April 2015</em>
+   * <del>Search and view listener</del> - <em>partial done at 20 April 2015</em>
+   * <del>Load from database</del> - <em>done but not optimize</em>
+- <del>Gateway Setup Implementation</del> - <em>partial done at 20 April 2015</em>

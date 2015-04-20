@@ -4,6 +4,12 @@ import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ResourceBundle;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -16,6 +22,8 @@ import javax.swing.JToolBar;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import org.jdesktop.swingx.JXSearchField;
@@ -27,7 +35,8 @@ import org.jdesktop.swingx.JXTable;
  * @since 1
  * @version 1.0.0
  */
-public class ImportDataPage extends JPanel {
+public class ImportDataPage extends JPanel 
+    implements ActionListener, ItemListener, ListSelectionListener {
 
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -55,21 +64,15 @@ public class ImportDataPage extends JPanel {
      */
     public ImportDataPage() {
         setVisible(false);
-        initComponents();
+        setLayout(new BorderLayout());
+        
+        initNorthPanel();
+        initCenterPanel();
+        initSouthPanel();
         initListeners();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Region Inititalization">  
-    /**
-     * Initialize components of the panel
-     */
-    private void initComponents() {
-        setLayout(new BorderLayout());
-
-        initNorthPanel();
-        initCenterPanel();
-        initSouthPanel();
-    }
 
     /**
      *
@@ -146,12 +149,33 @@ public class ImportDataPage extends JPanel {
      * Initialize listeners for all components of frame
      */
     private void initListeners() {
-//        addComponentListener(new ComponentAdapter() {
-//            @Override
-//            public void componentShown(ComponentEvent e) {
-//                JOptionPane.showMessageDialog(null, "This is dialog from Import Page");
-//            }
-//        });
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                loadDataTable();
+            }
+        });
     }
-    // </editor-fold>   
+    // </editor-fold>  
+    
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    private void loadDataTable() {
+        
+    }
+    // </editor-fold>
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+    
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+    
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+    
+    }
 }

@@ -4,6 +4,11 @@ import com.softhaxi.shortsage.v1.util.ModemUtil;
 import com.softhaxi.shortsage.v1.enums.ServiceHandler;
 import javax.swing.SwingWorker;
 
+/**
+ * 
+ * @author Ivo Hutasoit
+ * 
+ */
 public class ModemTask extends SwingWorker<Boolean, Void> {
 
     private final ServiceHandler handler;

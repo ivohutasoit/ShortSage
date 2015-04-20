@@ -203,6 +203,7 @@ public class HostWindow extends JFrame
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())
                 || evt.getPropertyName().equals(PropertyChangeField.CONNECTING.toString())
+                || evt.getPropertyName().equals(PropertyChangeField.DISCONNECTING.toString())
                 || evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
             boolean value = (boolean) evt.getNewValue();
 
@@ -217,6 +218,8 @@ public class HostWindow extends JFrame
                 pStatusbar.getStatusLabel().setText(RES_GLOBAL.getString("label.loading.data"));
             } else if (evt.getPropertyName().equals(PropertyChangeField.CONNECTING.toString())) {
                 pStatusbar.getStatusLabel().setText(RES_GLOBAL.getString("label.connecting"));
+            } else if (evt.getPropertyName().equals(PropertyChangeField.DISCONNECTING.toString())) {
+                pStatusbar.getStatusLabel().setText(RES_GLOBAL.getString("label.disconnecting"));
             } else if (evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
                 pStatusbar.getStatusLabel().setText(RES_GLOBAL.getString("label.saving.data"));
             }

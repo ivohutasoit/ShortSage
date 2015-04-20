@@ -2,27 +2,39 @@ package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.dto.Gateway;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
+import com.softhaxi.shortsage.v1.enums.ServiceHandler;
+import com.softhaxi.shortsage.v1.task.ModemTask;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -32,6 +44,10 @@ import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.smslib.AGateway;
+import org.smslib.GatewayException;
+import org.smslib.Service;
+import org.smslib.TimeoutException;
 
 /**
  *
@@ -39,7 +55,8 @@ import org.hibernate.Session;
  * @since 1
  * @version 1.0.0
  */
-public class DashboardPage extends JPanel {
+public class DashboardPage extends JPanel
+        implements ActionListener {
 
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -141,8 +158,8 @@ public class DashboardPage extends JPanel {
 //                .add(tfBattery);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.provider") + " :"))
                 .add(tfProvider, 2).empty();
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.ccenter") + " :"))
-                .add(tfCCenter, 2).empty(2);
+//        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.ccenter") + " :"))
+//                .add(tfCCenter, 2).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.gateway.cbalance") + " :"))
                 .add(tfCBalance).empty(3);
 
@@ -224,6 +241,7 @@ public class DashboardPage extends JPanel {
         pD3.add(lfBalance, BorderLayout.CENTER);
 
         baBalance = new JButton(RES_GLOBAL.getString("label.check.balance"));
+        baBalance.setEnabled(false);
         pD3.add(baBalance, BorderLayout.SOUTH);
 
         pDetail.add(pD3);
@@ -240,8 +258,10 @@ public class DashboardPage extends JPanel {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
-                LoadDataTask t1 = new LoadDataTask();
+                firePropertyChange(PropertyChangeField.CONNECTING.toString(), false, true);
+                final ModemTask tm = new ModemTask(ServiceHandler.START);
+
+                final LoadDataTask t1 = new LoadDataTask();
                 t1.addPropertyChangeListener(new PropertyChangeListener() {
 
                     @Override
@@ -250,11 +270,27 @@ public class DashboardPage extends JPanel {
                             boolean value = (boolean) evt.getNewValue();
                             if (value == false) {
                                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+                                if (cfName.getItemCount() > 1) {
+                                    cfName.setSelectedIndex(1);
+                                }
                             }
                         }
                     }
                 });
-                t1.execute();
+
+                tm.addPropertyChangeListener(new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("state".equals(evt.getPropertyName())
+                                && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                            firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
+                            t1.execute();
+                        }
+                    }
+                });
+
+                tm.execute();
             }
         });
 
@@ -262,23 +298,97 @@ public class DashboardPage extends JPanel {
 
             @Override
             public void itemStateChanged(ItemEvent e) {
+                if (cfName.getItemCount() <= 1) {
+                    return;
+                }
                 if (cfName.getSelectedIndex() != 0) {
                     Gateway g = gData.get(cfName.getSelectedIndex() - 1);
                     tfPort.setText(g.getPort());
                     tfManufacture.setText(g.getManufacture());
                     tfModel.setText(g.getModel());
                     tfProvider.setText(g.getProvider());
-                    tfCCenter.setText(g.getMessageCenter());
-                    tfCBalance.setText(g.getCheckBalance());
+                    tfCBalance.setText(g.getNumberBalance());
                     tfSerial.setText(g.getSerial());
                     tfISMI.setText(g.getIsmi());
+
+                    baBalance.setEnabled(true);
                     return;
                 }
-                
+
             }
         });
+
+        baBalance.addActionListener(this);
     }
     // </editor-fold>   
+
+    // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation"> 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (Service.getInstance().getServiceStatus() != Service.ServiceStatus.STARTED) {
+            JOptionPane.showMessageDialog(null, "Service was not running right now", "Service Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        class BalanceWorker extends SwingWorker<String, Void> {
+
+            private JProgressBar progress;
+            private JDialog dialog;
+
+            private String gatewayId;
+            private String number;
+
+            public BalanceWorker(String gatewayId, String number) {
+                this.gatewayId = gatewayId;
+                this.number = number;
+
+                if (dialog == null) {
+                    dialog = new JDialog();
+                    dialog.setTitle("USSD Request");
+                    dialog.setLayout(new GridBagLayout());
+                    dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+                    GridBagConstraints gbc = new GridBagConstraints();
+                    gbc.insets = new Insets(2, 2, 2, 2);
+                    gbc.weightx = 1;
+                    gbc.gridy = 0;
+                    dialog.add(new JLabel("Processing..."), gbc);
+                    progress = new JProgressBar();
+                    progress.setIndeterminate(true);
+                    gbc.gridy = 1;
+                    dialog.add(progress, gbc);
+                    dialog.pack();
+                    dialog.setLocationRelativeTo(null);
+                    dialog.setVisible(true);
+                }
+            }
+
+            @Override
+            protected void done() {
+                if (dialog != null) {
+                    dialog.dispose();
+                }
+                try {
+                    JOptionPane.showMessageDialog(null, get(), "USSD Response", JOptionPane.INFORMATION_MESSAGE);
+                } catch (InterruptedException | ExecutionException ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            @Override
+            protected String doInBackground() throws Exception {
+                String result = null;
+                AGateway gateway = Service.getInstance().findGateway(gatewayId);
+                result = gateway.sendUSSDCommand(number);
+                return result;
+            }
+        }
+
+        BalanceWorker t1 = new BalanceWorker(cfName.getSelectedItem().toString(),
+                tfCBalance.getText().trim());
+        t1.execute();
+    }
+    // </editor-fold> 
 
     // <editor-fold defaultstate="collapsed" desc="Task Classes">  
     class LoadDataTask extends SwingWorker<Boolean, Void> {
@@ -288,7 +398,7 @@ public class DashboardPage extends JPanel {
             try {
                 hSession = HibernateUtil.getSessionFactory().openSession();
                 hSession.getTransaction().begin();
-                Query query = hSession.createQuery("from Gateway");
+                Query query = hSession.getNamedQuery("Gateway.All");
                 gData = query.list();
                 hSession.getTransaction().commit();
                 hSession.close();
@@ -302,6 +412,8 @@ public class DashboardPage extends JPanel {
         @Override
         protected void done() {
             if (!isCancelled()) {
+                cfName.removeAllItems();
+                cfName.addItem("-- Select Gateway --");
                 for (Gateway gateway : gData) {
                     cfName.addItem(gateway.getName());
                 }
