@@ -24,7 +24,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "M0CNTC")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "CCCCTY", discriminatorType = DiscriminatorType.STRING)
-@DiscriminatorValue(value = "MSSG")
+@DiscriminatorValue(value = "CNTC")
 @AttributeOverrides({
     @AttributeOverride(name = "id",
             column = @Column(name = "CCCCID", unique = true)),
