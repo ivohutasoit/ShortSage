@@ -38,8 +38,8 @@ Current list of tasks to be completed are:
    * Load data from database
 - Message Template Implementation
    * <del>Create, update and delete message template</del> - <em>partial done at 20 April 2015</em>
-   * Fields Validation form
+   * <del>Fields Validation form</del> - <em>partial done at 20 April 2015</em>
    * <del>Double click row table</del> - <em>partial done at 20 April 2015</em>
-   * Search and view listener
+   * <del>Search and view listener</del> - <em>partial done at 20 April 2015</em>
    * <del>Load from database</del> - <em>done but not optimize</em>
 - <del>Gateway Setup Implementation</del> - <em>partial done at 20 April 2015</em>
