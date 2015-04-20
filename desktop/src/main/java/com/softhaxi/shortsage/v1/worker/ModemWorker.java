@@ -12,7 +12,7 @@ import org.smslib.Service;
 import org.smslib.Service.ServiceStatus;
 
 /**
- * 
+ *
  * @author Ivo Hutasoit
  * @since 1
  * @version 1.0.0
@@ -57,11 +57,15 @@ public class ModemWorker extends SwingWorker<Boolean, Integer> {
 
                     if (service.getServiceStatus() == ServiceStatus.STOPPED) {
                         if (modem == null) {
-                            for (AGateway gateway  : data) {
-                                modem.setInbound(true);
-                                modem.setOutbound(true);
-                                service.addGateway(modem);
+                            for (AGateway gateway : data) {
+                                gateway.setInbound(true);
+                                gateway.setOutbound(true);
+                                service.addGateway(gateway);
                             }
+                        } else {
+                            modem.setInbound(true);
+                            modem.setOutbound(true);
+                            service.addGateway(modem);
                         }
                         // add callback for service
                     }
