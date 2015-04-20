@@ -254,6 +254,10 @@ public class MessageTemplateActionForm extends JPanel
         });
         t1.execute();
     }
+    
+    private void update() {
+        
+    }
     // </editor-fold>
     
 }
