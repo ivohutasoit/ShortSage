@@ -9,8 +9,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
@@ -83,7 +83,7 @@ public class InboxPage extends JPanel
     private JXTable ttData;
 
     private DefaultTableModel mData;
-    private List<InboxMessage> dMessage;
+    private List<InboxMessage> data;
 
     private Session hSession;
 
@@ -173,35 +173,24 @@ public class InboxPage extends JPanel
      * Initialize listeners for all components of frame
      */
     private void initListeners() {
-        addComponentListener(new ComponentListener() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-
-            }
+        addComponentListener(new ComponentAdapter() {
 
             @Override
             public void componentShown(ComponentEvent e) {
-                loadMessageData();
+                loadData();
             }
 
-            @Override
-            public void componentHidden(ComponentEvent e) {
-
-            }
         });
         sfSearch.addActionListener(this);
         cfViews.addItemListener(this);
-//        bRefresh.addActionListener(this);
+        bRefresh.addActionListener(this);
         ttData.getSelectionModel().addListSelectionListener(this);
 
     }
 
+    /**
+     * 
+     */
     private void initTableModel() {
         if (mData.getRowCount() > 0) {
             for (int i = mData.getRowCount() - 1; i > -1; i--) {
@@ -210,11 +199,11 @@ public class InboxPage extends JPanel
         }
         Object[] obj = null;
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        for (InboxMessage message : dMessage) {
+        for (InboxMessage message : data) {
             obj = new Object[4];
             obj[0] = message.getContact();
             obj[1] = message.getText();
-            obj[2] = message.getDate();
+            obj[2] = sdf.format(message.getDate());
             obj[3] = message.getStatus() == 1 ? InboundMessage.MessageClasses.UNREAD.toString() : 
                     InboundMessage.MessageClasses.READ.toString();
 
@@ -225,7 +214,7 @@ public class InboxPage extends JPanel
     // </editor-fold>   
 
     // <editor-fold defaultstate="collapsed" desc="Private Methods">
-    private synchronized void loadMessageData() {
+    private synchronized void loadData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
             @Override
@@ -261,7 +250,7 @@ public class InboxPage extends JPanel
                     }
 
                     Query query = hSession.getNamedQuery("Inbox.All");
-                    dMessage = query.list();
+                    data = query.list();
 
                     hSession.close();
                     return true;
@@ -303,7 +292,7 @@ public class InboxPage extends JPanel
         if (e.getSource() instanceof JButton) {
             JButton bb = (JButton) e.getSource();
             if (bb == bRefresh) {
-                loadMessageData();
+                loadData();
             } else if (bb == bDelete) {
                 JOptionPane.showMessageDialog(null, "Delete Data from Table");
             }
@@ -340,7 +329,7 @@ public class InboxPage extends JPanel
                 for (int i = minIndex; i <= maxIndex; i++) {
                     if (lsm.isSelectedIndex(i)) {
                         System.out.println(" " + i);
-                        message = dMessage.get(i);
+                        message = data.get(i);
                         
                         System.out.println(message.getId());
                     }
