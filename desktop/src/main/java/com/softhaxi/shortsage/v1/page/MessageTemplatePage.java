@@ -36,7 +36,7 @@ import org.jdesktop.swingx.JXTable;
  * @version 1.0.0
  */
 public class MessageTemplatePage extends JPanel 
-        implements ActionListener {
+        implements ActionListener, ItemListener {
     
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -175,6 +175,8 @@ public class MessageTemplatePage extends JPanel
                 loadData();
             }
         });
+        sfSearch.addActionListener(this);
+        cfViews.addItemListener(this);
         ttData.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -295,7 +297,47 @@ public class MessageTemplatePage extends JPanel
                 }
             } else if(source == bRefresh) {
                 loadData();
+            } 
+        } else if (e.getSource() instanceof JXSearchField) {
+            JOptionPane.showMessageDialog(null, "Search Implementation");
+        }
+    }
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="ItemListener Implementation">
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        int state = e.getStateChange();
+        System.out.println((state == ItemEvent.SELECTED) ? "Selected" : "Deselected");
+        System.out.println("Item: " + e.getItem());
+//        ItemSelectable is = e.getItemSelectable();
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ListSelectionListener Implementation"> 
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (ttData.getSelectedRow() > -1) {
+            ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+            
+            InboxMessage message = null;
+
+            if (lsm.isSelectionEmpty()) {
+                System.out.println(" <none>");
+            } else {
+                // Find out which indexes are selected.
+                int minIndex = lsm.getMinSelectionIndex();
+                int maxIndex = lsm.getMaxSelectionIndex();
+                for (int i = minIndex; i <= maxIndex; i++) {
+                    if (lsm.isSelectedIndex(i)) {
+                        System.out.println(" " + i);
+                        message = dMessage.get(i);
+                        
+                        System.out.println(message.getId());
+                    }
+                }
             }
+            System.out.println();
         }
     }
     // </editor-fold>
