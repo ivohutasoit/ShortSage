@@ -140,7 +140,7 @@ public class GatewaySetupPage extends JPanel
         bRefresh = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png")));
 
         pToolbar.add(bNew);
-        pToolbar.add(bEdit);
+        //pToolbar.add(bEdit);
         pToolbar.addSeparator();
         pToolbar.add(bDelete);
         pToolbar.add(Box.createHorizontalGlue());
@@ -186,6 +186,8 @@ public class GatewaySetupPage extends JPanel
      */
     private void initListeners() {
         bNew.addActionListener(this);
+        bDelete.addActionListener(this);
+        bRefresh.addActionListener(this);
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
@@ -267,30 +269,6 @@ public class GatewaySetupPage extends JPanel
         });
         t1.execute();
     }
-    
-    /**
-     * 
-     */
-//    private void restartService() {
-//        try {
-//            List<AGateway> gateways = (List<AGateway>) Service.getInstance().getGateways();
-//            
-//            Service.getInstance().stopService();
-//            for(AGateway gateway : gateways) {
-//                Service.getInstance().removeGateway(gateway);
-//            }
-//            
-//            SerialModemGateway modem = null;
-//            for (Gateway g : gData) {
-//                modem = new SerialModemGateway(g.getId(), g.getPort(), g.getBaudRate(), 
-//                        g.getManufacture(), g.getModel());
-//                Service.getInstance().addGateway(modem);
-//            }
-//            Service.getInstance().startService();
-//        } catch (SMSLibException | IOException | InterruptedException ex) {
-//            Logger.getLogger(GatewaySetupPage.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
@@ -331,6 +309,21 @@ public class GatewaySetupPage extends JPanel
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
 
+            } else if(source == bDelete) {
+                if(ttData.getSelectedRow() == -1) {
+                   JOptionPane.showMessageDialog(null, "No data selected to be deleted.", "Gateway", JOptionPane.WARNING_MESSAGE);
+                   return;
+                }
+                
+                Gateway gateway = dGateway.get(ttData.getSelectedRow());
+                
+                int result = JOptionPane.showConfirmDialog(null, "Delete Gateway " + gateway.getName() + "?", 
+                        "Gateway", JOptionPane.YES_NO_OPTION);
+                if(result == JOptionPane.YES_OPTION) {
+                  // running delete 
+                }
+            } else if(source == bRefresh) {
+                loadGatewayData();
             }
         }
     }

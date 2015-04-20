@@ -36,7 +36,7 @@ import org.jdesktop.swingx.JXTable;
  * @version 1.0.0
  */
 public class MessageTemplatePage extends JPanel 
-        implements ActionListener {
+        implements ActionListener, ItemListener {
     
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -61,6 +61,9 @@ public class MessageTemplatePage extends JPanel
     private JButton bNew, bDelete, bRefresh;
     
     private DefaultTableModel mData;
+    
+    private Session hSession;
+    private List data;
     
     /**
      * Main Constructor
@@ -164,12 +167,83 @@ public class MessageTemplatePage extends JPanel
      */
     private void initListeners() {
         bNew.addActionListener(this);
-//        addComponentListener(new ComponentAdapter() {
-//            @Override
-//            public void componentShown(ComponentEvent e) {
-//                JOptionPane.showMessageDialog(null, "This is dialog from Import Page");
-//            }
-//        });
+        bDelete.addActionListener(this);
+        bRefresh.addActionListener(this);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                loadData();
+            }
+        });
+        sfSearch.addActionListener(this);
+        cfViews.addItemListener(this);
+        ttData.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    JXTable target = (JXTable) e.getSource();
+                    int row = target.getSelectedRow();
+                    JOptionPane.showMessageDialog(null, "Clicked row" + row);
+                }
+            }
+        });
+    }
+    // </editor-fold>   
+    
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    private void loadData() {
+        firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
+           @Override
+           protected Boolean doInBackground() {
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    Query query = hSession.getNamedQuery("MessageTemplate.All");
+                    data = query.list();
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    return true;
+                } catch (Exception ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return false;
+           }
+           
+            @Override
+            protected void done() {
+                if (!isCancelled()) {
+                    mData = new DefaultTableModel(COLUMN_NAME, 0);
+                    Object[] obj = null;
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    for (MessageTemplate template : data) {
+                        obj = new Object[4];
+                        obj[0] = template.getName();
+                        obj[1] = template.getText();
+                        obj[2] = sdf.format(template.getCreatedDate());
+                        obj[3] = template.getCreatedBy();
+
+                        mData.addRow(obj);
+                        mData.fireTableDataChanged();
+                    }
+                    ttData.setModel(mData);
+                }
+            }
+        }
+        
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+           @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("state".equals(event.getPropertyName())
+                 && SwingWorker.StateValue.DONE == event.getNewValue()) {
+                     if(t1.get() == true) {
+                        firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);   
+                     }
+                 }
+            }
+        });
+        t1.execute();
     }
     // </editor-fold>   
 
@@ -208,7 +282,62 @@ public class MessageTemplatePage extends JPanel
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
+            } else if(source == bDelete) {
+                if(ttData.getSelectedRow() == -1) {
+                   JOptionPane.showMessageDialog(null, "No data selected to be deleted.", "Message Template", JOptionPane.WARNING_MESSAGE);
+                   return;
+                }
+                
+                MessageTemplate template = data.get(ttData.getSelectedRow());
+                
+                int result = JOptionPane.showConfirmDialog(null, "Delete Message Template " + template.getName() + "?", 
+                        "Gateway", JOptionPane.YES_NO_OPTION);
+                if(result == JOptionPane.YES_OPTION) {
+                  // running delete 
+                }
+            } else if(source == bRefresh) {
+                loadData();
+            } 
+        } else if (e.getSource() instanceof JXSearchField) {
+            JOptionPane.showMessageDialog(null, "Search Implementation");
+        }
+    }
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="ItemListener Implementation">
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        int state = e.getStateChange();
+        System.out.println((state == ItemEvent.SELECTED) ? "Selected" : "Deselected");
+        System.out.println("Item: " + e.getItem());
+//        ItemSelectable is = e.getItemSelectable();
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ListSelectionListener Implementation"> 
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (ttData.getSelectedRow() > -1) {
+            ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+            
+            InboxMessage message = null;
+
+            if (lsm.isSelectionEmpty()) {
+                System.out.println(" <none>");
+            } else {
+                // Find out which indexes are selected.
+                int minIndex = lsm.getMinSelectionIndex();
+                int maxIndex = lsm.getMaxSelectionIndex();
+                for (int i = minIndex; i <= maxIndex; i++) {
+                    if (lsm.isSelectedIndex(i)) {
+                        System.out.println(" " + i);
+                        message = dMessage.get(i);
+                        
+                        System.out.println(message.getId());
+                    }
+                }
             }
+            System.out.println();
         }
     }
     // </editor-fold>

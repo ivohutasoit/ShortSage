@@ -26,14 +26,21 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 @Table(name = "M0CNTC")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+<<<<<<< HEAD
 @DiscriminatorColumn(name = "CCCCTY", 
         discriminatorType = DiscriminatorType.STRING)
+=======
+@DiscriminatorColumn(name = "CCCCTY", discriminatorType = DiscriminatorType.STRING)
+>>>>>>> origin/develop
 @DiscriminatorValue(value = "CNTC")
 @AttributeOverrides({
     @AttributeOverride(name = "id",
             column = @Column(name = "CCCCID", unique = true)),
+<<<<<<< HEAD
     @AttributeOverride(name = "name",
             column = @Column(name = "CCCCNA", length = 100)),
+=======
+>>>>>>> origin/develop
     @AttributeOverride(name = "remark",
             column = @Column(name = "CCRMRK")),
     @AttributeOverride(name = "status",
@@ -52,5 +59,11 @@ import org.hibernate.annotations.GenericGenerator;
             column = @Column(name = "CCVRSN"))
 })
 public class Contact extends BasicEntity
+<<<<<<< HEAD
     implements Serializable {
+=======
+        implements Serializable {
+    @Column(name = "CCCCNA", length = 100)
+    private String name;
+>>>>>>> origin/develop
 }

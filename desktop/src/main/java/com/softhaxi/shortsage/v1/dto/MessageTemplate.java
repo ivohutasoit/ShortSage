@@ -17,183 +17,43 @@ import org.hibernate.annotations.GenericGenerator;
  * @versio 1.0.0
  */
 @Entity
-@Table(name = "M0MSTL")
-public class MessageTemplate
+@Table(name = "M0MGTL")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(
+        name = "MTMTTY",
+        discriminatorType = DiscriminatorType.STRING
+)
+@DiscriminatorValue(value = "TMPL")
+@AttributeOverrides({
+    @AttributeOverride(name = "id",
+            column = @Column(name = "MTMTID", unique = true)),
+    @AttributeOverride(name = "remark",
+            column = @Column(name = "MTRMRK")),
+    @AttributeOverride(name = "status",
+            column = @Column(name = "MTRCST")),
+    @AttributeOverride(name = "createdBy",
+            column = @Column(name = "MTCRBY")),
+    @AttributeOverride(name = "createdDate",
+            column = @Column(name = "MTCRDT")),
+    @AttributeOverride(name = "modifiedBy",
+            column = @Column(name = "MTMFBY")),
+    @AttributeOverride(name = "modifiedDate",
+            column = @Column(name = "MTMFDT")),
+    @AttributeOverride(name = "deletedState",
+            column = @Column(name = "MTDLST")),
+    @AttributeOverride(name = "version",
+            column = @Column(name = "MTVRSN"))
+})
+@NamedQueries({
+    @NamedQuery(name = "MessageTemplate.All", query = "from MessageTemplate a where a.deletedState = 0"),
+    @NamedQuery(name = "MessageTemplate.Id", query = "from MessageTemplate a where a.id = :id")
+})
+public class MessageTemplate extends BasicEntity
         implements Serializable {
+   
+   @Column(name = "MTMTNA", nullable = false, length = 100)
+   private String name;
 
-    @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    @Column(name = "MTMTID", unique = true)
-    private String id;
-    
-    @Column(name = "MTMTNA", nullable = false)
-    private String name;
-    
-    @Column(name = "MTRMRK")
-    private String text;
-    
-    @Column(name = "MTRCTS")
-    private int status;
-
-    @Column(name = "MTCRBY", length = 100)
-    private String createdBy;
-
-    @Column(name = "MTCRON")
-    private Date createdOn;
-
-    @Column(name = "MTMDBY", length = 100)
-    private String modifiedBy;
-
-    @Column(name = "MTMDON")
-    private Date modifiedOn;
-
-    @Column(name = "MTDLST")
-    private int deletedState;
-
-    @Version
-    @Column(name = "MTVRSN")
-    private Integer version;
-
-    /**
-     * @return the id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return the text
-     */
-    public String getText() {
-        return text;
-    }
-
-    /**
-     * @param text the text to set
-     */
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    /**
-     * @return the status
-     */
-    public int getStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    /**
-     * @return the createdBy
-     */
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    /**
-     * @param createdBy the createdBy to set
-     */
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    /**
-     * @return the createdOn
-     */
-    public Date getCreatedOn() {
-        return createdOn;
-    }
-
-    /**
-     * @param createdOn the createdOn to set
-     */
-    public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
-    }
-
-    /**
-     * @return the modifiedBy
-     */
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-
-    /**
-     * @param modifiedBy the modifiedBy to set
-     */
-    public void setModifiedBy(String modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
-
-    /**
-     * @return the modifiedOn
-     */
-    public Date getModifiedOn() {
-        return modifiedOn;
-    }
-
-    /**
-     * @param modifiedOn the modifiedOn to set
-     */
-    public void setModifiedOn(Date modifiedOn) {
-        this.modifiedOn = modifiedOn;
-    }
-
-    /**
-     * @return the deletedState
-     */
-    public int getDeletedState() {
-        return deletedState;
-    }
-
-    /**
-     * @param deletedState the deletedState to set
-     */
-    public void setDeletedState(int deletedState) {
-        this.deletedState = deletedState;
-    }
-
-    /**
-     * @return the version
-     */
-    public Integer getVersion() {
-        return version;
-    }
-
-    /**
-     * @param version the version to set
-     */
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-    
-    
+   @Column(name = "MTTEXT", nullable = false)
+   private String text;
 }

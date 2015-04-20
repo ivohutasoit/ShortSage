@@ -20,7 +20,8 @@ import net.java.dev.designgridlayout.LabelAlignment;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXTextField;
 
-public class MessageTemplateActionForm extends JPanel {
+public class MessageTemplateActionForm extends JPanel
+        implements ActionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -95,7 +96,7 @@ public class MessageTemplateActionForm extends JPanel {
 
         bSaveNew = new JButton(RES_GLOBAL.getString("label.save.new"),
                 new ImageIcon(getClass().getClassLoader().getResource("images/ic_save_as.png")));
-        pToolbar.add(bSaveNew);
+        //pToolbar.add(bSaveNew);
         pToolbar.addSeparator();
 
         bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
@@ -133,7 +134,7 @@ public class MessageTemplateActionForm extends JPanel {
      *
      */
     private void initListeners() {
-
+        bNew.addActionListener(this);
     }
 
     /**
@@ -188,20 +189,75 @@ public class MessageTemplateActionForm extends JPanel {
             }
         }
     }
-
     // </editor-fold>
-    private void save() {
-        if (state == ActionState.CREATE) {
-            object = new MessageTemplate();
-            object.setId(UUID.randomUUID().toString());
-            object.setName(tfName.getText().trim());
-            object.setText(tfText.getText().trim());
-            object.setStatus(0);
-            object.setCreatedBy("SYSTEM");
-            object.setCreatedOn(new Date());
-            object.setModifiedBy("SYSTEM");
-            object.setModifiedOn(new Date());
-            object.setDeletedState(0);
+    
+    // <editor-fold defaultstate="collapsed" desc="Private Metjods">
+    private boolean isValidModel() {
+        if (tfName.getText().equals("")) {
+            tfName.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+            return false;
+        }  
+        
+        if (tfText.getText().equals("")) {
+            tfText.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+            return false;
         }
+        
+        return true;
     }
+    
+    private void create() {
+        firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
+        
+        object = new MessageTemplate();
+        object.setName(tfName.getText().trim());
+        object.setText(tfText.getText().trim());
+        
+        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+
+            /**
+             *
+             * @return @throws Exception
+             */
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                boolean saved = false;
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    hSession.save(object);
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    saved = true;
+                } catch (Exception ex) {
+                    Logger.getLogger(MessageTemplateActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    saved = false;
+                }
+                return saved;
+            }
+        };
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+            /**
+             *
+             * @param evt
+             */
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("state".equals(event.getPropertyName())
+                         && SwingWorker.StateValue.DONE == event.getNewValue()) {
+                    firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                    if (t1.get() == true) {
+                        JOptionPane.showMessageDialog(null, "Saving new template successfull", "New Message Template", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                 }
+            }
+        });
+        t1.execute();
+    }
+    
+    private void update() {
+        
+    }
+    // </editor-fold>
+    
 }

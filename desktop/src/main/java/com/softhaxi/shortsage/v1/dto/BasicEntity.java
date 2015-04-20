@@ -29,8 +29,6 @@ public class BasicEntity implements Serializable {
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
     private String id;
 
-    private String name;
-
     private String remark;
 
     private int status;
@@ -55,6 +53,10 @@ public class BasicEntity implements Serializable {
      */ 
     public BasicEntity() {
         this.status = 1;
+        this.createdDate = new Date();
+        this.createdBy = "SYSTEM";
+        this.modifiedDate = createdDate;
+        this.modifiedBy = createdBy;
         this.deletedState = 0;
     }
 
@@ -70,20 +72,6 @@ public class BasicEntity implements Serializable {
      */
     public void setId(String id) {
         this.id = id;
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
