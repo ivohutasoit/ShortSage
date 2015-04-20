@@ -11,7 +11,11 @@ import javax.persistence.Entity;
  * @version 1.0.0
  */
 @Entity
-@DiscriminatorValue("GROP")
+@DiscriminatorValue("GCRP")
+@NamedQueries({
+    @NamedQuery(name = "ContactGroup.All", query = "from ContactGroup a where a.deletedState = 0"),
+    @NamedQuery(name = "ContactGroup.Id", query = "from ContactGroup a where a.id = :id")
+})
 public class ContactGroup extends Contact 
     implements Serializable {
     
