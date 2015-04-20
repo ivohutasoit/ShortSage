@@ -37,9 +37,9 @@ Current list of tasks to be completed are:
    * Attact Contact Person to Contact Group
    * Load data from database
 - Message Template Implementation
-   * Create, update and delete message template
+   * <del>Create, update and delete message template</del> - <em>partial done at 20 April 2015</em>
    * Fields Validation form
-   * Double click row table
+   * <del>Double click row table</del> - <em>partial done at 20 April 2015</em>
    * Search and view listener
-   * <del>Load from database</del> - <em>partial done at 20 April 2015</em>
+   * <del>Load from database</del> - <em>done but not optimize</em>
 - <del>Gateway Setup Implementation</del> - <em>partial done at 20 April 2015</em>
