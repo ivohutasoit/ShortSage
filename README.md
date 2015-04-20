@@ -42,4 +42,4 @@ Current list of tasks to be completed are:
    * Double click row table
    * Search and view listener
    * Load from database
-- <del>Gateway Setup Implementation</del> - <em>partial done at 14 April 2015</em>
+- <del>Gateway Setup Implementation</del> - <em>partial done at 20 April 2015</em>
