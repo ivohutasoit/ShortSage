@@ -28,8 +28,6 @@ import org.hibernate.annotations.GenericGenerator;
 @AttributeOverrides({
     @AttributeOverride(name = "id",
             column = @Column(name = "CCCCID", unique = true)),
-    @AttributeOverride(name = "name",
-            column = @Column(name = "CCCCNA", length = 100)),
     @AttributeOverride(name = "remark",
             column = @Column(name = "CCRMRK")),
     @AttributeOverride(name = "status",
@@ -49,5 +47,6 @@ import org.hibernate.annotations.GenericGenerator;
 })
 public class Contact extends BasicEntity
         implements Serializable {
-    
+    @Column(name = "CCCCNA", length = 100)
+    private String name;
 }
