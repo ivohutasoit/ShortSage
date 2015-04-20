@@ -53,7 +53,7 @@ import javax.persistence.TemporalType;
 })
 public class Message extends BasicEntity
         implements Serializable {
-    
+    @Column(name = "MGMGNA", length = 100)
     private String name;
 
     @Column(name = "MGRFID")
