@@ -27,8 +27,6 @@ import org.hibernate.annotations.GenericGenerator;
 @AttributeOverrides({
     @AttributeOverride(name = "id",
             column = @Column(name = "MTMTID", unique = true)),
-    @AttributeOverride(name = "name",
-            column = @Column(name = "MTMTNA", nullable = false, length = 100)),
     @AttributeOverride(name = "remark",
             column = @Column(name = "MTRMRK")),
     @AttributeOverride(name = "status",
@@ -52,6 +50,9 @@ import org.hibernate.annotations.GenericGenerator;
 })
 public class MessageTemplate extends BasicEntity
         implements Serializable {
+   
+   @Column(name = "MTMTNA", nullable = false, length = 100)
+   private String name;
 
    @Column(name = "MTTEXT", nullable = false)
    private String text;
