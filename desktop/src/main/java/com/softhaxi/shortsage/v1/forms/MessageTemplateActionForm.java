@@ -264,7 +264,7 @@ public class MessageTemplateActionForm extends JPanel
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("state".equals(evt.getPropertyName())
-                         && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                        && SwingWorker.StateValue.DONE == evt.getNewValue()) {
                     try {
                         firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
                         if (t1.get() == true) {
@@ -273,7 +273,7 @@ public class MessageTemplateActionForm extends JPanel
                     } catch (InterruptedException | ExecutionException ex) {
                         Logger.getLogger(MessageTemplateActionForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                 }
+                }
             }
         });
         t1.execute();
