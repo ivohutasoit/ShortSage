@@ -41,5 +41,5 @@ Current list of tasks to be completed are:
    * Fields Validation form
    * Double click row table
    * Search and view listener
-   * <del>Load from database</del>
+   * <del>Load from database</del> - <em>partial done at 20 April 2015</em>
 - <del>Gateway Setup Implementation</del> - <em>partial done at 20 April 2015</em>
