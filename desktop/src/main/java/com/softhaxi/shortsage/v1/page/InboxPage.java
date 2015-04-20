@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -133,9 +134,11 @@ public class InboxPage extends JPanel
         //pToolbar.add(new JButton(RES_GLOBAL.getString("label.reply"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_reply_16.png"))));
         //pToolbar.add(new JButton(RES_GLOBAL.getString("label.edit"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
         //pToolbar.addSeparator();
-        pToolbar.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png"))));
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        pToolbar.add(bDelete);
         pToolbar.add(Box.createHorizontalGlue());
-        pToolbar.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png"))));
+        bRefresh = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png")));
+        pToolbar.add(bRefresh);
 
         pCenter.add(pToolbar, BorderLayout.NORTH);
 
@@ -183,6 +186,7 @@ public class InboxPage extends JPanel
         });
         sfSearch.addActionListener(this);
         cfViews.addItemListener(this);
+        bDelete.addActionListener(this);
         bRefresh.addActionListener(this);
         ttData.getSelectionModel().addListSelectionListener(this);
 
@@ -284,6 +288,48 @@ public class InboxPage extends JPanel
         });
         t1.execute();
     }
+    
+    /**
+     * 
+     * @param message 
+     */
+    private void deleteData(final InboxMessage message) {
+        firePropertyChange(PropertyChangeField.DELETING.toString(), false, true);
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+           @Override
+           protected Boolean doInBackground() {
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    hSession.delete(message);
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    return true;
+                } catch (Exception ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return false;
+           }
+        };
+        
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+           @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("state".equals(evt.getPropertyName())
+                 && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                    try {
+                        if(t1.get() == true) {
+                            firePropertyChange(PropertyChangeField.DELETING.toString(), true, false);
+                            loadData();
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(InboxPage.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                 }
+            }
+        });
+        t1.execute();
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
@@ -294,7 +340,19 @@ public class InboxPage extends JPanel
             if (bb == bRefresh) {
                 loadData();
             } else if (bb == bDelete) {
-                JOptionPane.showMessageDialog(null, "Delete Data from Table");
+                if(ttData.getSelectedRow() == -1) {
+                   JOptionPane.showMessageDialog(null, "No data selected to be deleted.", "Inbox Message", JOptionPane.WARNING_MESSAGE);
+                   return;
+                }
+                
+                InboxMessage message = data.get(ttData.getSelectedRow());
+                
+                int result = JOptionPane.showConfirmDialog(null, "Delete Message from " + message.getContact() + "?", 
+                        "Inbox Message", JOptionPane.YES_NO_OPTION);
+                if(result == JOptionPane.YES_OPTION) {
+                  // running delete 
+                    deleteData(message);
+                }
             }
         } else if (e.getSource() instanceof JXSearchField) {
             JOptionPane.showMessageDialog(null, "Search Implementation");

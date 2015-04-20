@@ -366,7 +366,7 @@ public class MessageTemplatePage extends JPanel
                 MessageTemplate template = data.get(ttData.getSelectedRow());
                 
                 int result = JOptionPane.showConfirmDialog(null, "Delete Message Template " + template.getName() + "?", 
-                        "Gateway", JOptionPane.YES_NO_OPTION);
+                        "Message Template", JOptionPane.YES_NO_OPTION);
                 if(result == JOptionPane.YES_OPTION) {
                   // running delete 
                     deleteData(template);
