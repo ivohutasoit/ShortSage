@@ -167,10 +167,23 @@ public class MessageTemplatePage extends JPanel
      */
     private void initListeners() {
         bNew.addActionListener(this);
+        bDelete.addActionListener(this);
+        bRefresh.addActionListener(this);
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                loadGatewayData();
+                loadData();
+            }
+        });
+        ttData.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    JXTable target = (JXTable) e.getSource();
+                    int row = target.getSelectedRow();
+                    JOptionPane.showMessageDialog(null, "Clicked row" + row);
+                }
             }
         });
     }
@@ -267,6 +280,21 @@ public class MessageTemplatePage extends JPanel
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
+            } else if(source == bDelete) {
+                if(ttData.getSelectedRow() == -1) {
+                   JOptionPane.showMessageDialog(null, "No data selected to be deleted.", "Message Template", JOptionPane.WARNING_MESSAGE);
+                   return;
+                }
+                
+                MessageTemplate template = data.get(ttData.getSelectedRow());
+                
+                int result = JOptionPane.showConfirmDialog(null, "Delete Message Template " + template.getName() + "?", 
+                        "Gateway", JOptionPane.YES_NO_OPTION);
+                if(result == JOptionPane.YES_OPTION) {
+                  // running delete 
+                }
+            } else if(source == bRefresh) {
+                loadData();
             }
         }
     }
