@@ -52,4 +52,7 @@ import org.hibernate.annotations.GenericGenerator;
 })
 public class MessageTemplate extends BasicEntity
         implements Serializable {
+
+   @Column(name = "MTTEXT", nullable = false)
+   private String text;
 }
