@@ -7,7 +7,11 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("PRSN")
+@DiscriminatorValue("CPRN")
+@NamedQueries({
+    @NamedQuery(name = "ContactPerson.All", query = "from ContactPerson a where a.deletedState = 0"),
+    @NamedQuery(name = "ContactPerson.Id", query = "from ContactPerson a where a.id = :id")
+})
 public class ContactPerson extends Contact 
     implements Serializable {
     
