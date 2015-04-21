@@ -1,7 +1,7 @@
 package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.desktop.HNumberedTable;
-import com.softhaxi.shortsage.v1.dto.OutboxMessage;
+import com.softhaxi.shortsage.v1.dto.InboxMessage;
 import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.MessageActionForm;
@@ -16,11 +16,15 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
@@ -235,7 +239,7 @@ public class OutboxPage extends JPanel
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     hSession.getTransaction().begin();
                     Query query = hSession.getNamedQuery("Outbox.All");
-                    dMessage = query.list();
+                    data = query.list();
 
                     hSession.getTransaction().commit();
                     hSession.close();
@@ -318,7 +322,7 @@ public class OutboxPage extends JPanel
         if (e.getSource() instanceof JButton) {
             JButton bb = (JButton) e.getSource();
             if (bb == bRefresh) {
-                loadMessageData();
+                loadData();
             } else if (bb == bNew) {
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
@@ -357,7 +361,7 @@ public class OutboxPage extends JPanel
                    return;
                 }
                 
-                InboxMessage message = data.get(ttData.getSelectedRow());
+                OutboxMessage message = data.get(ttData.getSelectedRow());
                 
                 int result = JOptionPane.showConfirmDialog(null, "Delete Message from " + message.getContact() + "?", 
                         "Inbox Message", JOptionPane.YES_NO_OPTION);

@@ -167,7 +167,7 @@ public class MessageTemplateActionForm extends JPanel
             bEdit.setVisible(false);
             bDelete.setVisible(false);
             bSaveNew.setVisible(false);
-        } else if (state == ActionState.SHOW || state == ActionState.EDIT) {
+        } else if (state == ActionState.SHOW || state == ActionState.UPDATE) {
             cfStatus.removeAllItems();
             cfStatus.addItem("DRAFT");
             cfStatus.addItem("ACTIVE");

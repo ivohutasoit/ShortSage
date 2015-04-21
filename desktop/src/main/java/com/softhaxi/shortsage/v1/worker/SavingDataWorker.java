@@ -1,5 +1,26 @@
 package com.softhaxi.shortsage.v1.worker;
 
+import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.util.HibernateUtil;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingWorker;
+import org.hibernate.Session;
+
+/**
+ *
+ * @author Ivo Hutasoit
+ * @since 1
+ * @version 1.0.0
+ * @param <T>
+ */
 public class SavingDataWorker<T> extends SwingWorker<Boolean, Void> {
   private JProgressBar progress;
   private JDialog dialog;
@@ -42,14 +63,13 @@ public class SavingDataWorker<T> extends SwingWorker<Boolean, Void> {
           session = HibernateUtil.getSessionFactory().openSession();
           session.getTransaction().begin();
           
-          swicth(state) {
-            case ActionState.CREATE:
+          if(state == ActionState.CREATE) {
               session.save(t);
               saved = true;
-            case ActionState.UPDATE:
+          }else if (state == ActionState.UPDATE) {
               session.update(t);
               saved = true;
-            case ActionState.DELETE:
+          } else if(state == ActionState.DELETE) {
               session.delete(t);
               saved = true;
           }
