@@ -193,7 +193,7 @@ public class MessageTemplateActionForm extends JPanel
      *
      */
     public void initData() {
-        if (state == ActionState.SHOW || state == ActionState.EDIT) {
+        if (state == ActionState.SHOW || state == ActionState.UPDATE) {
             if (object != null) {
                 tfName.setText(object.getName());
                 tfText.setText(object.getText());
