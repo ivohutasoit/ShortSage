@@ -2,15 +2,8 @@ package com.softhaxi.shortsage.v1.worker;
 
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import org.hibernate.Session;
 
@@ -22,38 +15,13 @@ import org.hibernate.Session;
  * @param <T>
  */
 public class SavingDataWorker<T> extends SwingWorker<Boolean, Void> {
-  private JProgressBar progress;
-  private JDialog dialog;
-  
   private ActionState state;
   private Session session;
   private T t;
   
-  public SavingDataWorker(T t, ActionState state, boolean showDialog) {
+  public SavingDataWorker(T t, ActionState state) {
     this.state = state;
     this.t = t;
-    
-    if(showDialog) {
-      if (dialog == null) {
-          dialog = new JDialog();
-          dialog.setTitle("Saving Data");
-          dialog.setPreferredSize(new Dimension(300, 250));
-          dialog.setLayout(new GridBagLayout());
-          dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-          GridBagConstraints gbc = new GridBagConstraints();
-          gbc.insets = new Insets(2, 2, 2, 2);
-          gbc.weightx = 1;
-          gbc.gridy = 0;
-          dialog.add(new JLabel("Please wait..."), gbc);
-          progress = new JProgressBar();
-          progress.setIndeterminate(true);
-          gbc.gridy = 1;
-          dialog.add(progress, gbc);
-          dialog.pack();
-          dialog.setLocationRelativeTo(null);
-          dialog.setVisible(true);
-      }
-    }
   }
   
   @Override
@@ -90,12 +58,5 @@ public class SavingDataWorker<T> extends SwingWorker<Boolean, Void> {
         session.close();
       }
       return saved;
-  }
-  
-  @Override
-  protected void done() {
-      if (dialog != null) {
-          dialog.dispose();
-      }
   }
 }

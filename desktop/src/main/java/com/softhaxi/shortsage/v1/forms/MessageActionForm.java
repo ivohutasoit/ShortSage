@@ -1,5 +1,6 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.desktop.HWaitDialog;
 import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
@@ -269,13 +270,15 @@ public class MessageActionForm extends JPanel
                             "Message", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-
+                
+                final HWaitDialog dialog = new HWaitDialog("Send Message");
+                
                 oMessage = new OutboundMessage(tfContact.getText().trim(), tfText.getText().trim());      // Only one number 
                 // not contact person or group
                 object = new OutboxMessage();
 
                 // http://stackoverflow.com/questions/8121621/progress-dialog-in-swingworker
-                final SavingDataWorker td = new SavingDataWorker<OutboxMessage>(object, ActionState.CREATE, true);
+                final SavingDataWorker td = new SavingDataWorker<OutboxMessage>(object, ActionState.CREATE);
                 td.addPropertyChangeListener(new PropertyChangeListener() {
 
                     @Override
@@ -284,6 +287,8 @@ public class MessageActionForm extends JPanel
                                 && SwingWorker.StateValue.DONE == evt.getNewValue()) {
                             try {
                                 if (Boolean.parseBoolean(td.get().toString()) == true) {
+                                    dialog.setVisible(false);
+                                    dialog.dispose();
                                     JOptionPane.showMessageDialog(null, "Sending and saving message successfull",
                                             "New Message", JOptionPane.INFORMATION_MESSAGE);
                                     firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
@@ -295,7 +300,7 @@ public class MessageActionForm extends JPanel
                     }
                 });
 
-                final SendingMessageWorker tm = new SendingMessageWorker(oMessage, null, true);
+                final SendingMessageWorker tm = new SendingMessageWorker(oMessage, null);
                 firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
                 tm.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -316,7 +321,11 @@ public class MessageActionForm extends JPanel
                                     object.setErrorMessage(oMessage.getErrorMessage());
                                     object.setStatus(oMessage.getMessageStatus() == OutboundMessage.MessageStatuses.UNSENT ? 1 :
                                             oMessage.getMessageStatus() == OutboundMessage.MessageStatuses.SENT ? 2 : 3);
+                                    
+                                    dialog.setVisible(false);
                                     td.execute();
+                                    dialog.setTitle("Save Message");
+                                    dialog.setVisible(true);
                                 }
                             } catch (InterruptedException | ExecutionException ex) {
                                 Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
@@ -325,6 +334,7 @@ public class MessageActionForm extends JPanel
                     }
                 });
                 tm.execute();
+                dialog.setVisible(true);
             } else if(bb == bCancel) {
                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
             }

@@ -32,6 +32,7 @@ public class HToolBar extends JToolBar
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
     private JButton biMessage;
+    private JButton biDialog;
     private JButton biLogout;
 
     public HToolBar() {
@@ -39,6 +40,9 @@ public class HToolBar extends JToolBar
 
         biMessage = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
         add(biMessage);
+        
+        biDialog = new JButton("Test Dialog");
+        add(biDialog);
 
         add(Box.createHorizontalGlue());
 
@@ -51,6 +55,7 @@ public class HToolBar extends JToolBar
 
     private void initListeners() {
         biMessage.addActionListener(this);
+        biDialog.addActionListener(this);
     }
 
     @Override
@@ -82,6 +87,9 @@ public class HToolBar extends JToolBar
                 dialog.add(form);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            } else if(source == biDialog) {
+                HWaitDialog dialog = new HWaitDialog("Test Dialog");
                 dialog.setVisible(true);
             }
         }

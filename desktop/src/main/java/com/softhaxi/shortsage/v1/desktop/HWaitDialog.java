@@ -6,7 +6,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.border.EmptyBorder;
+import net.java.dev.designgridlayout.DesignGridLayout;
 
 /**
  *
@@ -19,20 +22,28 @@ public class HWaitDialog extends JDialog {
     private JProgressBar progress;
     private JLabel label;
 
+    /**
+     * 
+     * @param title 
+     */
     public HWaitDialog(String title) {
         setTitle(title);
-        setPreferredSize(new Dimension(300, 50));
-        setLayout(new GridBagLayout());
+        setModal(true);
+        setResizable(false);
+        setPreferredSize(new Dimension(300, 80));
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(2, 2, 2, 2);
-        gbc.weightx = 1;
-        gbc.gridy = 0;
-        add(new JLabel("Please wait..."), gbc);
+        
+        initComponents();
+    }
+
+    private void initComponents() {
+        DesignGridLayout layout = new DesignGridLayout(getContentPane());
         progress = new JProgressBar();
         progress.setIndeterminate(true);
-        gbc.gridy = 1;
-        add(progress, gbc);
+        
+        layout.row().grid().add(new JLabel("Please Wait..."));
+        layout.row().grid().add(progress);
+        
         pack();
         setLocationRelativeTo(null);
     }
