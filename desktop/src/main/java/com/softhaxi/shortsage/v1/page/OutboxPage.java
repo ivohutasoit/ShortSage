@@ -83,7 +83,7 @@ public class OutboxPage extends JPanel
      * Data
      */
     private DefaultTableModel mData;
-    private List<OutboxMessage> dMessage;
+    private List<OutboxMessage> data;
 
     /**
      * Database Connection
@@ -187,7 +187,7 @@ public class OutboxPage extends JPanel
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                loadMessageData();
+                loadData();
             }
         });
         sfSearch.addActionListener(this);
@@ -200,7 +200,7 @@ public class OutboxPage extends JPanel
     // </editor-fold>   
 
     // <editor-fold defaultstate="collapsed" desc="Private Methods">
-    private synchronized void loadMessageData() {
+    private synchronized void loadData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
             @Override
@@ -226,7 +226,7 @@ public class OutboxPage extends JPanel
                     mData = new DefaultTableModel(COLUMN_NAME, 0);
                     Object[] obj = null;
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                    for (OutboxMessage message : dMessage) {
+                    for (OutboxMessage message : data) {
                         obj = new Object[4];
                         obj[0] = message.getContact();
                         obj[1] = message.getText();
