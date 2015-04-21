@@ -141,12 +141,15 @@ public class OutboxPage extends JPanel
         pToolbar.setFloatable(false);
         pToolbar.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
 
-        pToolbar.add(new JButton(RES_GLOBAL.getString("label.new"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png"))));
+        bNew = new JButton(RES_GLOBAL.getString("label.new"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_new.png")));
+        pToolbar.add(bNew);
         //pToolbar.add(new JButton(RES_GLOBAL.getString("label.edit"), new ImageIcon(getClass().getClassLoader().getResource("images/ic_edit.png"))));
         pToolbar.addSeparator();
-        pToolbar.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png"))));
+        bDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_delete.png")));
+        pToolbar.add(bDelete);
         pToolbar.add(Box.createHorizontalGlue());
-        pToolbar.add(new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png"))));
+        bRefresh = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh.png")));
+        pToolbar.add(bRefresh);
 
         pCenter.add(pToolbar, BorderLayout.NORTH);
 
@@ -192,15 +195,38 @@ public class OutboxPage extends JPanel
         });
         sfSearch.addActionListener(this);
         cfViews.addItemListener(this);
-        //bNew.addActionListener(this);
-        //bDelete.addActionListener(this);
-        //bRefresh.addActionListener(this);
+        bNew.addActionListener(this);
+        bDelete.addActionListener(this);
+        bRefresh.addActionListener(this);
+        ttData.addMouseListener(new MouseAdapter() {
+        });
         ttData.getSelectionModel().addListSelectionListener(this);
     }
     // </editor-fold>   
 
     // <editor-fold defaultstate="collapsed" desc="Private Methods">
-    private synchronized void loadData() {
+    /**
+     * 
+     */
+    private void initTableModel() {
+        mData = new DefaultTableModel(COLUMN_NAME, 0);
+    Object[] obj = null;
+    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+    for (OutboxMessage message : data) {
+        obj = new Object[4];
+        obj[0] = message.getContact();
+        obj[1] = message.getText();
+        obj[2] = sdf.format(message.getDate());
+        obj[3] = message.getStatus() == 1 ? OutboundMessage.MessageStatuses.UNSENT.toString() :
+                message.getStatus() == 2 ? OutboundMessage.MessageStatuses.SENT.toString() :
+                OutboundMessage.MessageStatuses.FAILED.toString();
+
+        mData.addRow(obj);
+        mData.fireTableDataChanged();
+    }
+    }
+    
+    private void loadData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
             @Override
@@ -223,21 +249,7 @@ public class OutboxPage extends JPanel
             @Override
             protected void done () {
                 if (!isCancelled()) {
-                    mData = new DefaultTableModel(COLUMN_NAME, 0);
-                    Object[] obj = null;
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                    for (OutboxMessage message : data) {
-                        obj = new Object[4];
-                        obj[0] = message.getContact();
-                        obj[1] = message.getText();
-                        obj[2] = sdf.format(message.getDate());
-                        obj[3] = message.getStatus() == 1 ? OutboundMessage.MessageStatuses.UNSENT.toString() :
-                                message.getStatus() == 2 ? OutboundMessage.MessageStatuses.SENT.toString() :
-                                OutboundMessage.MessageStatuses.FAILED.toString();
-
-                        mData.addRow(obj);
-                        mData.fireTableDataChanged();
-                    }
+                    initTableModel();
                 }
                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
             }
@@ -252,6 +264,48 @@ public class OutboxPage extends JPanel
                         firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
                     }
                 }
+            }
+        });
+        t1.execute();
+    }
+    
+    /**
+     * 
+     * @param message 
+     */
+    private void deleteData(final OutboxMessage message) {
+        firePropertyChange(PropertyChangeField.DELETING.toString(), false, true);
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+           @Override
+           protected Boolean doInBackground() {
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    hSession.getTransaction().begin();
+                    hSession.delete(message);
+                    hSession.getTransaction().commit();
+                    hSession.close();
+                    return true;
+                } catch (Exception ex) {
+                    Logger.getLogger(OutboxPage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return false;
+           }
+        };
+        
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+           @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("state".equals(evt.getPropertyName())
+                 && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                    try {
+                        if(t1.get() == true) {
+                            firePropertyChange(PropertyChangeField.DELETING.toString(), true, false);
+                            loadData();
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(OutboxPage.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                 }
             }
         });
         t1.execute();
@@ -287,12 +341,32 @@ public class OutboxPage extends JPanel
                         }
                     }
                 });
+                dialog.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        loadData();
+                    }
+                });
                 dialog.add(form);
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             } else if (bb == bDelete) {
-                JOptionPane.showMessageDialog(null, "Delete Data from Table");
+                if(ttData.getSelectedRow() == -1) {
+                   JOptionPane.showMessageDialog(null, "No data selected to be deleted.", "Inbox Message", JOptionPane.WARNING_MESSAGE);
+                   return;
+                }
+                
+                InboxMessage message = data.get(ttData.getSelectedRow());
+                
+                int result = JOptionPane.showConfirmDialog(null, "Delete Message from " + message.getContact() + "?", 
+                        "Inbox Message", JOptionPane.YES_NO_OPTION);
+                if(result == JOptionPane.YES_OPTION) {
+                  // running delete 
+                    deleteData(message);
+                }
+            } else if(bb == bRefresh) {
+                loadData();
             }
         } else if (e.getSource() instanceof JXSearchField) {
             JOptionPane.showMessageDialog(null, "Search Implementation");
