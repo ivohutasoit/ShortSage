@@ -73,7 +73,7 @@ public class OutboxPage extends JPanel
     private JPanel pNorth;
     private JPanel pCenter;
     private JPanel pSouth;
-    
+
     /**
      * Tool bar items
      */
@@ -210,26 +210,30 @@ public class OutboxPage extends JPanel
 
     // <editor-fold defaultstate="collapsed" desc="Private Methods">
     /**
-     * 
+     *
      */
     private void initTableModel() {
-        mData = new DefaultTableModel(COLUMN_NAME, 0);
-    Object[] obj = null;
-    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-    for (OutboxMessage message : data) {
-        obj = new Object[4];
-        obj[0] = message.getContact();
-        obj[1] = message.getText();
-        obj[2] = sdf.format(message.getDate());
-        obj[3] = message.getStatus() == 1 ? OutboundMessage.MessageStatuses.UNSENT.toString() :
-                message.getStatus() == 2 ? OutboundMessage.MessageStatuses.SENT.toString() :
-                OutboundMessage.MessageStatuses.FAILED.toString();
+        if (mData.getRowCount() > 0) {
+            for (int i = mData.getRowCount() - 1; i > -1; i--) {
+                mData.removeRow(i);
+            }
+        }
+        Object[] obj = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        for (OutboxMessage message : data) {
+            obj = new Object[4];
+            obj[0] = message.getContact();
+            obj[1] = message.getText();
+            obj[2] = sdf.format(message.getCreatedDate());
+            obj[3] = message.getStatus() == 1 ? OutboundMessage.MessageStatuses.UNSENT.toString()
+                    : message.getStatus() == 2 ? OutboundMessage.MessageStatuses.SENT.toString()
+                            : OutboundMessage.MessageStatuses.FAILED.toString();
 
-        mData.addRow(obj);
-        mData.fireTableDataChanged();
+            mData.addRow(obj);
+            mData.fireTableDataChanged();
+        }
     }
-    }
-    
+
     private void loadData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
@@ -251,7 +255,7 @@ public class OutboxPage extends JPanel
             }
 
             @Override
-            protected void done () {
+            protected void done() {
                 if (!isCancelled()) {
                     initTableModel();
                 }
@@ -272,16 +276,16 @@ public class OutboxPage extends JPanel
         });
         t1.execute();
     }
-    
+
     /**
-     * 
-     * @param message 
+     *
+     * @param message
      */
     private void deleteData(final OutboxMessage message) {
         firePropertyChange(PropertyChangeField.DELETING.toString(), false, true);
         final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
-           @Override
-           protected Boolean doInBackground() {
+            @Override
+            protected Boolean doInBackground() {
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     hSession.getTransaction().begin();
@@ -293,23 +297,23 @@ public class OutboxPage extends JPanel
                     Logger.getLogger(OutboxPage.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 return false;
-           }
+            }
         };
-        
+
         t1.addPropertyChangeListener(new PropertyChangeListener() {
-           @Override
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("state".equals(evt.getPropertyName())
-                 && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                        && SwingWorker.StateValue.DONE == evt.getNewValue()) {
                     try {
-                        if(t1.get() == true) {
+                        if (t1.get() == true) {
                             firePropertyChange(PropertyChangeField.DELETING.toString(), true, false);
                             loadData();
                         }
                     } catch (InterruptedException | ExecutionException ex) {
                         Logger.getLogger(OutboxPage.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                 }
+                }
             }
         });
         t1.execute();
@@ -356,20 +360,20 @@ public class OutboxPage extends JPanel
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             } else if (bb == bDelete) {
-                if(ttData.getSelectedRow() == -1) {
-                   JOptionPane.showMessageDialog(null, "No data selected to be deleted.", "Inbox Message", JOptionPane.WARNING_MESSAGE);
-                   return;
+                if (ttData.getSelectedRow() == -1) {
+                    JOptionPane.showMessageDialog(null, "No data selected to be deleted.", "Inbox Message", JOptionPane.WARNING_MESSAGE);
+                    return;
                 }
-                
+
                 OutboxMessage message = data.get(ttData.getSelectedRow());
-                
-                int result = JOptionPane.showConfirmDialog(null, "Delete Message from " + message.getContact() + "?", 
+
+                int result = JOptionPane.showConfirmDialog(null, "Delete Message from " + message.getContact() + "?",
                         "Inbox Message", JOptionPane.YES_NO_OPTION);
-                if(result == JOptionPane.YES_OPTION) {
-                  // running delete 
+                if (result == JOptionPane.YES_OPTION) {
+                    // running delete 
                     deleteData(message);
                 }
-            } else if(bb == bRefresh) {
+            } else if (bb == bRefresh) {
                 loadData();
             }
         } else if (e.getSource() instanceof JXSearchField) {

@@ -3,7 +3,8 @@ package com.softhaxi.shortsage.v1.forms;
 import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
-import com.softhaxi.shortsage.v1.util.HibernateUtil;
+import com.softhaxi.shortsage.v1.worker.SavingDataWorker;
+import com.softhaxi.shortsage.v1.worker.SendingMessageWorker;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,9 +12,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
-import java.util.Date;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -22,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -33,10 +36,8 @@ import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.RowGroup;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXDatePicker;
-import org.smslib.GatewayException;
 import org.smslib.OutboundMessage;
 import org.smslib.Service;
-import org.smslib.TimeoutException;
 
 public class MessageActionForm extends JPanel
         implements ActionListener {
@@ -152,6 +153,7 @@ public class MessageActionForm extends JPanel
         tfText = new JTextArea();
         tfText.setRows(3);
         tfText.setFont(tfContact.getFont());
+        tfText.setLineWrap(true);
         cfTemplate = new JComboBox();
         cfStatus = new JComboBox();
         cfStatus.setEnabled(false);
@@ -177,6 +179,8 @@ public class MessageActionForm extends JPanel
      *
      */
     private void initListeners() {
+        bSave.addActionListener(this);
+        bCancel.addActionListener(this);
     }
 
     /**
@@ -217,112 +221,33 @@ public class MessageActionForm extends JPanel
      *
      * @return
      */
-    private boolean isDataValid() {
+    private boolean isModelValid() {
         if (cfScheduler.isSelected()) {
             if (dfDate.getDate().toString().equals("")) {
-                dfDate.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+                dfDate.setBorder(BorderFactory.createLineBorder(Color.red, 1));
                 return false;
             }
         }
 
-        if (!tfContact.getText().equals("")) {
-            tfContact.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+        if (tfContact.getText().equals("")) {
+            tfContact.setBorder(BorderFactory.createLineBorder(Color.red, 1));
             return false;
         }
 
         if (tfText.getText().equals("")) {
-            tfText.setBorder(BorderFactory.createLineBorder(Color.red, 5));
+            tfText.setBorder(BorderFactory.createLineBorder(Color.red, 1));
             return false;
         }
 
         return true;
     }
 
-    /**
-     * Send message or scheduler sending message at date given.
-     */
-    private synchronized void sendMessage() {
-        if (!isDataValid()) {
-            return;
-        }
-
-        firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
-        running = true;
-        final boolean isScheduler = cfScheduler.isSelected();
-        final Date date = dfDate.getDate();
-        oMessage = new OutboundMessage(tfContact.getText().trim(), tfText.getText().trim());      // Only one number 
-        // not contact person or group
-
-        SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
-            @Override
-            protected Boolean doInBackground() {
-                try {
-                    if (isScheduler) {
-                        Service.getInstance().queueMessageAt(oMessage, date);
-                    } else {
-                        Service.getInstance().sendMessage(oMessage);
-                    }
-                    return true;
-                } catch (TimeoutException | GatewayException | IOException | InterruptedException ex) {
-                    Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                    return false;
-                }
-            }
-
-            @Override
-            protected void done() {
-                if (!isCancelled()) {
-                    object = new OutboxMessage();
-                    object.setId(oMessage.getId());
-                    running = false;
-                    firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
-                }
-            }
-        };
-        t1.execute();
-    }
-
-    private synchronized void saveMessage() {
-        if (isDataValid()) {
-            return;
-        }
-
-        firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
-        // Save Message to database
-        if (running == false) {
-            SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
-
-                @Override
-                protected Boolean doInBackground() {
-                    try {
-                        hSession = HibernateUtil.getSessionFactory().openSession();
-                        hSession.getTransaction().begin();
-                        hSession.saveOrUpdate(object);
-                        hSession.getTransaction().commit();
-                        hSession.close();
-                        return true;
-                    } catch (Exception ex) {
-                        Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                        return false;
-                    }
-                }
-
-                @Override
-                protected void done() {
-                    if (!isCancelled()) {
-                        firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
-                    }
-                }
-            };
-            t1.execute();
-        }
-    }
-  // </editor-fold>
-
+    // </editor-fold> 
+    
     // <editor-fold defaultstate="collapsed" desc="Public Methods">
     /**
-     * 
-     * @param contact 
+     *
+     * @param contact
      */
     public void setContact(String contact) {
         tfContact.setText(contact);
@@ -332,7 +257,78 @@ public class MessageActionForm extends JPanel
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton bb = (JButton) e.getSource();
+            if (bb == bSave) {
+                if (!isModelValid()) {
+                    return;
+                }
 
+                if (Service.getInstance().getServiceStatus() == Service.ServiceStatus.STOPPED) {
+                    JOptionPane.showMessageDialog(null, "Modem Service does not running.",
+                            "Message", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                oMessage = new OutboundMessage(tfContact.getText().trim(), tfText.getText().trim());      // Only one number 
+                // not contact person or group
+                object = new OutboxMessage();
+
+                // http://stackoverflow.com/questions/8121621/progress-dialog-in-swingworker
+                final SavingDataWorker td = new SavingDataWorker<OutboxMessage>(object, ActionState.CREATE, true);
+                td.addPropertyChangeListener(new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("state".equals(evt.getPropertyName())
+                                && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                            try {
+                                if (Boolean.parseBoolean(td.get().toString()) == true) {
+                                    JOptionPane.showMessageDialog(null, "Sending and saving message successfull",
+                                            "New Message", JOptionPane.INFORMATION_MESSAGE);
+                                    firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                                }
+                            } catch (InterruptedException | ExecutionException ex) {
+                                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                });
+
+                final SendingMessageWorker tm = new SendingMessageWorker(oMessage, null, true);
+                firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
+                tm.addPropertyChangeListener(new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("state".equals(evt.getPropertyName())
+                                && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                            try {
+                                firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
+                                if ((oMessage = tm.get()) != null) {
+                                    object.setRefId(oMessage.getId());
+                                    object.setContact(oMessage.getRecipient());
+                                    object.setGatewayId(oMessage.getGatewayId());
+                                    object.setText(oMessage.getText());
+                                    object.setDate(oMessage.getDate());
+                                    object.setFailureCause(oMessage.getFailureCause().toString());
+                                    object.setRetryCount(oMessage.getRetryCount());
+                                    object.setErrorMessage(oMessage.getErrorMessage());
+                                    object.setStatus(oMessage.getMessageStatus() == OutboundMessage.MessageStatuses.UNSENT ? 1 :
+                                            oMessage.getMessageStatus() == OutboundMessage.MessageStatuses.SENT ? 2 : 3);
+                                    td.execute();
+                                }
+                            } catch (InterruptedException | ExecutionException ex) {
+                                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                });
+                tm.execute();
+            } else if(bb == bCancel) {
+                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+            }
+        }
     }
     // </editor-fold>
 
