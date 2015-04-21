@@ -112,6 +112,7 @@
         </dependency>
     </dependencies>
     
+    <!-- http://howtodoinjava.com/2013/05/31/create-windows-exe-file-for-java-application/ -->
     <build>
         <plugins>
             <plugin>
