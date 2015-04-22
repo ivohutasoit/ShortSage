@@ -1,6 +1,6 @@
-package com.softhaxi.shortsage.v1.pane;
+package com.softhaxi.shortsage.v1.lookup;
 
-public class MessageTemplateSearch extends JPanel
+public class MessageTemplateSearch extends JDialog
       implements ActionListener {
       
   private final static ResourcesBundle RES_GLOBAL = ResourcesBundle.getBundle("global");
@@ -26,6 +26,9 @@ public class MessageTemplateSearch extends JPanel
   }
   
   private void initComponents() {
+        
+      setTitle("Look Up Template - Dialog Search");
+      setModal(true);
     setLayout(new BorderLayout());
     setPreferredSize(new Dimension(600, 400));
     
@@ -164,6 +167,10 @@ public class MessageTemplateSearch extends JPanel
     });
     t1.execute();
     dialog.setVisible(true);
+  }
+  
+  public MessageTemplate getUserData() {
+      return object;
   }
   
   @Override
