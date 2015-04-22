@@ -1,0 +1,37 @@
+-- Before sent 
+Gateway Id: modem.com7
+Message Id: 0
+Message UUID: ff096afb-13bd-4b12-a62e-f09caf22ebe9
+Encoding: 7-bit
+Date: Thu Apr 23 00:08:57 ICT 2015
+SMSC Ref No: 
+Recipient: 082166013128
+Dispatch Date: null
+Message Status: UNSENT
+Failure Cause: NO_ERROR
+Validity Period (Hours): -1
+Status Report: false
+Source / Destination Ports: -1 / -1
+Flash SMS: false
+Text: Testing Scheduler Message 23 April 2015.
+PDU data: D4F29C9E769F41D331BA4CAEB3CB7250B33C9F87CF65906C060AC2E5693648068BD55C
+Scheduled Delivery: Thu Apr 23 00:00:00 ICT 2015
+
+-- After Sent
+Gateway Id: modem.com7
+Message Id: 0
+Message UUID: ff096afb-13bd-4b12-a62e-f09caf22ebe9
+Encoding: 7-bit
+Date: Thu Apr 23 00:08:57 ICT 2015
+SMSC Ref No: 14
+Recipient: 082166013128
+Dispatch Date: Thu Apr 23 00:09:04 ICT 2015
+Message Status: SENT
+Failure Cause: NO_ERROR
+Validity Period (Hours): -1
+Status Report: false
+Source / Destination Ports: -1 / -1
+Flash SMS: false
+Text: Testing Scheduler Message 23 April 2015.
+PDU data: D4F29C9E769F41D331BA4CAEB3CB7250B33C9F87CF65906C060AC2E5693648068BD55C
+Scheduled Delivery: Thu Apr 23 00:00:00 ICT 2015
