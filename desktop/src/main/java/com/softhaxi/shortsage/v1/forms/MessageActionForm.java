@@ -62,7 +62,8 @@ public class MessageActionForm extends JPanel
     private JTextField tfContact;
     private JXDatePicker dfDate;
     private JTextArea tfText;
-    private JComboBox cfTemplate, cfStatus, cfHandler;
+    private JXSearchField sfTemplate;
+    private JComboBox cfStatus, cfHandler;
 
     /**
      * Message
@@ -155,7 +156,9 @@ public class MessageActionForm extends JPanel
         tfText.setRows(3);
         tfText.setFont(tfContact.getFont());
         tfText.setLineWrap(true);
-        cfTemplate = new JComboBox();
+        sfTemplate = new JXSearchField("Select Template");
+        sfTemplate.setEditable(false);
+        sfTemplate.setSearchMode(JXSearchField.SearchMode.REGULAR);
         cfStatus = new JComboBox();
         cfStatus.setEnabled(false);
         cfHandler = new JComboBox();
@@ -168,7 +171,7 @@ public class MessageActionForm extends JPanel
         layout.row().left().add(cfScheduler, new JSeparator()).fill();
         layout.row().group(rgScheduler).grid(new JLabel(RES_GLOBAL.getString("label.message.date"))).add(dfDate).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.name") + " :")).add(tfContact, 2).empty();
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.template.name") + " :")).add(cfTemplate, 2).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.template.name") + " :")).add(sfTemplate);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.message.text") + " :")).add(new JScrollPane(tfText));
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler") + " :")).add(cfHandler).empty(2);
@@ -182,6 +185,7 @@ public class MessageActionForm extends JPanel
     private void initListeners() {
         bSave.addActionListener(this);
         bCancel.addActionListener(this);
+        sfTemplate.addActionListener(this);
     }
 
     /**
@@ -337,6 +341,28 @@ public class MessageActionForm extends JPanel
                 dialog.setVisible(true);
             } else if(bb == bCancel) {
                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+            } 
+        } else if(e.getSource() instanceof jXSearchField) {
+            JXSearchField ss = (JXSearchField) e.getSource();
+            if(ss == sfTemplate) {
+                final MessageTemplateSearch dialog = new MessageTemplateSearch();
+                dialog.addPropertyChangeListener(new PropertyChangeListener() {
+                        @Override
+                            public void propertyChange(PropertyChangeEvent evt) {
+                                if ("select".equals(evt.getPropertyName())) {
+                                    if(((boolean)e.getNewValue()) == true) {
+                                        // Look Up Template - Dialog Search
+                                        MessageTemplate template = dialog.getUserObject();
+                                        sfTemplate.setText(template.getName());
+                                        tfText.setText(template.getText());
+                                        template.dispose();
+                                    }
+                                 } 
+                                 dialog.setVisible(false);
+                                 dialog.dispose();
+                            }  
+                });
+                dialog.setVisible(true);
             }
         }
     }
