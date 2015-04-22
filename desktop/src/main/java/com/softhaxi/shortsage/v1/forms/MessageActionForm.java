@@ -1,5 +1,6 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.desktop.HLookupField;
 import com.softhaxi.shortsage.v1.desktop.HWaitDialog;
 import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.ActionState;
@@ -38,7 +39,6 @@ import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.RowGroup;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXDatePicker;
-import org.jdesktop.swingx.JXTextField;
 import org.smslib.OutboundMessage;
 import org.smslib.Service;
 
@@ -61,7 +61,7 @@ public class MessageActionForm extends JPanel
      */
     private JCheckBox cfScheduler;
     private JTextField tfContact;
-    private JXTextField tfTemplate;
+    private HLookupField lfTemplate;
     private JXDatePicker dfDate;
     private JTextArea tfText;
     private JComboBox cfStatus, cfHandler;
@@ -157,8 +157,8 @@ public class MessageActionForm extends JPanel
         tfText.setRows(3);
         tfText.setFont(tfContact.getFont());
         tfText.setLineWrap(true);
-        tfTemplate = new JXTextField("Select Template");
-        tfTemplate.setEditable(false);
+        lfTemplate = new HLookupField("Select Template");
+        lfTemplate.setEditable(false);
         bTemplate = new JButton("...");
         cfStatus = new JComboBox();
         cfStatus.setEnabled(false);
@@ -172,7 +172,7 @@ public class MessageActionForm extends JPanel
         layout.row().left().add(cfScheduler, new JSeparator()).fill();
         layout.row().group(rgScheduler).grid(new JLabel(RES_GLOBAL.getString("label.message.date"))).add(dfDate).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.name") + " :")).add(tfContact, 2).empty();
-        //layout.row().grid(new JLabel(RES_GLOBAL.getString("label.template.name") + " :")).add(tfTemplate, 2).add(bTemplate);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.template.name") + " :")).add(lfTemplate, 2).empty();
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.message.text") + " :")).add(new JScrollPane(tfText));
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler") + " :")).add(cfHandler).empty(2);
