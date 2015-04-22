@@ -12,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -51,12 +53,15 @@ import javax.persistence.TemporalType;
     @AttributeOverride(name = "version",
             column = @Column(name = "MGVRSN"))
 })
+@NamedQueries({
+    @NamedQuery(name = "Message.ByRefId", query = "from Message a where a.refId = :uuid")
+})
 public class Message extends BasicEntity
         implements Serializable {
     @Column(name = "MGMGNA", length = 100)
     private String name;
 
-    @Column(name = "MGRFID")
+    @Column(name = "MGRFID", unique = true)
     private String refId;
     
     @Column(name = "MGGWID")

@@ -30,13 +30,16 @@ public class SendingMessageWorker extends SwingWorker<OutboundMessage, Void> {
   
   /**
    * 
-   * @param message
-   * @param date
-   * @param showDialog 
    */
-  public SendingMessageWorker(OutboundMessage message, Date date) {
-    this.message = message;
-    this.date = date;
+  public SendingMessageWorker() {
+  }
+  
+  public void setMessage(OutboundMessage message) {
+      this.message = message;
+  }
+  
+  public void setDate(Date date) {
+      this.date = date;
   }
   
   @Override

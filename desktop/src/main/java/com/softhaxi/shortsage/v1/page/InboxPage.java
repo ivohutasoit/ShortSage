@@ -234,9 +234,8 @@ public class InboxPage extends JPanel
                         for (InboundMessage msg : mMessage) {
                             System.out.println(msg);
                             diMsg = new InboxMessage();
-                            diMsg.setName(msg.getUuid());
                             diMsg.setDate(msg.getDate());
-                            diMsg.setRefId(msg.getId());
+                            diMsg.setRefId(msg.getUuid());
                             diMsg.setGatewayId(msg.getGatewayId());
                             diMsg.setContact(msg.getOriginator());
                             diMsg.setText(msg.getText());

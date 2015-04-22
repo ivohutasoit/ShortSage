@@ -42,7 +42,7 @@ public class HToolBar extends JToolBar
         add(biMessage);
         
         biDialog = new JButton("Test Dialog");
-        add(biDialog);
+        //add(biDialog);
 
         add(Box.createHorizontalGlue());
 
