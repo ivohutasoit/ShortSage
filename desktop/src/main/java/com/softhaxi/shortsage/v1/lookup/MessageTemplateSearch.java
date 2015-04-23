@@ -60,6 +60,7 @@ public class MessageTemplateSearch extends JPanel
     }
 
     private void initComponents() {
+        setVisible(false);
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 400));
 
@@ -87,8 +88,8 @@ public class MessageTemplateSearch extends JPanel
         ttData.setShowGrid(false);
         ttData.setIntercellSpacing(new Dimension(0, 0));
         ttData.getTableHeader().setDefaultRenderer(new TableHeaderCenterRender(ttData));
-        ttData.getColumnModel().getColumn(0).setPreferredWidth(100);
-        ttData.getColumnModel().getColumn(1).setPreferredWidth(450);
+        ttData.getColumnModel().getColumn(0).setPreferredWidth(150);
+        ttData.getColumnModel().getColumn(1).setPreferredWidth(200);
         ttData.getColumnModel().getColumn(2).setPreferredWidth(50);
 
         JScrollPane sPane = new JScrollPane(ttData);
@@ -126,6 +127,8 @@ public class MessageTemplateSearch extends JPanel
                 loadData();
             }
         });
+        
+        
         sfKeyword.addActionListener(this);
         bOK.addActionListener(this);
         bCancel.addActionListener(this);

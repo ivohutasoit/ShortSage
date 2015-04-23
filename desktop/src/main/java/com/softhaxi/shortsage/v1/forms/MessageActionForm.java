@@ -2,24 +2,20 @@ package com.softhaxi.shortsage.v1.forms;
 
 import com.softhaxi.shortsage.v1.desktop.HLookupField;
 import com.softhaxi.shortsage.v1.desktop.HWaitDialog;
+import com.softhaxi.shortsage.v1.dto.MessageTemplate;
 import com.softhaxi.shortsage.v1.dto.OutboxMessage;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
-import com.softhaxi.shortsage.v1.worker.SavingDataWorker;
-import com.softhaxi.shortsage.v1.worker.SendingMessageWorker;
+import com.softhaxi.shortsage.v1.impl.ShowHideGroupPanel;
+import com.softhaxi.shortsage.v1.lookup.MessageTemplateSearch;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -32,14 +28,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.SwingWorker;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.RowGroup;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXDatePicker;
-import org.smslib.OutboundMessage;
 import org.smslib.Service;
 
 public class MessageActionForm extends JPanel
@@ -54,27 +47,27 @@ public class MessageActionForm extends JPanel
      * Tool bar items
      */
     private JButton bNew, bEdit, bDelete, bReply;
-    private JButton bSave, bSaveNew, bCancel, bTemplate;
+    private JButton bSave, bSaveNew, bCancel;
 
     /**
      * Fields
      */
-    private JCheckBox cfScheduler;
-    private JTextField tfContact;
-    private HLookupField lfTemplate;
+    private JCheckBox cfDate;
+    private HLookupField lfContact, lfTemplate;
     private JXDatePicker dfDate;
     private JTextArea tfText;
     private JComboBox cfStatus, cfHandler;
 
     /**
-     * Message
+     * Message References
      */
-    private OutboundMessage oMessage;
+    private MessageTemplate template;
 
     /**
-     * Database connection
+     * Database and Modem
      */
     private Session hSession;
+    private Service mService;
 
     /**
      *
@@ -149,33 +142,85 @@ public class MessageActionForm extends JPanel
     private void initFormPanel() {
         JPanel pForm = new JPanel();
 
-        cfScheduler = new JCheckBox(RES_GLOBAL.getString("label.message.scheduler"));
-        cfScheduler.setForeground(Color.blue);
-        tfContact = new JTextField();
+        cfDate = new JCheckBox(RES_GLOBAL.getString("label.message.scheduler"));
+        cfDate.setForeground(Color.blue);
         dfDate = new JXDatePicker();
+
+        DesignGridLayout layout = new DesignGridLayout(pForm);
+        RowGroup rgDate = new RowGroup();
+        cfDate.setSelected(true);
+        cfDate.addItemListener(new ShowHideGroupPanel(rgDate));
+
+        layout.row().left().add(cfDate, new JSeparator()).fill();
+        layout.row().group(rgDate).grid(new JLabel(RES_GLOBAL.getString("label.message.date"))).add(dfDate).empty(2);
+
+        JLabel llMessage = new JLabel("Message Detail");
+        llMessage.setForeground(Color.blue);
+        lfContact = new HLookupField("Lookup or Typed Contact") {
+            @Override
+            public void lookupPerformed() {
+
+            }
+        };
         tfText = new JTextArea();
         tfText.setRows(3);
-        tfText.setFont(tfContact.getFont());
+        tfText.setFont(lfContact.getFont());
         tfText.setLineWrap(true);
-        lfTemplate = new HLookupField("Select Template");
+        lfTemplate = new HLookupField("Lookup Template") {
+            @Override
+            public void lookupPerformed() {
+                final JDialog dialog = new JDialog();
+                dialog.setModal(true);
+                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                dialog.setTitle("Lookup Template - Dialog Selection");
+
+                final MessageTemplateSearch panel = new MessageTemplateSearch();
+                panel.addPropertyChangeListener(new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("select".equalsIgnoreCase(evt.getPropertyName())
+                                && ((boolean) evt.getNewValue()) == true) {
+                            template = panel.getUserData();
+                            if (template != null) {
+                                lfTemplate.setText(template.getName());
+                                tfText.setText(template.getText());
+                            }
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        } else if ("cancel".equalsIgnoreCase(evt.getPropertyName())
+                                && ((boolean) evt.getNewValue()) == true) {
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        } else if ("clear".equalsIgnoreCase(evt.getPropertyName())
+                                && ((boolean) evt.getNewValue()) == true) {
+                            template = null;
+                            lfTemplate.setText("");
+                            tfText.setText("");
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        }
+
+                    }
+                });
+                dialog.add(panel);
+                panel.setVisible(true);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
+        };
         lfTemplate.setEditable(false);
-        bTemplate = new JButton("...");
         cfStatus = new JComboBox();
         cfStatus.setEnabled(false);
         cfHandler = new JComboBox();
 
-        DesignGridLayout layout = new DesignGridLayout(pForm);
-        RowGroup rgScheduler = new RowGroup();
-        cfScheduler.setSelected(true);
-        cfScheduler.addItemListener(new ShowHideAction(rgScheduler));
-
-        layout.row().left().add(cfScheduler, new JSeparator()).fill();
-        layout.row().group(rgScheduler).grid(new JLabel(RES_GLOBAL.getString("label.message.date"))).add(dfDate).empty(2);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.name") + " :")).add(tfContact, 2).empty();
+        layout.row().left().add(llMessage, new JSeparator()).fill();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.name") + " :")).add(lfContact);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.template.name") + " :")).add(lfTemplate, 2).empty();
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.message.text") + " :")).add(new JScrollPane(tfText));
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler") + " :")).add(cfHandler).empty(2);
+//        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
+//        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler") + " :")).add(cfHandler).empty(2);
 
         add(pForm, BorderLayout.CENTER);
     }
@@ -186,7 +231,7 @@ public class MessageActionForm extends JPanel
     private void initListeners() {
         bSave.addActionListener(this);
         bCancel.addActionListener(this);
-        bTemplate.addActionListener(this);
+
     }
 
     /**
@@ -228,15 +273,15 @@ public class MessageActionForm extends JPanel
      * @return
      */
     private boolean isModelValid() {
-        if (cfScheduler.isSelected()) {
+        if (cfDate.isSelected()) {
             if (dfDate.getDate().toString().equals("")) {
                 dfDate.setBorder(BorderFactory.createLineBorder(Color.red, 1));
                 return false;
             }
         }
 
-        if (tfContact.getText().equals("")) {
-            tfContact.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+        if (lfContact.getText().equals("")) {
+            lfContact.setBorder(BorderFactory.createLineBorder(Color.red, 1));
             return false;
         }
 
@@ -249,14 +294,13 @@ public class MessageActionForm extends JPanel
     }
 
     // </editor-fold> 
-    
     // <editor-fold defaultstate="collapsed" desc="Public Methods">
     /**
      *
      * @param contact
      */
     public void setContact(String contact) {
-        tfContact.setText(contact);
+        lfContact.setText(contact);
     }
   // </editor-fold>
 
@@ -277,118 +321,12 @@ public class MessageActionForm extends JPanel
                 }
 
                 final HWaitDialog dialog = new HWaitDialog("Send Message");
-                oMessage = new OutboundMessage(tfContact.getText().trim(), tfText.getText().trim());      // Only one number 
 
-                // not contact person or group
-                object = new OutboxMessage();
-
-                // http://stackoverflow.com/questions/8121621/progress-dialog-in-swingworker
-                final SavingDataWorker td = new SavingDataWorker<OutboxMessage>(object, ActionState.CREATE);
-                td.addPropertyChangeListener(new PropertyChangeListener() {
-
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if ("state".equals(evt.getPropertyName())
-                                && SwingWorker.StateValue.DONE == evt.getNewValue()) {
-                            try {
-                                if (Boolean.parseBoolean(td.get().toString()) == true) {
-                                    dialog.setVisible(false);
-                                    dialog.dispose();
-                                    JOptionPane.showMessageDialog(null, "Sending and saving message successfull",
-                                            "New Message", JOptionPane.INFORMATION_MESSAGE);
-                                    firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
-                                }
-                            } catch (InterruptedException | ExecutionException ex) {
-                                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    }
-                });
-
-                final SendingMessageWorker tm = new SendingMessageWorker();
-                tm.setMessage(oMessage);
-                
-                if(cfScheduler.isSelected())
-                    tm.setDate(dfDate.getDate());
-                
-                firePropertyChange(PropertyChangeField.SENDING.toString(), false, true);
-                tm.addPropertyChangeListener(new PropertyChangeListener() {
-
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if ("state".equals(evt.getPropertyName())
-                                && SwingWorker.StateValue.DONE == evt.getNewValue()) {
-                            try {
-                                firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
-                                if ((oMessage = tm.get()) != null) {
-                                    System.out.println(oMessage);
-                                    object.setRefId(oMessage.getUuid());
-                                    object.setContact(oMessage.getRecipient());
-                                    object.setGatewayId(oMessage.getGatewayId());
-                                    object.setText(oMessage.getText());
-                                    object.setDate(oMessage.getDate());
-                                    object.setFailureCause(oMessage.getFailureCause().toString());
-                                    object.setRetryCount(oMessage.getRetryCount());
-                                    object.setErrorMessage(oMessage.getErrorMessage());
-                                    object.setStatus(oMessage.getMessageStatus() == OutboundMessage.MessageStatuses.UNSENT ? 1
-                                            : oMessage.getMessageStatus() == OutboundMessage.MessageStatuses.SENT ? 2 : 3);
-
-                                    dialog.setVisible(false);
-                                    td.execute();
-                                    dialog.setTitle("Save Message");
-                                    dialog.setVisible(true);
-                                }
-                            } catch (InterruptedException | ExecutionException ex) {
-                                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    }
-                });
-                tm.execute();
                 dialog.setVisible(true);
             } else if (bb == bCancel) {
                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
-            } else if (bb == bTemplate) {
-                HWaitDialog dialog = new HWaitDialog("Select Template");
-                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-                dialog.setVisible(true);
-//                final MessageTemplateSearch dialog = new MessageTemplateSearch();
-//                dialog.addPropertyChangeListener(new PropertyChangeListener() {
-//                        @Override
-//                            public void propertyChange(PropertyChangeEvent evt) {
-//                                if ("select".equals(evt.getPropertyName())) {
-//                                    if(((boolean)evt.getNewValue()) == true) {
-//                                        // Look Up Template - Dialog Search
-//                                        MessageTemplate template = dialog.getUserData();
-//                                        sfTemplate.setText(template.getName());
-//                                        tfText.setText(template.getText());
-//                                    }
-//                                 } 
-//                                 dialog.setVisible(false);
-//                                 dialog.dispose();
-//                            }  
-//                });
-//                dialog.setVisible(true);
             }
         }
     }
     // </editor-fold>
-
-    class ShowHideAction implements ItemListener {
-
-        private RowGroup group;
-
-        public ShowHideAction(RowGroup group) {
-            this.group = group;
-        }
-
-        @Override
-        public void itemStateChanged(ItemEvent event) {
-            if (event.getStateChange() == ItemEvent.SELECTED) {
-                group.show();
-            } else {
-                group.hide();
-            }
-        }
-    }
 }
