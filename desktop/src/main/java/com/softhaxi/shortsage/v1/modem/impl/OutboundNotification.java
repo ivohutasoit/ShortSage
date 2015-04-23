@@ -23,28 +23,32 @@ public class OutboundNotification extends ModemCallback
 
             message = (OutboxMessage) query.uniqueResult();
 
+            // Only use for scheduler messages
             if (message != null) {
                 message.setStatus(msg.getMessageStatus() == OutboundMessage.MessageStatuses.UNSENT ? 1
                         : msg.getMessageStatus() == OutboundMessage.MessageStatuses.SENT ? 2 : 3);
                 message.setErrorMessage(msg.getErrorMessage());
                 message.setFailureCause(msg.getFailureCause().toString());
                 message.setDate(msg.getDispatchDate());
-            } else {
-                message = new OutboxMessage();
-                message.setRefId(msg.getUuid());
-                message.setContact(msg.getRecipient());
-                message.setGatewayId(msg.getGatewayId());
-                message.setText(msg.getText());
-                message.setDate(msg.getDate());
-                message.setFailureCause(msg.getFailureCause().toString());
-                message.setRetryCount(msg.getRetryCount());
-                message.setErrorMessage(msg.getErrorMessage());
-                message.setStatus(msg.getMessageStatus() == OutboundMessage.MessageStatuses.UNSENT ? 1
-                        : msg.getMessageStatus() == OutboundMessage.MessageStatuses.SENT ? 2 : 3);
-            }
-            session.getTransaction().begin();
-            session.saveOrUpdate(message);
-            session.getTransaction().commit();
+                
+                
+                    session.getTransaction().begin();
+                    session.saveOrUpdate(message);
+                    session.getTransaction().commit();
+            } 
+            //else {
+            //    message = new OutboxMessage();
+            //    message.setRefId(msg.getUuid());
+            //    message.setContact(msg.getRecipient());
+            //    message.setGatewayId(msg.getGatewayId());
+            //    message.setText(msg.getText());
+            //    message.setDate(msg.getDate());
+            //    message.setFailureCause(msg.getFailureCause().toString());
+            //    message.setRetryCount(msg.getRetryCount());
+            //    message.setErrorMessage(msg.getErrorMessage());
+            //    message.setStatus(msg.getMessageStatus() == OutboundMessage.MessageStatuses.UNSENT ? 1
+            //            : msg.getMessageStatus() == OutboundMessage.MessageStatuses.SENT ? 2 : 3);
+            //}
         } catch (Exception ex) {
             session.getTransaction().rollback();
             throw new RuntimeException(ex);
