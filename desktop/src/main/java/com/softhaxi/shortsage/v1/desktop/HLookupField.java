@@ -12,16 +12,17 @@ import javax.swing.JPanel;
 import org.jdesktop.swingx.JXTextField;
 
 /**
- *
+ * http://stackoverflow.com/questions/4330076/joptionpane-showmessagedialog-truncates-jtextarea-message
  * @author Ivo Hutasoit
  * @since 1
  * @version 1.0.0
  */
-public class HLookupField extends JPanel {
+public class HLookupField<T> extends JPanel {
     private JXTextField tfLookup;
     private JButton bbLookup;
     
     private String promptText;
+    private T userData;
     
     public HLookupField(String promptText) {
         initComponents();
