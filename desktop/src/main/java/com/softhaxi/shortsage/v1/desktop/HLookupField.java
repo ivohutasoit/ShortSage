@@ -21,19 +21,22 @@ public class HLookupField extends JPanel {
     private JXTextField tfLookup;
     private JButton bbLookup;
     
+    private String promptText;
+    
     public HLookupField(String promptText) {
-        tfLookup = new JXTextField(promptText);
-        bbLookup = new JButton("...");
-        bbLookup.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/ic_lookup_16.png")));
-        
         initComponents();
     }
     
     private void initComponents() {
-        setLayout(new BorderLayout());
-        bbLookup.setPreferredSize(new Dimension(25, 25));
-        add(tfLookup, BorderLayout.CENTER);
-        add(bbLookup, BorderLayout.EAST);
+        tfLookup = new JXTextField(promptText);
+        bbLookup = new JButton("...");
+        
+        add(tfLookup);
+        add(bbLookup);
+        
+        setBackground(tfLookup.getBackground());
+        setBorder(tfLookup.getBorder());
+        tfLookup.setBorder(null);
     }
     
     public void setEditable(boolean editable) {
