@@ -225,23 +225,63 @@ public class ContactGroupActionForm extends JPanel
     }
  
     private void initState() {
-        if (state == ActionState.CREATE) {
-            cfStatus.removeAllItems();
-            cfStatus.addItem("Create");
-
-            cfHandler.removeAllItems();
-            cfHandler.addItem("Created");
-            cfHandler.setEnabled(false);
+        cfStatus.removeAllItems();
+        cfHandler.removeAllItems();
+        
+        if (state == ActionState.CREATE ||
+                state == ActionState.UPDATE) {
+            
+            if(state == ActionState.CREATE) {
+                cfStatus.addItem("Create");
+                cfHandler.addItem("Created");
+                cfHandler.setEnabled(false);
+            } else {
+                cfStatus.addItem("Actived");
+                cfStatus.addItem("Inactived");
+                
+                cfHandler.addItem("No Action");
+                cfHandler.addItem("Activate");
+                cfHandler.addItem("Deactivate");
+                cfHandler.addItem("Delete");
+                
+                cfHandler.setEnabled(true);
+                tfName.setEnabled(false);
+            }
+            tfRemark.setEnabled(true);
 
             bNew.setVisible(false);
             bEdit.setVisible(false);
             bDelete.setVisible(false);
             bSaveNew.setVisible(false);
-        }
+        } if(state == ActionState.READ) {
+            bSave.setVisible(false);
+            bSaveNew.setVisible(false);
+            bCancel.setVisible(false);
+            
+            bNew.setVisible(true);
+            bEdit.setVisible(true);
+            bDelete.setVisible(true);
+            
+            cfStatus.addItem("Actived");
+            cfStatus.addItem("Inactived");
+            
+            cfHandler.addItem("No Action");
+            cfHandler.addItem("Activate");
+            cfHandler.addItem("Deactivate");
+            cfHandler.addItem("Delete");
+            
+            tfName.setEnabled(false);
+            tfRemark.setEnabled(false);
+            cfHandler.setEnabled(false);
     }
 
     private void initData() {
-        
+        if(object != null) {
+            tfName.setText(object.getName());
+            tfRemark.setText(object.getRemark());
+            cfStatus.setSelectedIndex(object.getStatus() - 1);
+            cfStatus.setSelectedIndex(0);
+        }
     }
     
     // <editor-fold defaultstate="collapsed" desc="Private Methods">
