@@ -25,7 +25,10 @@ import javax.swing.border.EtchedBorder;
 
 /**
  * Main window of application as top application
- *
+ * 
+ * Maintenance SwingWorker of components by using ExecutorService 
+ * http://stackoverflow.com/questions/23394172/how-to-correctly-use-executorservice-to-manage-the-number-of-concurrently-runnin
+ * 
  * @author Ivo Hutasoit
  * @since 1
  * @verison 1.0.0
