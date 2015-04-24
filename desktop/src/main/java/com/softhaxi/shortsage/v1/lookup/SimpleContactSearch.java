@@ -1,9 +1,26 @@
 package com.softhaxi.shortsage.v1.lookup;
 
+import com.softhaxi.shortsage.v1.dto.Contact;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JList;
 import javax.swing.JPanel;
-import org.jdesktop.swingx.JXTable;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import net.java.dev.designgridlayout.DesignGridLayout;
+import org.jdesktop.swingx.JXSearchField;
 
 /**
  * http://www.macs.hw.ac.uk/cs/java-swing-guidebook/?name=JList&page=3
@@ -19,6 +36,8 @@ public class SimpleContactSearch extends JPanel {
         bSelect, bDeselect;
     
     private DefaultListModel mdLeft, mdRight;
+    
+    private List<Contact> contacts;
 
     /**
      * Constructor
@@ -77,7 +96,7 @@ public class SimpleContactSearch extends JPanel {
         ldLeft.setFixedCellWidth(140);
         ldLeft.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         
-        JPanel pSelection = new JPanel(1, 6, 0, 4);
+        JPanel pSelection = new JPanel(new GridLayout(1, 6, 0, 4));
         //pSelection.setPreferredSize(new Dimension(40, pSelection.getHight()));
         pSelection.add(new JPanel());
         pSelection.add(new JPanel());
@@ -98,7 +117,7 @@ public class SimpleContactSearch extends JPanel {
         ldLeft.setFixedCellWidth(140);
         ldLeft.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         
-        layout.row().grid().add(new JScrollPane(ldLeft), 4).add(pSelection).add(new JScrollPane(ldRight, 4));
+        layout.row().grid().add(new JScrollPane(ldLeft), 4).add(pSelection).add(new JScrollPane(ldRight), 4);
         
         add(pList, BorderLayout.CENTER);
     }
@@ -132,6 +151,14 @@ public class SimpleContactSearch extends JPanel {
                 loadData();
             }
         });
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public List<Contact> getUserData() {
+        return new ArrayList<Contact>();
     }
     
     private void loadData() {

@@ -1,27 +1,33 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.desktop.HWaitDialog;
 import com.softhaxi.shortsage.v1.dto.ContactPerson;
 import com.softhaxi.shortsage.v1.enums.ActionState;
+import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.Date;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.SwingWorker;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
-import net.java.dev.designgridlayout.RowGroup;
 import org.hibernate.Session;
 
 /**
@@ -34,14 +40,14 @@ import org.hibernate.Session;
  * @since 1
  * @version 1.0.0
  */
-public class ContactPersonActionForm extends JPanel 
+public class ContactPersonActionForm extends JPanel
         implements ActionListener {
 
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
     private ContactPerson object;
     private ActionState state;
-    
+
     /**
      * Tool bar items
      */
@@ -57,6 +63,11 @@ public class ContactPersonActionForm extends JPanel
     private JTextField tfPhone, tfHome, tfWork, tfCustom;
     private JTextArea tfRemark;
     private JCheckBox cfAddress, cfPreference;
+
+    /**
+     * Database
+     */
+    private Session hSession;
 
     /**
      *
@@ -98,9 +109,9 @@ public class ContactPersonActionForm extends JPanel
         initToolbar();
         initFormPanel();
     }
-    
+
     /**
-     * 
+     *
      */
     private void initToolbar() {
         JToolBar pToolbar = new JToolBar();
@@ -132,9 +143,9 @@ public class ContactPersonActionForm extends JPanel
 
         add(pToolbar, BorderLayout.NORTH);
     }
-    
+
     /**
-     * 
+     *
      */
     private void initFormPanel() {
         cfPrefix = new JComboBox(new String[]{
@@ -202,14 +213,14 @@ public class ContactPersonActionForm extends JPanel
      *
      */
     private void initState() {
-        if(state == ActionState.CREATE) {
+        if (state == ActionState.CREATE) {
             cfStatus.removeAllItems();
             cfStatus.addItem("Created");
-            
+
             cfHandler.removeAllItems();
             cfHandler.addItem("Create");
             cfHandler.setEnabled(false);
-            
+
             bNew.setVisible(false);
             bEdit.setVisible(false);
             bDelete.setVisible(false);
@@ -220,66 +231,66 @@ public class ContactPersonActionForm extends JPanel
     private void initData() {
 
     }
-    
+
     private boolean isModelValid() {
-        
+        return true;
     }
-    
+
     @Override
-    private void actionPerformed(ActionEvent e) {
-        if(e.getSource() instanceof JButton) {
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
             JButton bb = (JButton) e.getSource();
-            if(bb == bSave) {
-                if(!isModelValid()) {
+            if (bb == bSave) {
+                if (!isModelValid()) {
                     return;
                 }
-                
+
                 firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
-                HWaitDialog dialog = new HWaitDialog("Save Data");
-                
+                final HWaitDialog dialog = new HWaitDialog("Save Data");
+
                 object = new ContactPerson();
-                object.setPrefix(cfPrefix.getSelectedText());
+                object.setPrefix(cfPrefix.getSelectedItem().toString());
                 object.setFirstName(tfFName.getText().trim());
-                object.setMiddleName(tfMName.getText().trim());
+                object.setMidName(tfMName.getText().trim());
                 object.setLastName(tfLName.getText().trim());
                 object.setPhone(tfPhone.getText().trim());
-                
-                SwingWorker<Boolean, Void> td = new SwingWorker<Boolean, Void>() {
-                  @Override
-                  protected Boolean doInBackground() throws Exception {
-                      boolean saved = false;
-                      try {
-                          session = HibernateUtil.getSessionFactory().openSession();
-                          session.getTransaction().begin();
-                          
-                          if(state == ActionState.CREATE) {
-                              session.save(object);
-                              saved = true;
-                          }else if (state == ActionState.UPDATE) {
-                              session.update(object);
-                              saved = true;
-                          }
-                          
-                          if(saved == true) { 
-                            session.getTransaction().commit();
-                            saved = true;
-                          } else {
-                            session.getTransaction().rollback();
+
+                final SwingWorker<Boolean, Void> td = new SwingWorker<Boolean, Void>() {
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        boolean saved = false;
+                        try {
+                            hSession = HibernateUtil.getSessionFactory().openSession();
+                            hSession.getTransaction().begin();
+
+                            if (state == ActionState.CREATE) {
+                                hSession.save(object);
+                                saved = true;
+                            } else if (state == ActionState.UPDATE) {
+                                hSession.update(object);
+                                saved = true;
+                            }
+
+                            if (saved == true) {
+                                hSession.getTransaction().commit();
+                                saved = true;
+                            } else {
+                                hSession.getTransaction().rollback();
+                                saved = false;
+                            }
+
+                        } catch (Exception ex) {
+                            hSession.getTransaction().rollback();
                             saved = false;
-                          }
-                          
-                      } catch (Exception ex) {
-                          session.getTransaction().rollback();
-                          saved  = false;
-                          Logger.getLogger(ContactPersonActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                      } finally {
-                        session.close();
-                      }
-                      return saved;
-                  }
-                }
+                            Logger.getLogger(ContactPersonActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                        } finally {
+                            hSession.close();
+                        }
+                        return saved;
+                    }
+                };
                 td.addPropertyChangeListener(new PropertyChangeListener() {
-                
+
                     /**
                      *
                      * @param evt
@@ -287,13 +298,13 @@ public class ContactPersonActionForm extends JPanel
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         if ("state".equals(evt.getPropertyName())
-                            && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                                && SwingWorker.StateValue.DONE == evt.getNewValue()) {
                             try {
-                                if (t1.get() == true) {
+                                if (td.get() == true) {
                                     dialog.setVisible(false);
                                     dialog.dispose();
-                                    JOptionPane.showMessageDialog(null, "Saving new contact person successfull", 
-                                        "New Contact Person", JOptionPane.INFORMATION_MESSAGE);
+                                    JOptionPane.showMessageDialog(null, "Saving new contact person successfull",
+                                            "New Contact Person", JOptionPane.INFORMATION_MESSAGE);
                                 }
                                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
                             } catch (InterruptedException | ExecutionException ex) {

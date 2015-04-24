@@ -5,6 +5,10 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -54,4 +58,48 @@ public class ContactGroupLine extends BasicEntity
     
     @Column(name = "GLNMBR")
     private String number;
+
+    /**
+     * @return the group
+     */
+    public ContactGroup getGroup() {
+        return group;
+    }
+
+    /**
+     * @param group the group to set
+     */
+    public void setGroup(ContactGroup group) {
+        this.group = group;
+    }
+
+    /**
+     * @return the contact
+     */
+    public ContactPerson getContact() {
+        return contact;
+    }
+
+    /**
+     * @param contact the contact to set
+     */
+    public void setContact(ContactPerson contact) {
+        this.contact = contact;
+    }
+
+    /**
+     * @return the number
+     */
+    public String getNumber() {
+        return number;
+    }
+
+    /**
+     * @param number the number to set
+     */
+    public void setNumber(String number) {
+        this.number = number;
+    }
+    
+    
 }

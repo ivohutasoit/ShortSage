@@ -2,11 +2,13 @@ package com.softhaxi.shortsage.v1.dto;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 
 @Entity
 @DiscriminatorValue("CPRN")
@@ -16,6 +18,9 @@ import javax.persistence.NamedQuery;
 })
 public class ContactPerson extends Contact 
     implements Serializable {
+    
+    @Column(name = "CCPREF")
+    private String prefix;
     
     @Column(name = "CCFRNA")
     private String firstName;
@@ -37,6 +42,21 @@ public class ContactPerson extends Contact
     
     @OneToMany(mappedBy="contact")
     private Set<ContactGroupLine> lines;
+    
+    
+    /**
+     * @return the prefix
+     */
+    public String getPrefix() {
+        return prefix;
+    }
+
+    /**
+     * @param prefix the prefix to set
+     */
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
 
     /**
      * @return the firstName
@@ -120,6 +140,20 @@ public class ContactPerson extends Contact
      */
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    /**
+     * @return the lines
+     */
+    public Set<ContactGroupLine> getLines() {
+        return lines;
+    }
+
+    /**
+     * @param lines the lines to set
+     */
+    public void setLines(Set<ContactGroupLine> lines) {
+        this.lines = lines;
     }
     
     @Override

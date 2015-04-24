@@ -1,10 +1,12 @@
 package com.softhaxi.shortsage.v1.dto;
 
 import java.io.Serializable;
+import java.util.Set;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -23,4 +25,18 @@ public class ContactGroup extends Contact
     
     @OneToMany(mappedBy="group")
     private Set<ContactGroupLine> lines;
+
+    /**
+     * @return the lines
+     */
+    public Set<ContactGroupLine> getLines() {
+        return lines;
+    }
+
+    /**
+     * @param lines the lines to set
+     */
+    public void setLines(Set<ContactGroupLine> lines) {
+        this.lines = lines;
+    }
 }
