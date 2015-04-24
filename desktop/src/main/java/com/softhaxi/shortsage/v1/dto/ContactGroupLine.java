@@ -29,14 +29,29 @@ import javax.persistence.Table;
     @AttributeOverride(name = "modifiedBy",
             column = @Column(name = "GLMFBY")),
     @AttributeOverride(name = "modifiedDate",
-            column = @Column(name = "CLMFDT")),
+            column = @Column(name = "GLMFDT")),
     @AttributeOverride(name = "deletedState",
-            column = @Column(name = "CLDLST")),
+            column = @Column(name = "GLDLST")),
     @AttributeOverride(name = "version",
-            column = @Column(name = "CLVRSN"))
+            column = @Column(name = "GLVRSN"))
+})
+@NamedQueries({
+    @NamedQuery(name = "ContactGroupLine.ByGroup", 
+            query = "from ContactGroupLine a where a.deletedState = 0 and a.group = :group")
 })
 public class ContactGroupLine extends BasicEntity
     implements Serializable {
-    @Column(name = "CLCCID")
-    private String contact;
+    
+    @ManyToOne
+    @JoinColumn(name="CCCCID")
+    @Column(name = "GLCGID")    
+    private ContactGroup group;
+    
+    @ManyToOne
+    @JoinColumn(name="CCCCID")
+    @Column(name = "GLCCID")
+    private ContactPerson contact;
+    
+    @Column(name = "GLNMBR")
+    private String number;
 }
