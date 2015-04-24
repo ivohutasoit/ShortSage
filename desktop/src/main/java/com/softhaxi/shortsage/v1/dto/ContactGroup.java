@@ -21,5 +21,6 @@ import javax.persistence.NamedQuery;
 public class ContactGroup extends Contact 
     implements Serializable {
     
-    
+    @OneToMany(mappedBy="group")
+    private Set<ContactGroupLine> lines;
 }
