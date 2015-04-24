@@ -31,8 +31,8 @@ Current list of tasks to be completed are:
    * <del>Save message into database</del> - <em>partial done at 14 April 2015</em>
    * <del>Message template usage</del> - <em>partial done at 22 April 2015</em>
 - Phone Book Implementation
-   * Create, update and delete Contact Group
-   * Create, update and delete Contact Person
+   * <del>Create, update and delete Contact Group</del> - <em>partial done at 24 April 2015</em>
+   * <del>Create, update and delete Contact Person</del> - <em>partial done at 24 April 2015</em>
    * Fields Validation form both contact group and contact person
    * Attact Contact Person to Contact Group
    * Load data from database
