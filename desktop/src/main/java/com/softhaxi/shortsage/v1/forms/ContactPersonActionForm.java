@@ -34,7 +34,8 @@ import org.hibernate.Session;
  * @since 1
  * @version 1.0.0
  */
-public class ContactPersonActionForm extends JPanel {
+public class ContactPersonActionForm extends JPanel 
+        implements ActionListener {
 
     private final static ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -184,8 +185,8 @@ public class ContactPersonActionForm extends JPanel {
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.zip") + " :")).add(tfZip).empty(5);
         //layout.emptyRow();
         //layout.row().grid(new JLabel("Description :")).add(new JScrollPane(fRemark));
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler") + " :")).add(cfHandler).empty(2);
+        //layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status") + " :")).add(cfStatus).empty(2);
+        //layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler") + " :")).add(cfHandler).empty(2);
 
         add(pForm, BorderLayout.CENTER);
     }
@@ -203,10 +204,10 @@ public class ContactPersonActionForm extends JPanel {
     private void initState() {
         if(state == ActionState.CREATE) {
             cfStatus.removeAllItems();
-            cfStatus.addItem("Create");
+            cfStatus.addItem("Created");
             
             cfHandler.removeAllItems();
-            cfHandler.addItem("Created");
+            cfHandler.addItem("Create");
             cfHandler.setEnabled(false);
             
             bNew.setVisible(false);
@@ -219,23 +220,90 @@ public class ContactPersonActionForm extends JPanel {
     private void initData() {
 
     }
-
-    // </editor-fold>
-
-    private class RowShowHideAction implements ItemListener {
-
-        private RowGroup group;
-
-        public RowShowHideAction(RowGroup group) {
-            this.group = group;
-        }
-
-        @Override
-        public void itemStateChanged(ItemEvent event) {
-            if (event.getStateChange() == ItemEvent.SELECTED) {
-                group.show();
-            } else {
-                group.hide();
+    
+    private boolean isModelValid() {
+        
+    }
+    
+    @Override
+    private void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton) {
+            JButton bb = (JButton) e.getSource();
+            if(bb == bSave) {
+                if(!isModelValid()) {
+                    return;
+                }
+                
+                firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
+                HWaitDialog dialog = new HWaitDialog("Save Data");
+                
+                object = new ContactPerson();
+                object.setPrefix(cfPrefix.getSelectedText());
+                object.setFirstName(tfFName.getText().trim());
+                object.setMiddleName(tfMName.getText().trim());
+                object.setLastName(tfLName.getText().trim());
+                object.setPhone(tfPhone.getText().trim());
+                
+                SwingWorker<Boolean, Void> td = new SwingWorker<Boolean, Void>() {
+                  @Override
+                  protected Boolean doInBackground() throws Exception {
+                      boolean saved = false;
+                      try {
+                          session = HibernateUtil.getSessionFactory().openSession();
+                          session.getTransaction().begin();
+                          
+                          if(state == ActionState.CREATE) {
+                              session.save(object);
+                              saved = true;
+                          }else if (state == ActionState.UPDATE) {
+                              session.update(object);
+                              saved = true;
+                          }
+                          
+                          if(saved == true) { 
+                            session.getTransaction().commit();
+                            saved = true;
+                          } else {
+                            session.getTransaction().rollback();
+                            saved = false;
+                          }
+                          
+                      } catch (Exception ex) {
+                          session.getTransaction().rollback();
+                          saved  = false;
+                          Logger.getLogger(ContactPersonActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                      } finally {
+                        session.close();
+                      }
+                      return saved;
+                  }
+                }
+                td.addPropertyChangeListener(new PropertyChangeListener() {
+                
+                    /**
+                     *
+                     * @param evt
+                     */
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("state".equals(evt.getPropertyName())
+                            && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                            try {
+                                if (t1.get() == true) {
+                                    dialog.setVisible(false);
+                                    dialog.dispose();
+                                    JOptionPane.showMessageDialog(null, "Saving new contact person successfull", 
+                                        "New Contact Person", JOptionPane.INFORMATION_MESSAGE);
+                                }
+                                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                            } catch (InterruptedException | ExecutionException ex) {
+                                Logger.getLogger(ContactPersonActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                });
+                td.execute();
+                dialog.setVisible(true);
             }
         }
     }
