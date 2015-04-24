@@ -32,6 +32,11 @@ public class ContactGroupActionForm extends JPanel
     
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
     
+    private final static String[] COLUMN_NAMES = new String[]{
+        "Contact Person",
+        "Phone Number"
+    };
+    
     private ContactGroup object;
     private ActionState state;
     
@@ -49,10 +54,17 @@ public class ContactGroupActionForm extends JPanel
     private JComboBox cfStatus, cfHandler;
 
     /**
-     * Contact Person Detail
+     * Group Line
      */
-    private JXTable tbContact;
-    private JButton bcNew, bcDelete, bcExport, bcImport, bcRefresh;
+    private JXTable ttLine;
+    private JButton bNewLine bDeleteLine, bExportLine, bImportLine, bRefreshLine;
+    
+    /**
+     * Data
+     */
+    private Session hSession;
+    private DefaultTableModel mLine;
+    private List<ContactGroupLine> dLine;
 
     /**
      * 
@@ -81,6 +93,7 @@ public class ContactGroupActionForm extends JPanel
         initComponents();
         initListeners();
         initState();
+        initData();
     }
 
     /**
@@ -92,7 +105,7 @@ public class ContactGroupActionForm extends JPanel
             setPreferredSize(new Dimension(450, 250));
         } else {
             setPreferredSize(new Dimension(450, 400));
-            initDetailPanel();
+            initLinePanel();
         }
         initToolbar();
         initFormPanel();
@@ -149,63 +162,180 @@ public class ContactGroupActionForm extends JPanel
 
         DesignGridLayout layout = new DesignGridLayout(pForm);
         layout.labelAlignment(LabelAlignment.RIGHT);
-        layout.row().grid(new JLabel("Group :")).add(tfName).empty();
-        layout.row().grid(new JLabel("Description :")).add(new JScrollPane(tfRemark));
-        layout.row().grid(new JLabel("Status :")).add(cfStatus).empty(2);
-        layout.row().grid(new JLabel("Handler :")).add(cfHandler).empty(2);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.group.name"))).add(tfName).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.group.desc"))).add(new JScrollPane(tfRemark));
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status"))).add(cfStatus).empty(2);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler"))).add(cfHandler).empty(2);
         
         add(pForm, BorderLayout.CENTER);
     }
     
-    private void initDetailPanel() {
+    private void initLinePanel() {
         JPanel pTable = new JPanel(new BorderLayout());
-        JToolBar toContact = new JToolBar();
-        toContact.setFloatable(false);
-        toContact.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
+        JToolBar tbLine = new JToolBar();
+        tbLine.setFloatable(false);
+        tbLine.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
         
-        bcNew = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_plus_12.png")));
-        bcNew.addActionListener(this);
-        toContact.add(bcNew);
-        toContact.add(new JToolBar.Separator());
+        bNewLine = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_plus_12.png")));
+        bNewLine.addActionListener(this);
+        tbLine.add(bNewLine);
+        tbLine.add(new JToolBar.Separator());
 
-        bcImport = new JButton("Import", new ImageIcon(getClass().getClassLoader().getResource("images/ic_upload_12.png")));
-        toContact.add(bcImport);
+        bImportLine = new JButton("Import", new ImageIcon(getClass().getClassLoader().getResource("images/ic_upload_12.png")));
+        //tbLine.add(bImportLine);
 
-        bcExport = new JButton("Export", new ImageIcon(getClass().getClassLoader().getResource("images/ic_download_12.png")));
-        toContact.add(bcExport);
-        toContact.add(new JToolBar.Separator());
+        bExportLine = new JButton("Export", new ImageIcon(getClass().getClassLoader().getResource("images/ic_download_12.png")));
+        //tbLine.add(bExportLine);
+        tbLine.add(new JToolBar.Separator());
 
-        bcDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_minus_12.png")));
-        toContact.add(bcDelete);
+        bDeleteLine = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_minus_12.png")));
+        tbLine.add(bDeleteLine);
         
-        toContact.add(Box.createHorizontalGlue());
-        bcRefresh = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh_12.png")));
-        toContact.add(bcRefresh);
+        tbLine.add(Box.createHorizontalGlue());
+        bRefreshLine = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh_12.png")));
+        tbLine.add(bRefreshLine);
 
-        pTable.add(toContact, BorderLayout.NORTH);
+        pTable.add(tbLine, BorderLayout.NORTH);
 
-        tbContact = new JXTable();
-        pTable.add(new JScrollPane(tbContact), BorderLayout.CENTER);
+        ttLine = new JXTable();
+        ttLine.setEditable(false);
+        
+        mLine = new DefaultTableModel(COLUMN_NAMES, 0);
+        ttLine.setModel(mLine);
+        ttLine.setShowGrid(false);
+        ttLine.setIntercellSpacing(new Dimension(0, 0));
+        ttLine.getTableHeader().setDefaultRenderer(new TableHeaderCenterRender(ttData));
+        ttLine.getColumnModel().getColumn(0).setPreferredWidth(200);
+        ttLine.getColumnModel().getColumn(1).setPreferredWidth(200);
+
+        JScrollPane sPane = new JScrollPane(ttLine);
+        HNumberedTable rowTable = new HNumberedTable(ttLine);
+        sPane.setRowHeaderView(rowTable);
+        sPane.setCorner(JScrollPane.UPPER_LEFT_CORNER,
+                rowTable.getTableHeader());
+
+        pTable.add(sPane, BorderLayout.CENTER);
         
         add(pTable, BorderLayout.SOUTH);
     }
     
     private void initListeners() {
-        
+        bSave.addActionListener(this);
+        bCancel.addActionListener(this);
     }
  
     private void initState() {
+        if (state == ActionState.CREATE) {
+            cfStatus.removeAllItems();
+            cfStatus.addItem("Create");
 
+            cfHandler.removeAllItems();
+            cfHandler.addItem("Created");
+            cfHandler.setEnabled(false);
+
+            bNew.setVisible(false);
+            bEdit.setVisible(false);
+            bDelete.setVisible(false);
+            bSaveNew.setVisible(false);
+        }
     }
 
     private void initData() {
         
     }
+    
+    // <editor-fold defaultstate="collapsed" desc="Private Methods">
+    private boolean isModelValid() {
+        if (lfContact.getName().equals("")) {
+            lfContact.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+            return false;
+        }
+        
+        return true;
+    }
+
+    // </editor-fold>
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
-            JButton bSource = (JButton) e.getSource();
+            JButton bb = (JButton) e.getSource();
+            if(bb == bSave) {
+                if(!isModelValid()) {
+                   return;
+                }
+                firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
+                HWaitDialog dialog = new HWaitDialog("Save Data");
+                
+                object = new ContactGroup();
+                object.setName(tfName.getText().trim());
+                object.setRemark(tfRemark.getText().trim());
+                
+                SwingWorker<Boolean, Void> td = new SwingWorker<Boolean, Void>() {
+                  @Override
+                  protected Boolean doInBackground() throws Exception {
+                      boolean saved = false;
+                      try {
+                          session = HibernateUtil.getSessionFactory().openSession();
+                          session.getTransaction().begin();
+                          
+                          if(state == ActionState.CREATE) {
+                              session.save(object);
+                              saved = true;
+                          }else if (state == ActionState.UPDATE) {
+                              session.update(object);
+                              saved = true;
+                          } else if(state == ActionState.DELETE) {
+                              session.delete(object);
+                              saved = true;
+                          }
+                          
+                          if(saved == true) { 
+                            session.getTransaction().commit();
+                            saved = true;
+                          } else {
+                            session.getTransaction().rollback();
+                            saved = false;
+                          }
+                          
+                      } catch (Exception ex) {
+                          session.getTransaction().rollback();
+                          saved  = false;
+                          Logger.getLogger(ContactGroupActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                      } finally {
+                        session.close();
+                      }
+                      return saved;
+                  }
+                }
+                td.addPropertyChangeListener(new PropertyChangeListener() {
+                
+                    /**
+                     *
+                     * @param evt
+                     */
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("state".equals(evt.getPropertyName())
+                            && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                            try {
+                                if (t1.get() == true) {
+                                    dialog.setVisible(false);
+                                    dialog.dispose();
+                                    JOptionPane.showMessageDialog(null, "Saving new template successfull", "New Contact Group", JOptionPane.INFORMATION_MESSAGE);
+                                }
+                                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                            } catch (InterruptedException | ExecutionException ex) {
+                                Logger.getLogger(MessageTemplateActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                });
+                td.execute();
+                dialog.setVisible(true);
+            } else if(bb == bCancel) {
+                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+            }
         }
     }
 }
