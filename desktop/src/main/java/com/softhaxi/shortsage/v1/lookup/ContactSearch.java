@@ -5,7 +5,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import org.jdesktop.swingx.JXTable;
 
-public class ContactPersonSearch extends JPanel {
+public class ContactSearch extends JPanel {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
