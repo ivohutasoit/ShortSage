@@ -5,6 +5,7 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -40,51 +41,49 @@ import javax.persistence.Table;
             column = @Column(name = "GLVRSN"))
 })
 @NamedQueries({
-    @NamedQuery(name = "ContactGroupLine.ByGroup", 
+    @NamedQuery(name = "ContactGroupLine.ByGroup",
             query = "from ContactGroupLine a where a.deletedState = 0 and a.group = :group")
 })
 public class ContactGroupLine extends BasicEntity
-    implements Serializable {
-    
-    @ManyToOne
-    @JoinColumn(name="CCCCID")
-    @Column(name = "GLCGID")    
-    private ContactGroup group;
-    
-    @ManyToOne
-    @JoinColumn(name="CCCCID")
-    @Column(name = "GLCCID")
-    private ContactPerson contact;
-    
+        implements Serializable {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "GLCGID", nullable = false, insertable = false, updatable = false)
+    private Contact group;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "GLCCID", nullable = false, insertable = false, updatable = false)
+    private Contact person;
+
     @Column(name = "GLNMBR")
     private String number;
 
     /**
      * @return the group
      */
-    public ContactGroup getGroup() {
+    public Contact getGroup() {
         return group;
     }
 
     /**
      * @param group the group to set
      */
-    public void setGroup(ContactGroup group) {
+    public void setGroup(Contact group) {
         this.group = group;
     }
 
     /**
-     * @return the contact
+     * @return the person
      */
-    public ContactPerson getContact() {
-        return contact;
+    public Contact getPerson() {
+        return person;
     }
 
     /**
-     * @param contact the contact to set
+     * @param person the contact to set
      */
-    public void setContact(ContactPerson contact) {
-        this.contact = contact;
+    public void setContact(Contact person) {
+        this.person = person;
     }
 
     /**
@@ -100,6 +99,5 @@ public class ContactGroupLine extends BasicEntity
     public void setNumber(String number) {
         this.number = number;
     }
-    
-    
+
 }

@@ -40,9 +40,6 @@ public class ContactPerson extends Contact
     @Column(name = "CCPHNE")
     private String phone;
     
-    @OneToMany(mappedBy="contact")
-    private Set<ContactGroupLine> lines;
-    
     
     /**
      * @return the prefix
@@ -140,20 +137,6 @@ public class ContactPerson extends Contact
      */
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    /**
-     * @return the lines
-     */
-    public Set<ContactGroupLine> getLines() {
-        return lines;
-    }
-
-    /**
-     * @param lines the lines to set
-     */
-    public void setLines(Set<ContactGroupLine> lines) {
-        this.lines = lines;
     }
     
     @Override

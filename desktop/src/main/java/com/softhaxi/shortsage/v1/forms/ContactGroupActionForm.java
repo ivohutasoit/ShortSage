@@ -177,8 +177,8 @@ public class ContactGroupActionForm extends JPanel
 
         DesignGridLayout layout = new DesignGridLayout(pForm);
         layout.labelAlignment(LabelAlignment.RIGHT);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.group.name"))).add(tfName).empty();
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.group.desc"))).add(new JScrollPane(tfRemark));
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.group"))).add(tfName).empty();
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.desc"))).add(new JScrollPane(tfRemark));
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status"))).add(cfStatus).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler"))).add(cfHandler).empty(2);
 

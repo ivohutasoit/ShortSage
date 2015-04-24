@@ -22,21 +22,4 @@ import javax.persistence.OneToMany;
 })
 public class ContactGroup extends Contact 
     implements Serializable {
-    
-    @OneToMany(mappedBy="group")
-    private Set<ContactGroupLine> lines;
-
-    /**
-     * @return the lines
-     */
-    public Set<ContactGroupLine> getLines() {
-        return lines;
-    }
-
-    /**
-     * @param lines the lines to set
-     */
-    public void setLines(Set<ContactGroupLine> lines) {
-        this.lines = lines;
-    }
 }

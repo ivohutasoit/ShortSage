@@ -3,6 +3,7 @@ package com.softhaxi.shortsage.v1.lookup;
 import com.softhaxi.shortsage.v1.dto.Contact;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -62,22 +63,30 @@ public class SimpleContactSearch extends JPanel {
     }
     
     private void initSearchPanel() {
-        JPanel pSearch = new JPanel(new GridLayout(2, 1, 5, 0));
+        JPanel pSearch = new JPanel(new GridLayout(1, 2, 5, 0));
+        pSearch.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         
         cfCategory = new JComboBox();
         cfCategory.addItem("Contact Group");
         cfCategory.addItem("Contact Person");
+        cfCategory.addItem("Search Result");
         cfCategory.setSelectedIndex(1);
         cfCategory.setEnabled(false);
         
+        sfKeyword = new JXSearchField("Contact or Group Name");
+        
         pSearch.add(cfCategory);
+        pSearch.add(sfKeyword);
         
         add(pSearch, BorderLayout.NORTH);
     }
     
     private void initListPanel() {
         JPanel pList = new JPanel();
-        DesignGridLayout layout = new DesignGridLayout(pList);
+        GridBagLayout layout = new GridBagLayout();
+        pList.setLayout(layout);
+//        pList.setLayout(new BoxLayout(pList, BoxLayout.LINE_AXIS));
+//        DesignGridLayout layout = new DesignGridLayout(pList);
         
         String[] contacts = new String[] {
           "Andri Kulkia",
@@ -90,14 +99,15 @@ public class SimpleContactSearch extends JPanel {
         }
         
         ldLeft = new JList(mdLeft);
-        //ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
+        ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
         ldLeft.setVisibleRowCount(10);
         ldLeft.setFixedCellHeight(20);
         ldLeft.setFixedCellWidth(140);
         ldLeft.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         
-        JPanel pSelection = new JPanel(new GridLayout(1, 6, 0, 4));
-        //pSelection.setPreferredSize(new Dimension(40, pSelection.getHight()));
+        
+        JPanel pSelection = new JPanel(new GridLayout(6, 1, 0, 4));
+//        pSelection.setPreferredSize(new Dimension(40, pSelection.getHeight()));
         pSelection.add(new JPanel());
         pSelection.add(new JPanel());
         
@@ -111,13 +121,24 @@ public class SimpleContactSearch extends JPanel {
         pSelection.add(new JPanel());
         
         ldRight = new JList(mdRight);
-        //ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
+        ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
         ldLeft.setVisibleRowCount(10);
         ldLeft.setFixedCellHeight(20);
         ldLeft.setFixedCellWidth(140);
         ldLeft.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         
-        layout.row().grid().add(new JScrollPane(ldLeft), 4).add(pSelection).add(new JScrollPane(ldRight), 4);
+//        pList.add(Box.createRigidArea(new Dimension(10,0)));
+//        pList.add(new JScrollPane(ldLeft));
+//        pList.add(Box.createRigidArea(new Dimension(5,0)));
+//        pList.add(pSelection);
+//        pList.add(Box.createRigidArea(new Dimension(5,0)));
+//        pList.add(new JScrollPane(ldRight));
+//        pList.add(Box.createRigidArea(new Dimension(10,0)));
+        
+//        layout.row()
+//                .grid().add(new JScrollPane(ldLeft), 3)
+//                .grid().add(pSelection)
+//                .grid().add(new JScrollPane(ldRight), 3);
         
         add(pList, BorderLayout.CENTER);
     }
