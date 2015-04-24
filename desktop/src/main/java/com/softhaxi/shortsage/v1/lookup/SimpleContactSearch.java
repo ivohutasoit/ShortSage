@@ -5,7 +5,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import org.jdesktop.swingx.JXTable;
 
-public class ContactSearch extends JPanel {
+/**
+ * http://www.macs.hw.ac.uk/cs/java-swing-guidebook/?name=JList&page=3
+ */
+public class SimpleContactSearch extends JPanel {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -20,7 +23,7 @@ public class ContactSearch extends JPanel {
     /**
      * Constructor
      */
-    public ContactPersonSearch() {
+    public SimpleContactSearch() {
         setVisible(false);
         
         mdLeft = new DefaultListModel();
