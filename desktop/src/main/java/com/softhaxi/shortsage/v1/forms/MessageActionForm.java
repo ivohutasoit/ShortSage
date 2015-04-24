@@ -61,13 +61,16 @@ public class MessageActionForm extends JPanel
     /**
      * Message References
      */
+    private HashMap<String, Contact> contacts;
     private MessageTemplate template;
 
     /**
      * Database and Modem
      */
-    private Session hSession;
     private Service mService;
+    private List<OutboundMessage> mMessages;
+    private Session hSession;
+    private List<OutboxMessages> dMessages;
 
     /**
      *
@@ -84,6 +87,7 @@ public class MessageActionForm extends JPanel
     public MessageActionForm(OutboxMessage object, ActionState state) {
         this.object = object;
         this.state = state;
+        contacts = new HashMap<String, Contact>();
 
         initComponents();
         initListeners();
@@ -159,7 +163,57 @@ public class MessageActionForm extends JPanel
         lfContact = new HLookupField("Lookup or Typed Contact") {
             @Override
             public void lookupPerformed() {
+                final JDialog dialog = new JDialog();
+                dialog.setModal(true);
+                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                dialog.setTitle("Lookup Contact - Dialog Selection");
+                
+                final ContactSearch panel = new MessageTemplateSearch();
+                panel.addPropertyChangeListener(new PropertyChangeListener() {
 
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("select".equalsIgnoreCase(evt.getPropertyName())
+                                && ((boolean) evt.getNewValue()) == true) {
+                            List<Contact> lContacts = panel.getUserData();
+                            if(lContact != null ||
+                                lContact.size() != 0) {
+                                
+                                for(Contact contact : lContacts) {
+                                  if(contacts.containsKey(contact.getName())) {
+                                    contacts.remove(contact.getName());
+                                    contacts.put(contact.getName(), contact)
+                                  }  
+                                }      
+                            }
+                            
+                            StringBuilder sb = new StringBuilder();
+                            for (Map.Entry<String, String> entry : map.entrySet()) {
+                              sb.append(entry.getKey()).append("; ");
+                          	}
+                          	tfContact.setTexx(sb);
+                            
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        } else if ("cancel".equalsIgnoreCase(evt.getPropertyName())
+                                && ((boolean) evt.getNewValue()) == true) {
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        } else if ("clear".equalsIgnoreCase(evt.getPropertyName())
+                                && ((boolean) evt.getNewValue()) == true) {
+                            contacts.clear();
+                            tfContact.setText("");
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        }
+
+                    }
+                });
+                dialog.add(panel);
+                panel.setVisible(true);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
             }
         };
         tfText = new JTextArea();
@@ -302,7 +356,9 @@ public class MessageActionForm extends JPanel
     public void setContact(String contact) {
         lfContact.setText(contact);
     }
-  // </editor-fold>
+    
+
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
     @Override
@@ -321,6 +377,83 @@ public class MessageActionForm extends JPanel
                 }
 
                 final HWaitDialog dialog = new HWaitDialog("Send Message");
+                final String[] names = tfContact.getText().split(";");
+                final OutbounMessage temp = new OutboundMessage(tfText.getText().trim(), tfContact.getText().trim());
+                final Date date = dfDate.getDate();
+                final boolean isScheduler = cfDate.isSelected();
+                
+                SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+                  @Override
+                  protected void doInBackground() {
+                    OutboundMessage mMsg = null;
+                    OutboxMessage dMsg = null;
+                    
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    mService = Service.getInstance();
+                    hSession.getTransaction().begin();
+                    for(String name : names) {
+                      if(contacts.containsKey(name)) {
+                        Contact cc = contacts.get(name);
+                        if(cc instanceof ContactPerson) {
+                          temp.clone(mMsg);
+                          mMsg.setRecipient(cc.getNumber());
+                          
+                          if(isScheduler) {
+                            mService.queueMessageAt(mMsg, date);
+                          } else {
+                            mService.queueMessage(mMsg);
+                          }
+                        } else if(cc instanceof ContactGroup) {
+                          
+                        }
+                      } else {
+                        // Only Number
+                        Query query = hSession.getNamedQuery("Contact.ByNameOrNumber");
+                        query.setParameter("name", name);
+                        query.setParameter("number", name);
+                        
+                        Contact cc = (contact) query.uniqueResult();
+                        if(cc == null) {
+                          temp.clone(mMsg);
+                          mMsg.setRecipient(name);
+                          
+                          if(isScheduler) {
+                            mService.queueMessageAt(mMsg, date);
+                          } else {
+                            mService.queueMessage(mMsg);
+                          }
+                        } else if(cc instanceof ContactPerson) {
+                          temp.clone(mMsg);
+                          mMsg.setRecipient(cc.getNumber());
+                          
+                          if(isScheduler) {
+                            mService.queueMessageAt(mMsg, date);
+                          } else {
+                            mService.queueMessage(mMsg);
+                          }
+                        } else if(cc instanceof ContactGroup) {
+                          
+                        }
+                      }
+                      dMsg = new OutboxMessage();
+                      dMsg.setRefId(mMsg.getUuid());
+                      dMsg.setGatewayId(mMsg.getGatewayId());
+                      dMsg.setContact(mMsg.getRecipient());
+                      dMsg.setText(mMsg.getText());
+                      dMsg.setDate(mMsg.getDate());
+                      dMsg.setFailureCause(msg.getFailureCause().toString());
+                      dMsg.setRetryCount(msg.getRetryCount());
+                      dMsg.setErrorMessage(msg.getErrorMessage());
+                      dMsg.setStatus(mMsg.getMessageStatus() == OutboundMessage.MessageStatuses.UNSENT ? 1
+                                  : mMsg.getMessageStatus() == OutboundMessage.MessageStatuses.SENT ? 2 : 3);
+                                  
+                      
+                      hSession.saveOrUpdate(message);
+                    }
+                    hSession.getTransaction().commit();
+                    return true;
+                  }
+                };
 
                 dialog.setVisible(true);
             } else if (bb == bCancel) {
