@@ -34,6 +34,9 @@ public class ContactPerson extends Contact
     
     @Column(name = "CCPHNE")
     private String phone;
+    
+    @OneToMany(mappedBy="contact")
+    private Set<ContactGroupLine> lines;
 
     /**
      * @return the firstName
