@@ -3,8 +3,10 @@ package com.softhaxi.shortsage.v1.lookup;
 import com.softhaxi.shortsage.v1.dto.Contact;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
@@ -16,15 +18,23 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import net.java.dev.designgridlayout.DesignGridLayout;
 import org.jdesktop.swingx.JXSearchField;
 
 /**
  * http://www.macs.hw.ac.uk/cs/java-swing-guidebook/?name=JList&page=3
+ * 
+ * http://stackoverflow.com/questions/13620894/gridbag-layout-problems
+ * 
+ * http://stackoverflow.com/questions/26063639/jlist-control-size-changes-while-running-the-jar-file%5C
+ * 
+ * @author Ivo Hutasoit
+ * @since 1
+ * @version 1.0.0
  */
 public class SimpleContactSearch extends JPanel {
 
@@ -85,6 +95,9 @@ public class SimpleContactSearch extends JPanel {
         JPanel pList = new JPanel();
         GridBagLayout layout = new GridBagLayout();
         pList.setLayout(layout);
+        
+        JLabel lLeft = new JLabel("Avaliable Contacts");
+        JLabel lRight = new JLabel("Selected Contacts");
 //        pList.setLayout(new BoxLayout(pList, BoxLayout.LINE_AXIS));
 //        DesignGridLayout layout = new DesignGridLayout(pList);
         
@@ -99,7 +112,7 @@ public class SimpleContactSearch extends JPanel {
         }
         
         ldLeft = new JList(mdLeft);
-        ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
+//        ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
         ldLeft.setVisibleRowCount(10);
         ldLeft.setFixedCellHeight(20);
         ldLeft.setFixedCellWidth(140);
@@ -121,7 +134,7 @@ public class SimpleContactSearch extends JPanel {
         pSelection.add(new JPanel());
         
         ldRight = new JList(mdRight);
-        ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
+//        ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
         ldLeft.setVisibleRowCount(10);
         ldLeft.setFixedCellHeight(20);
         ldLeft.setFixedCellWidth(140);
@@ -139,6 +152,40 @@ public class SimpleContactSearch extends JPanel {
 //                .grid().add(new JScrollPane(ldLeft), 3)
 //                .grid().add(pSelection)
 //                .grid().add(new JScrollPane(ldRight), 3);
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(3, 3, 3, 3);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        pList.add(lLeft, gbc);
+        gbc.gridx = 2;
+        pList.add(lRight, gbc);
+        
+        gbc.weighty = 1.0;
+        gbc.weightx = 1.0;
+        gbc.gridheight = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        pList.add(new JScrollPane(ldLeft), gbc);
+        
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.gridheight = 1;
+        gbc.gridx = 1;
+        gbc.weightx = 0;
+        pList.add(bSelect, gbc);
+        gbc.gridy = 2;
+        pList.add(bDeselect, gbc);
+
+        gbc.gridheight = 2;
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+
+        pList.add(new JScrollPane(ldRight), gbc);
         
         add(pList, BorderLayout.CENTER);
     }

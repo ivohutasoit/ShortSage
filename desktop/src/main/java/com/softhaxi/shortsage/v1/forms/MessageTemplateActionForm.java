@@ -128,6 +128,7 @@ public class MessageTemplateActionForm extends JPanel
         tfText = new JTextArea();
         tfText.setRows(3);
         tfText.setLineWrap(true);
+        tfText.setWrapStyleWord(true);
         tfText.setFont(tfName.getFont());
         cfStatus = new JComboBox();
         cfHandler = new JComboBox();

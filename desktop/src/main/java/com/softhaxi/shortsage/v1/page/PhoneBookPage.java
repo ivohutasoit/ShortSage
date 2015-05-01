@@ -5,7 +5,6 @@ import com.softhaxi.shortsage.v1.dto.ContactPerson;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.ContactGroupActionForm;
 import com.softhaxi.shortsage.v1.forms.ContactPersonActionForm;
-import com.softhaxi.shortsage.v1.forms.GatewayActionForm;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
@@ -45,13 +46,14 @@ import org.jdesktop.swingx.JXSearchField;
  */
 public class PhoneBookPage extends JPanel
         implements ActionListener {
-    
+
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
-    
+
     /**
      * Tool bar group items
      */
-    private JButton bgNew, bgImport, bgExport, bgDelete, bgRefresh;
+    private JButton bNewGroup, bImportGroup,
+            bExportGroup, bDeleteGroup, bRefreshGroup;
 
     /**
      * panel data
@@ -113,28 +115,28 @@ public class PhoneBookPage extends JPanel
         JToolBar tbGroup = new JToolBar();
         tbGroup.setBorder(new EmptyBorder(2, 2, 2, 2));
 
-        bgNew = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_plus_12.png")));
-        tbGroup.add(bgNew);
+        bNewGroup = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_plus_12.png")));
+        tbGroup.add(bNewGroup);
 //        tbGroup.add(new JToolBar.Separator());
 
-        bgImport = new JButton("Import", new ImageIcon(getClass().getClassLoader().getResource("images/ic_upload_12.png")));
-//        tbGroup.add(bgImport);
+        bImportGroup = new JButton("Import", new ImageIcon(getClass().getClassLoader().getResource("images/ic_upload_12.png")));
+//        tbGroup.add(bImportGroup);
 
-        bgExport = new JButton("Export", new ImageIcon(getClass().getClassLoader().getResource("images/ic_download_12.png")));
-//        tbGroup.add(bgExport);
+        bExportGroup = new JButton("Export", new ImageIcon(getClass().getClassLoader().getResource("images/ic_download_12.png")));
+//        tbGroup.add(bExportGroup);
         tbGroup.add(new JToolBar.Separator());
 
-        bgDelete = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_minus_12.png")));
-        tbGroup.add(bgDelete);
+        bDeleteGroup = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_minus_12.png")));
+        tbGroup.add(bDeleteGroup);
 
         tbGroup.add(Box.createHorizontalGlue());
-        bgRefresh = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh_12.png")));
-        tbGroup.add(bgRefresh);
+        bRefreshGroup = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_refresh_12.png")));
+        tbGroup.add(bRefreshGroup);
 
         pGroup.add(tbGroup, BorderLayout.NORTH);
 
         mGroup = new DefaultListModel<String>();
-        mGroup.addElement("All Group");
+        mGroup.addElement("ALL");
         lGroup = new JList(mGroup);
         lGroup.setSelectedIndex(0);
         pGroup.add(new JScrollPane(lGroup), BorderLayout.CENTER);
@@ -186,8 +188,55 @@ public class PhoneBookPage extends JPanel
                 loadingData();
             }
         });
-        bgNew.addActionListener(this);
-        bgRefresh.addActionListener(this);
+        bNewGroup.addActionListener(this);
+        bRefreshGroup.addActionListener(this);
+        lGroup.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList) evt.getSource();
+                //System.out.println(evt.getButton());
+                if (evt.getButton() == 1) {
+                    if (evt.getClickCount() == 2) {
+                        // Double-click detected
+                        int index = list.locationToIndex(evt.getPoint());
+
+                        if (index == 0) {
+                            return;
+                        }
+
+                        final JDialog dialog = new JDialog();
+                        dialog.setModal(true);
+                        dialog.setTitle(RES_GLOBAL.getString("label.new") + " Group");
+                        ContactGroupActionForm form = new ContactGroupActionForm((ContactGroup)dGroup.get(index-1));
+                        form.addPropertyChangeListener(new PropertyChangeListener() {
+                            /**
+                             *
+                             * @param evt
+                             */
+                            @Override
+                            public void propertyChange(PropertyChangeEvent evt) {
+                                firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+
+                                if (evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
+                                    boolean value = (boolean) evt.getNewValue();
+                                    if (value == false) {
+                                        dialog.dispose();
+                                    }
+                                }
+                            }
+                        });
+                        dialog.add(form);
+                        dialog.pack();
+                        dialog.setLocationRelativeTo(null);
+                        dialog.setVisible(true);
+                    }
+//                else if (evt.getClickCount() == 3) {
+//                    // Triple-click detected
+//                    int index = list.locationToIndex(evt.getPoint());
+//                }
+                }
+            }
+        });
     }
     // </editor-fold>
 
@@ -200,7 +249,7 @@ public class PhoneBookPage extends JPanel
     }
 
     /**
-     * 
+     *
      */
     private synchronized void loadGroupData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
@@ -227,7 +276,7 @@ public class PhoneBookPage extends JPanel
             protected void done() {
                 if (!isCancelled()) {
                     mGroup.removeAllElements();
-                    mGroup.addElement("All Group");
+                    mGroup.addElement("ALL");
 
                     for (Iterator ii = dGroup.iterator(); ii.hasNext();) {
                         ContactGroup group = (ContactGroup) ii.next();
@@ -256,7 +305,7 @@ public class PhoneBookPage extends JPanel
     }
 
     /**
-     * 
+     *
      */
     private synchronized void loadContactData() {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
@@ -314,7 +363,7 @@ public class PhoneBookPage extends JPanel
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton source = (JButton) e.getSource();
-            if (source == bgNew) {
+            if (source == bNewGroup) {
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
                 dialog.setTitle(RES_GLOBAL.getString("label.new") + " Group");
@@ -340,7 +389,7 @@ public class PhoneBookPage extends JPanel
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-            } else if(source == bgRefresh) {
+            } else if (source == bRefreshGroup) {
                 loadGroupData();
             }
         }

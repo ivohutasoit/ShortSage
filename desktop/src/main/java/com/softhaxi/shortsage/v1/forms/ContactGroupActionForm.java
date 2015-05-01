@@ -54,6 +54,8 @@ public class ContactGroupActionForm extends JPanel
 
     private ContactGroup object;
     private ActionState state;
+    
+    private JPanel pForm;
 
     /**
      * Tool bar items
@@ -93,7 +95,7 @@ public class ContactGroupActionForm extends JPanel
      * @param object
      */
     public ContactGroupActionForm(ContactGroup object) {
-        this(object, ActionState.SHOW);
+        this(object, ActionState.EDIT);
     }
 
     /**
@@ -116,14 +118,19 @@ public class ContactGroupActionForm extends JPanel
      */
     private void initComponents() {
         setLayout(new BorderLayout());
-        if (state == ActionState.CREATE) {
-            setPreferredSize(new Dimension(450, 250));
-        } else {
+        setPreferredSize(new Dimension(450, 250));
+        
+        pForm = new JPanel(new BorderLayout());
+        add(pForm, BorderLayout.CENTER);
+        
+        
+        initToolbar();
+        initFormPanel();
+        
+        if (state != ActionState.CREATE) {
             setPreferredSize(new Dimension(450, 400));
             initLinePanel();
         }
-        initToolbar();
-        initFormPanel();
     }
 
     /**
@@ -157,14 +164,14 @@ public class ContactGroupActionForm extends JPanel
                 new ImageIcon(getClass().getClassLoader().getResource("images/ic_cancel.png")));
         pToolbar.add(bCancel);
 
-        add(pToolbar, BorderLayout.NORTH);
+        add(pToolbar, BorderLayout.PAGE_START);
     }
 
     /**
      *
      */
     private void initFormPanel() {
-        JPanel pForm = new JPanel();
+        JPanel pfHeader = new JPanel();
 
         tfName = new JXTextField(RES_GLOBAL.getString("label.contact.group"));
         tfRemark = new JTextArea();
@@ -175,14 +182,14 @@ public class ContactGroupActionForm extends JPanel
         cfStatus.setEnabled(false);
         cfHandler = new JComboBox();
 
-        DesignGridLayout layout = new DesignGridLayout(pForm);
+        DesignGridLayout layout = new DesignGridLayout(pfHeader);
         layout.labelAlignment(LabelAlignment.RIGHT);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.group"))).add(tfName).empty();
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.desc"))).add(new JScrollPane(tfRemark));
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.status"))).add(cfStatus).empty(2);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.handler"))).add(cfHandler).empty(2);
 
-        add(pForm, BorderLayout.CENTER);
+        pForm.add(pfHeader, BorderLayout.NORTH);
     }
 
     private void initLinePanel() {
@@ -201,7 +208,7 @@ public class ContactGroupActionForm extends JPanel
 
         bExportLine = new JButton("Export", new ImageIcon(getClass().getClassLoader().getResource("images/ic_download_12.png")));
         //tbLine.add(bExportLine);
-        tbLine.add(new JToolBar.Separator());
+        //tbLine.add(new JToolBar.Separator());
 
         bDeleteLine = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_minus_12.png")));
         tbLine.add(bDeleteLine);
@@ -231,7 +238,7 @@ public class ContactGroupActionForm extends JPanel
 
         pTable.add(sPane, BorderLayout.CENTER);
 
-        add(pTable, BorderLayout.SOUTH);
+        pForm.add(pTable, BorderLayout.CENTER);
     }
 
     private void initListeners() {
@@ -244,15 +251,15 @@ public class ContactGroupActionForm extends JPanel
         cfHandler.removeAllItems();
 
         if (state == ActionState.CREATE
-                || state == ActionState.UPDATE) {
+                || state == ActionState.EDIT) {
 
             if (state == ActionState.CREATE) {
                 cfStatus.addItem("Create");
-                cfHandler.addItem("Created");
+                cfHandler.addItem("Create");
                 cfHandler.setEnabled(false);
             } else {
-                cfStatus.addItem("Actived");
-                cfStatus.addItem("Inactived");
+                cfStatus.addItem("Active");
+                cfStatus.addItem("Inactive");
 
                 cfHandler.addItem("No Action");
                 cfHandler.addItem("Activate");
@@ -269,35 +276,14 @@ public class ContactGroupActionForm extends JPanel
             bDelete.setVisible(false);
             bSaveNew.setVisible(false);
         }
-        if (state == ActionState.READ) {
-            bSave.setVisible(false);
-            bSaveNew.setVisible(false);
-            bCancel.setVisible(false);
-
-            bNew.setVisible(true);
-            bEdit.setVisible(true);
-            bDelete.setVisible(true);
-
-            cfStatus.addItem("Actived");
-            cfStatus.addItem("Inactived");
-
-            cfHandler.addItem("No Action");
-            cfHandler.addItem("Activate");
-            cfHandler.addItem("Deactivate");
-            cfHandler.addItem("Delete");
-
-            tfName.setEnabled(false);
-            tfRemark.setEnabled(false);
-            cfHandler.setEnabled(false);
-        }
     }
 
     private void initData() {
         if (object != null) {
             tfName.setText(object.getName());
             tfRemark.setText(object.getRemark());
-            cfStatus.setSelectedIndex(object.getStatus() - 1);
-            cfStatus.setSelectedIndex(0);
+            cfStatus.setSelectedIndex(object.getStatus());
+            cfHandler.setSelectedIndex(0);
         }
     }
 
@@ -339,7 +325,7 @@ public class ContactGroupActionForm extends JPanel
                             if (state == ActionState.CREATE) {
                                 hSession.save(object);
                                 saved = true;
-                            } else if (state == ActionState.UPDATE) {
+                            } else if (state == ActionState.EDIT) {
                                 hSession.update(object);
                                 saved = true;
                             }
@@ -381,6 +367,7 @@ public class ContactGroupActionForm extends JPanel
                                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
                             } catch (InterruptedException | ExecutionException ex) {
                                 Logger.getLogger(MessageTemplateActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
                             }
                         }
                     }

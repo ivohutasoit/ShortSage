@@ -42,7 +42,7 @@ public class HibernateUtil {
                     .setProperty("hibernate.connection.username", "admin")
                     .setProperty("hibernate.connection.password", "admin")
                     .setProperty("hibernate.show_sql", "true");
-//                    .setProperty("hibernate.hbm2ddl.auto", "create-drop")
+//                    .setProperty("hibernate.hbm2ddl.auto", "create-drop");
             sessionFactory = config.buildSessionFactory();
         } catch (Throwable ex) {
             System.err.println("Initial SessionFactory creation failed." + ex);

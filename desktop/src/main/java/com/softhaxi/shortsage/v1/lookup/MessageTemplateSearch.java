@@ -105,11 +105,14 @@ public class MessageTemplateSearch extends JPanel
         bOK = new JButton(RES_GLOBAL.getString("label.ok"));
         bCancel = new JButton(RES_GLOBAL.getString("label.cancel"));
         bClear = new JButton(RES_GLOBAL.getString("label.clear.value"));
+        
+        bOK.setPreferredSize(bClear.getPreferredSize());
+        bCancel.setPreferredSize(bClear.getPreferredSize());
 
         //Lay out the buttons from left to right.
         JPanel pButton = new JPanel();
         pButton.setLayout(new BoxLayout(pButton, BoxLayout.LINE_AXIS));
-        pButton.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        pButton.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         pButton.add(Box.createHorizontalGlue());
         pButton.add(bOK);
         pButton.add(Box.createRigidArea(new Dimension(5, 0)));

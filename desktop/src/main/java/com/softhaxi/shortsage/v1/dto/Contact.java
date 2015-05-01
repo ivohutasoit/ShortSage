@@ -13,6 +13,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -47,6 +49,9 @@ import javax.persistence.Table;
             column = @Column(name = "CCDLST")),
     @AttributeOverride(name = "version",
             column = @Column(name = "CCVRSN"))
+})
+@NamedQueries({
+    @NamedQuery(name = "Contact.ByName", query = "from Contact a where a.name = :name")
 })
 public class Contact extends BasicEntity
         implements Serializable {

@@ -13,6 +13,7 @@ import com.softhaxi.shortsage.v1.impl.ShowHideGroupPanel;
 import com.softhaxi.shortsage.v1.lookup.MessageTemplateSearch;
 import com.softhaxi.shortsage.v1.lookup.SimpleContactSearch;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
+import com.softhaxi.shortsage.v1.validator.PhoneNumberValidator;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -25,6 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -232,6 +236,7 @@ public class MessageActionForm extends JPanel
         tfText.setRows(3);
         tfText.setFont(lfContact.getFont());
         tfText.setLineWrap(true);
+        tfText.setWrapStyleWord(true);
         lfTemplate = new HLookupField("Lookup Template") {
             @Override
             public void lookupPerformed() {
@@ -360,7 +365,6 @@ public class MessageActionForm extends JPanel
     }
 
     // </editor-fold> 
-    
     // <editor-fold defaultstate="collapsed" desc="Public Methods">
     /**
      *
@@ -371,7 +375,6 @@ public class MessageActionForm extends JPanel
     }
 
     // </editor-fold>
-    
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -388,17 +391,20 @@ public class MessageActionForm extends JPanel
                     return;
                 }
 
+                System.out.println(PhoneNumberValidator.validate(lfContact.getText().trim()));
+                firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
                 final HWaitDialog dialog = new HWaitDialog("Send Message");
                 final String[] names = lfContact.getText().split(";");
-                final OutboundMessage temp = new OutboundMessage(tfText.getText().trim(), lfContact.getText().trim());
+                final OutboundMessage temp = new OutboundMessage(lfContact.getText().trim(), tfText.getText().trim());
                 final Date date = dfDate.getDate();
                 final boolean isScheduler = cfDate.isSelected();
 
-                SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+                final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
                     @Override
                     protected Boolean doInBackground() {
                         OutboundMessage mMsg = null;
                         OutboxMessage dMsg = null;
+                        boolean valid = false;
 
                         hSession = HibernateUtil.getSessionFactory().openSession();
                         mService = Service.getInstance();
@@ -407,6 +413,7 @@ public class MessageActionForm extends JPanel
                             if (contacts.containsKey(name)) {
                                 Contact cc = contacts.get(name);
                                 if (cc instanceof ContactPerson) {
+                                    valid = true;
                                     mMsg = new OutboundMessage(((ContactPerson) cc).getPhone(), temp.getText());
 
                                     if (isScheduler) {
@@ -419,20 +426,22 @@ public class MessageActionForm extends JPanel
                                 }
                             } else {
                                 // Only Number
-                                Query query = hSession.getNamedQuery("Contact.ByNameOrNumber");
+                                Query query = hSession.getNamedQuery("Contact.ByName");
                                 query.setParameter("name", name);
-                                query.setParameter("number", name);
 
                                 Contact cc = (Contact) query.uniqueResult();
                                 if (cc == null) {
-                                    mMsg = new OutboundMessage(name, temp.getText());
+                                    if ((valid = PhoneNumberValidator.validate(name)) == true) {
+                                        mMsg = new OutboundMessage(name, temp.getText());
 
-                                    if (isScheduler) {
-                                        mService.queueMessageAt(mMsg, date);
-                                    } else {
-                                        mService.queueMessage(mMsg);
+                                        if (isScheduler) {
+                                            mService.queueMessageAt(mMsg, date);
+                                        } else {
+                                            mService.queueMessage(mMsg);
+                                        }
                                     }
                                 } else if (cc instanceof ContactPerson) {
+                                    valid = true;
                                     mMsg = new OutboundMessage(((ContactPerson) cc).getPhone(), temp.getText());
 
                                     if (isScheduler) {
@@ -444,25 +453,46 @@ public class MessageActionForm extends JPanel
 
                                 }
                             }
-                            dMsg = new OutboxMessage();
-                            dMsg.setRefId(mMsg.getUuid());
-                            dMsg.setGatewayId(mMsg.getGatewayId());
-                            dMsg.setContact(mMsg.getRecipient());
-                            dMsg.setText(mMsg.getText());
-                            dMsg.setDate(mMsg.getDate());
-                            dMsg.setFailureCause(mMsg.getFailureCause().toString());
-                            dMsg.setRetryCount(mMsg.getRetryCount());
-                            dMsg.setErrorMessage(mMsg.getErrorMessage());
-                            dMsg.setStatus(mMsg.getMessageStatus() == OutboundMessage.MessageStatuses.UNSENT ? 1
-                                    : mMsg.getMessageStatus() == OutboundMessage.MessageStatuses.SENT ? 2 : 3);
+                            if (valid) {
+                                dMsg = new OutboxMessage();
+                                dMsg.setRefId(mMsg.getUuid());
+                                dMsg.setGatewayId(mMsg.getGatewayId());
+                                dMsg.setContact(mMsg.getRecipient());
+                                dMsg.setText(mMsg.getText());
+                                dMsg.setDate(mMsg.getDate());
+                                dMsg.setFailureCause(mMsg.getFailureCause().toString());
+                                dMsg.setRetryCount(mMsg.getRetryCount());
+                                dMsg.setErrorMessage(mMsg.getErrorMessage());
+                                dMsg.setStatus(mMsg.getMessageStatus() == OutboundMessage.MessageStatuses.UNSENT ? 1
+                                        : mMsg.getMessageStatus() == OutboundMessage.MessageStatuses.SENT ? 2 : 3);
 
-                            hSession.saveOrUpdate(dMsg);
+                                hSession.saveOrUpdate(dMsg);
+                            }
                         }
                         hSession.getTransaction().commit();
                         return true;
                     }
                 };
+                t1.addPropertyChangeListener(new PropertyChangeListener() {
 
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("state".equals(evt.getPropertyName())
+                                && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                            try {
+                                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                                if (t1.get() == true) {
+                                    JOptionPane.showMessageDialog(null, "Sending message was successfull", "New Message", JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            } catch (InterruptedException | ExecutionException ex) {
+                                Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                });
+                t1.execute();
                 dialog.setVisible(true);
             } else if (bb == bCancel) {
                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
