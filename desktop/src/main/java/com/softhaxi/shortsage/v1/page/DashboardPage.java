@@ -1,17 +1,16 @@
 package com.softhaxi.shortsage.v1.page;
 
+import com.softhaxi.shortsage.v1.desktop.HWaitDialog;
 import com.softhaxi.shortsage.v1.dto.Gateway;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.enums.ServiceHandler;
+import com.softhaxi.shortsage.v1.forms.MessageActionForm;
 import com.softhaxi.shortsage.v1.task.ModemTask;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -20,7 +19,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
@@ -30,11 +28,9 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -44,10 +40,9 @@ import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import static org.jboss.logging.NDC.get;
 import org.smslib.AGateway;
-import org.smslib.GatewayException;
 import org.smslib.Service;
-import org.smslib.TimeoutException;
 
 /**
  *
@@ -258,6 +253,7 @@ public class DashboardPage extends JPanel
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
+                final HWaitDialog dialog = new HWaitDialog("Connect Modem");
                 firePropertyChange(PropertyChangeField.CONNECTING.toString(), false, true);
                 final ModemTask tm = new ModemTask(ServiceHandler.START);
 
@@ -269,6 +265,8 @@ public class DashboardPage extends JPanel
                         if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())) {
                             boolean value = (boolean) evt.getNewValue();
                             if (value == false) {
+                                dialog.setTitle("Loading Data");
+                                dialog.dispose();
                                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
                                 if (cfName.getItemCount() > 1) {
                                     cfName.setSelectedIndex(1);
@@ -285,12 +283,15 @@ public class DashboardPage extends JPanel
                         if ("state".equals(evt.getPropertyName())
                                 && SwingWorker.StateValue.DONE == evt.getNewValue()) {
                             firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
+                            dialog.setVisible(false);
+                            dialog.setTitle("Loading Data");
                             t1.execute();
                         }
                     }
                 });
 
                 tm.execute();
+                dialog.setVisible(true);
             }
         });
 
@@ -331,62 +332,43 @@ public class DashboardPage extends JPanel
             return;
         }
 
-        class BalanceWorker extends SwingWorker<String, Void> {
-
-            private JProgressBar progress;
-            private JDialog dialog;
-
-            private String gatewayId;
-            private String number;
-
-            public BalanceWorker(String gatewayId, String number) {
-                this.gatewayId = gatewayId;
-                this.number = number;
-
-                if (dialog == null) {
-                    dialog = new JDialog();
-                    dialog.setTitle("USSD Request");
-                    dialog.setLayout(new GridBagLayout());
-                    dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-                    GridBagConstraints gbc = new GridBagConstraints();
-                    gbc.insets = new Insets(2, 2, 2, 2);
-                    gbc.weightx = 1;
-                    gbc.gridy = 0;
-                    dialog.add(new JLabel("Processing..."), gbc);
-                    progress = new JProgressBar();
-                    progress.setIndeterminate(true);
-                    gbc.gridy = 1;
-                    dialog.add(progress, gbc);
-                    dialog.pack();
-                    dialog.setLocationRelativeTo(null);
-                    dialog.setVisible(true);
-                }
-            }
-
-            @Override
-            protected void done() {
-                if (dialog != null) {
-                    dialog.dispose();
-                }
-                try {
-                    JOptionPane.showMessageDialog(null, get(), "USSD Response", JOptionPane.INFORMATION_MESSAGE);
-                } catch (InterruptedException | ExecutionException ex) {
-                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+        final String gatewayid = cfName.getSelectedItem().toString();
+        final String number = tfCBalance.getText().trim();
+        final HWaitDialog dialog = new HWaitDialog("USSD Request");
+        
+        final SwingWorker<String, Boolean> t1 = new SwingWorker<String, Boolean>() {
 
             @Override
             protected String doInBackground() throws Exception {
                 String result = null;
-                AGateway gateway = Service.getInstance().findGateway(gatewayId);
+                AGateway gateway = Service.getInstance().findGateway(gatewayid);
                 result = gateway.sendUSSDCommand(number);
                 return result;
             }
-        }
+        };
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
 
-        BalanceWorker t1 = new BalanceWorker(cfName.getSelectedItem().toString(),
-                tfCBalance.getText().trim());
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("state".equals(evt.getPropertyName())
+                        && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                    dialog.setVisible(false);
+                    dialog.dispose();
+                    try {
+                        firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                        if (!t1.get().equals("")) {
+                            JOptionPane.showMessageDialog(null, t1.get(), 
+                                    "USSD Response", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(MessageActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
+            }
+        });
         t1.execute();
+        dialog.setVisible(true);
     }
     // </editor-fold> 
 

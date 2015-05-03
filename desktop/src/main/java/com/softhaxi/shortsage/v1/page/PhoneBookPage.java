@@ -15,6 +15,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
@@ -359,6 +361,10 @@ public class PhoneBookPage extends JPanel
     }
     // </editor-fold>
 
+    /**
+     * 
+     * @param e 
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
@@ -366,6 +372,7 @@ public class PhoneBookPage extends JPanel
             if (source == bNewGroup) {
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
+                dialog.setResizable(false);
                 dialog.setTitle(RES_GLOBAL.getString("label.new") + " Group");
                 ContactGroupActionForm form = new ContactGroupActionForm();
                 form.addPropertyChangeListener(new PropertyChangeListener() {
@@ -383,6 +390,12 @@ public class PhoneBookPage extends JPanel
                                 dialog.dispose();
                             }
                         }
+                    }
+                });
+                dialog.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        loadGroupData();
                     }
                 });
                 dialog.add(form);

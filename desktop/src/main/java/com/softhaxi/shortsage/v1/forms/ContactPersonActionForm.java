@@ -29,6 +29,8 @@ import javax.swing.SwingWorker;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
 import org.hibernate.Session;
+import org.jdesktop.swingx.JXTextArea;
+import org.jdesktop.swingx.JXTextField;
 
 /**
  * Referencese
@@ -58,10 +60,10 @@ public class ContactPersonActionForm extends JPanel
      * Fields
      */
     private JComboBox cfPrefix, cfCountry, cfStatus, cfHandler;
-    private JTextField tfFName, tfMName, tfLName, tfEmail, tfCompany;
-    private JTextField tfAddr1, tfAddr2, tfAddr3, tfCity, tfZip;
-    private JTextField tfPhone, tfHome, tfWork, tfCustom;
-    private JTextArea tfRemark;
+    private JXTextField tfFName, tfMName, tfLName, tfEmail, tfCompany;
+    private JXTextField tfAddr1, tfAddr2, tfAddr3, tfCity, tfZip;
+    private JXTextField tfPhone, tfHome, tfWork, tfCustom;
+    private JXTextArea tfRemark;
     private JCheckBox cfAddress, cfPreference;
 
     /**
@@ -161,20 +163,23 @@ public class ContactPersonActionForm extends JPanel
         cfStatus = new JComboBox();
         cfStatus.setEnabled(false);
         cfHandler = new JComboBox();
-        tfFName = new JTextField();
-        tfMName = new JTextField();
-        tfLName = new JTextField();
-        tfEmail = new JTextField();
-        tfCompany = new JTextField();
-        tfAddr1 = new JTextField();
-        tfAddr2 = new JTextField();
-        tfAddr3 = new JTextField();
-        tfCity = new JTextField();
-        tfZip = new JTextField();
-        tfPhone = new JTextField();
-        tfRemark = new JTextArea();
+        tfFName = new JXTextField(RES_GLOBAL.getString("label.contact.firstname"));
+        tfMName = new JXTextField(RES_GLOBAL.getString("label.contact.midname"));
+        tfLName = new JXTextField(RES_GLOBAL.getString("label.contact.lastname"));
+        tfEmail = new JXTextField(RES_GLOBAL.getString("label.contact.email"));
+        tfCompany = new JXTextField(RES_GLOBAL.getString("label.contact.company"));
+        tfAddr1 = new JXTextField(RES_GLOBAL.getString("label.contact.fulladdress"));
+        tfAddr2 = new JXTextField();
+        tfAddr3 = new JXTextField();
+        tfCity = new JXTextField(RES_GLOBAL.getString("label.contact.city"));
+        tfZip = new JXTextField(RES_GLOBAL.getString("label.contact.zip"));
+        tfPhone = new JXTextField(RES_GLOBAL.getString("label.contact.phone") + " " + 
+                RES_GLOBAL.getString("label.contact.phone.exp"));
+        tfRemark = new JXTextArea();
         tfRemark.setRows(3);
+        tfRemark.setFont(tfPhone.getFont());
         tfRemark.setLineWrap(true);
+        tfRemark.setWrapStyleWord(true);
 
         JPanel pForm = new JPanel();
         DesignGridLayout layout = new DesignGridLayout(pForm);
@@ -215,7 +220,7 @@ public class ContactPersonActionForm extends JPanel
     private void initState() {
         if (state == ActionState.CREATE) {
             cfStatus.removeAllItems();
-            cfStatus.addItem("Created");
+            cfStatus.addItem("Create");
 
             cfHandler.removeAllItems();
             cfHandler.addItem("Create");
@@ -303,7 +308,7 @@ public class ContactPersonActionForm extends JPanel
                                 if (td.get() == true) {
                                     dialog.setVisible(false);
                                     dialog.dispose();
-                                    JOptionPane.showMessageDialog(null, "Saving new contact person successfull",
+                                    JOptionPane.showMessageDialog(null, "Saving new contact successfull",
                                             "New Contact Person", JOptionPane.INFORMATION_MESSAGE);
                                 }
                                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);

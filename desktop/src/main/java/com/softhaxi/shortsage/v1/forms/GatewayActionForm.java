@@ -1,9 +1,12 @@
 package com.softhaxi.shortsage.v1.forms;
 
+import com.softhaxi.shortsage.v1.desktop.HMenuBar;
+import com.softhaxi.shortsage.v1.desktop.HWaitDialog;
 import com.softhaxi.shortsage.v1.dto.Gateway;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.page.DashboardPage;
+import com.softhaxi.shortsage.v1.util.AppUtil;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -174,8 +177,9 @@ public class GatewayActionForm extends JPanel
         tfCCenter = new JTextField();
         tfCBalance = new JTextField();
         cfRate = new JComboBox();
+        cfRate.addItem("9600");
         cfRate.addItem("115200");
-        cfRate.setEnabled(false);
+//        cfRate.setEnabled(false);
         cfStatus = new JComboBox();
         cfStatus.setEnabled(false);
         cfHandler = new JComboBox();
@@ -239,11 +243,12 @@ public class GatewayActionForm extends JPanel
             cfHandler.addItem("Created");
             cfHandler.setEnabled(false);
 
+//            bTest.setVisible(false);
             bSaveNew.setVisible(false);
             bNew.setVisible(false);
             bEdit.setVisible(false);
             bDelete.setVisible(false);
-            
+
             bSave.setEnabled(false);
         }
     }
@@ -291,6 +296,7 @@ public class GatewayActionForm extends JPanel
      *
      */
     private void connect() {
+        final HWaitDialog dialog = new HWaitDialog("Connect Gateway");
         firePropertyChange(PropertyChangeField.CONNECTING.toString(), false, true);
         modem = new SerialModemGateway(tfName.getText().trim(),
                 tfPort.getText().trim(),
@@ -315,14 +321,15 @@ public class GatewayActionForm extends JPanel
                     return true;
                 } catch (SMSLibException | IOException | InterruptedException ex) {
                     Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                    return false;
+                    throw new RuntimeException(ex);
                 }
             }
 
             @Override
             protected void done() {
-                if (!isCancelled()) {
-                    try {
+                try {
+                    if (!isCancelled()) {
+
                         if (get() == true) {
                             tfManufacture.setText(modem.getManufacturer());
                             tfModel.setText(modem.getModel());
@@ -336,13 +343,17 @@ public class GatewayActionForm extends JPanel
                             Service.getInstance().removeGateway(modem);
                             bSave.setEnabled(true);
                         }
-                    } catch (TimeoutException | GatewayException | IOException | InterruptedException | ExecutionException ex) {
-                        Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (SMSLibException ex) {
-                        Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                        
                     }
+                } catch (TimeoutException | GatewayException | IOException | InterruptedException | ExecutionException ex) {
+                    Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SMSLibException ex) {
+                    Logger.getLogger(GatewayActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    dialog.setVisible(false);
+                    dialog.dispose();
+                    firePropertyChange(PropertyChangeField.CONNECTING.toString(), true, false);
                 }
-                firePropertyChange(PropertyChangeField.CONNECTING.toString(), true, false);
             }
         };
         t1.addPropertyChangeListener(new PropertyChangeListener() {
@@ -353,12 +364,14 @@ public class GatewayActionForm extends JPanel
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(PropertyChangeField.CONNECTING.toString())) {
+                    dialog.setVisible(false);
+                    dialog.dispose();
                     firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
                 }
             }
         });
         t1.execute();
-
+        dialog.setVisible(true);
     }
 
     /**
@@ -429,7 +442,17 @@ public class GatewayActionForm extends JPanel
                 if (evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
                     firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
                     if (((boolean) evt.getNewValue()) == false) {
-                        JOptionPane.showMessageDialog(null, "Saving new modem successfull", "New Gateway", JOptionPane.INFORMATION_MESSAGE);
+                        try {
+                            AppUtil.restart(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    JOptionPane.showMessageDialog(null, "Saving new modem successfull and \napplication will be restart to take effect", "New Gateway", JOptionPane.INFORMATION_MESSAGE);
+                                }
+                            });
+                        } catch (IOException ex) {
+                            Logger.getLogger(HMenuBar.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
             }

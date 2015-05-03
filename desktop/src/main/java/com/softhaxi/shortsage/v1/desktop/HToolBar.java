@@ -65,6 +65,7 @@ public class HToolBar extends JToolBar
             if (source == biMessage) {
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
+                dialog.setResizable(false);
                 dialog.setTitle(RES_GLOBAL.getString("label.new") + " Message");
                 MessageActionForm form = new MessageActionForm();
                 form.addPropertyChangeListener(new PropertyChangeListener() {

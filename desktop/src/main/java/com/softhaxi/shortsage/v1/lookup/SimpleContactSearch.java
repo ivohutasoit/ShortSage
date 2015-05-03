@@ -2,6 +2,7 @@ package com.softhaxi.shortsage.v1.lookup;
 
 import com.softhaxi.shortsage.v1.dto.Contact;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -48,7 +49,7 @@ public class SimpleContactSearch extends JPanel {
     
     private DefaultListModel mdLeft, mdRight;
     
-    private List<Contact> contacts;
+    private List<Contact> aContacts, sContacts;
 
     /**
      * Constructor
@@ -63,6 +64,9 @@ public class SimpleContactSearch extends JPanel {
         initListeners();
     }
 
+    /**
+     * 
+     */
     private void initComponents() {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(500, 400));
@@ -72,6 +76,9 @@ public class SimpleContactSearch extends JPanel {
         initButtonPanel();
     }
     
+    /**
+     * 
+     */
     private void initSearchPanel() {
         JPanel pSearch = new JPanel(new GridLayout(1, 2, 5, 0));
         pSearch.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
@@ -91,105 +98,73 @@ public class SimpleContactSearch extends JPanel {
         add(pSearch, BorderLayout.NORTH);
     }
     
+    /**
+     * 
+     */
     private void initListPanel() {
         JPanel pList = new JPanel();
         GridBagLayout layout = new GridBagLayout();
         pList.setLayout(layout);
-        
-        JLabel lLeft = new JLabel("Avaliable Contacts");
-        JLabel lRight = new JLabel("Selected Contacts");
-//        pList.setLayout(new BoxLayout(pList, BoxLayout.LINE_AXIS));
-//        DesignGridLayout layout = new DesignGridLayout(pList);
-        
-        String[] contacts = new String[] {
-          "Andri Kulkia",
-          "Heidi Lian",
-          "Balman Tri"
-        };
-        
-        for(String contact : contacts) {
-            mdLeft.addElement(contact);
-        }
-        
-        ldLeft = new JList(mdLeft);
-//        ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
-        ldLeft.setVisibleRowCount(10);
-        ldLeft.setFixedCellHeight(20);
-        ldLeft.setFixedCellWidth(140);
-        ldLeft.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        
-        
-        JPanel pSelection = new JPanel(new GridLayout(6, 1, 0, 4));
-//        pSelection.setPreferredSize(new Dimension(40, pSelection.getHeight()));
-        pSelection.add(new JPanel());
-        pSelection.add(new JPanel());
-        
-        bSelect = new JButton(">>");
-        bDeselect = new JButton("<<");
-        
-        pSelection.add(bSelect);
-        pSelection.add(bDeselect);
-        
-        pSelection.add(new JPanel());
-        pSelection.add(new JPanel());
-        
-        ldRight = new JList(mdRight);
-//        ldLeft.setPreferredSize(new Dimension(140, ldLeft.getHeight()));
-        ldLeft.setVisibleRowCount(10);
-        ldLeft.setFixedCellHeight(20);
-        ldLeft.setFixedCellWidth(140);
-        ldLeft.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        
-//        pList.add(Box.createRigidArea(new Dimension(10,0)));
-//        pList.add(new JScrollPane(ldLeft));
-//        pList.add(Box.createRigidArea(new Dimension(5,0)));
-//        pList.add(pSelection);
-//        pList.add(Box.createRigidArea(new Dimension(5,0)));
-//        pList.add(new JScrollPane(ldRight));
-//        pList.add(Box.createRigidArea(new Dimension(10,0)));
-        
-//        layout.row()
-//                .grid().add(new JScrollPane(ldLeft), 3)
-//                .grid().add(pSelection)
-//                .grid().add(new JScrollPane(ldRight), 3);
+        pList.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(3, 3, 3, 3);
+        
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.anchor = GridBagConstraints.WEST;
-        pList.add(lLeft, gbc);
-        gbc.gridx = 2;
-        pList.add(lRight, gbc);
+        gbc.weightx = 1;
+        gbc.insets = new Insets(0, 0, 0, 2);
+        pList.add(new JLabel("Avaliable Contacts"), gbc);
         
-        gbc.weighty = 1.0;
-        gbc.weightx = 1.0;
-        gbc.gridheight = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.insets = new Insets(0, 2, 0, 0);
+        pList.add(new JLabel("Selected Contacts"), gbc);
+       
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        pList.add(new JScrollPane(ldLeft), gbc);
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.insets = new Insets(0, 0, 0, 2);
+        ldLeft = new JList();
+        JScrollPane slLeft = new JScrollPane(ldLeft);
+        slLeft.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
         
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridheight = 1;
+        pList.add(slLeft, gbc);
+        
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 1;
-        gbc.weightx = 0;
-        pList.add(bSelect, gbc);
-        gbc.gridy = 2;
-        pList.add(bDeselect, gbc);
+        gbc.gridy = 1;
+        gbc.weightx = 0.1;
+        gbc.weighty = 1;
+        JPanel pSelect = new JPanel(new GridLayout(2, 1, 2, 2));
+        bSelect = new JButton(">>");
+        bDeselect = new JButton("<<");
+        pSelect.add(bSelect);
+        pSelect.add(bDeselect);
+        pList.add(pSelect, gbc);
 
-        gbc.gridheight = 2;
+        gbc.fill = GridBagConstraints.BOTH;
         gbc.gridx = 2;
         gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-
-        pList.add(new JScrollPane(ldRight), gbc);
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.insets = new Insets(0, 2, 0, 0);
+        ldRight = new JList();
+        JScrollPane slRight = new JScrollPane(ldRight);
+        slRight.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        pList.add(slRight, gbc);
         
         add(pList, BorderLayout.CENTER);
     }
     
+    
+    /**
+     * 
+     */
     private void initButtonPanel() {
         bOK = new JButton(RES_GLOBAL.getString("label.ok"));
         bCancel = new JButton(RES_GLOBAL.getString("label.cancel"));
@@ -212,6 +187,9 @@ public class SimpleContactSearch extends JPanel {
         add(pButton, BorderLayout.PAGE_END);
     }
 
+    /**
+     * 
+     */
     private void initListeners() {
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -229,6 +207,9 @@ public class SimpleContactSearch extends JPanel {
         return new ArrayList<Contact>();
     }
     
+    /**
+     * 
+     */
     private void loadData() {
         
     }

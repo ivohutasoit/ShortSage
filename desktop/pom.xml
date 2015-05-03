@@ -8,9 +8,9 @@
     <name>Short Sage</name>
     <repositories>
         <repository>
-            <id>unknown-jars-temp-repo</id>
-            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
-            <url>file:${project.basedir}/lib</url>
+            <id>SMSLib</id>
+            <name>SMSLib</name>
+            <url>http://smslib.org/maven2/v3/</url>
         </repository>
     </repositories>
     <properties>

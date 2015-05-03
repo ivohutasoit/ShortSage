@@ -51,6 +51,7 @@ import javax.persistence.Table;
             column = @Column(name = "CCVRSN"))
 })
 @NamedQueries({
+    @NamedQuery(name = "Contact.All", query = "from Contact a where a.deletedState = 0"),
     @NamedQuery(name = "Contact.ByName", query = "from Contact a where a.name = :name")
 })
 public class Contact extends BasicEntity

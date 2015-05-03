@@ -175,8 +175,10 @@ public class ContactGroupActionForm extends JPanel
 
         tfName = new JXTextField(RES_GLOBAL.getString("label.contact.group"));
         tfRemark = new JTextArea();
+        tfRemark.setRows(6);
         tfRemark.setLineWrap(true);
-        tfRemark.setRows(3);
+        tfRemark.setWrapStyleWord(true);
+        tfRemark.setFont(tfName.getFont());
 
         cfStatus = new JComboBox();
         cfStatus.setEnabled(false);
@@ -282,7 +284,7 @@ public class ContactGroupActionForm extends JPanel
         if (object != null) {
             tfName.setText(object.getName());
             tfRemark.setText(object.getRemark());
-            cfStatus.setSelectedIndex(object.getStatus());
+            cfStatus.setSelectedIndex(object.getStatus() - 1);
             cfHandler.setSelectedIndex(0);
         }
     }
@@ -362,7 +364,8 @@ public class ContactGroupActionForm extends JPanel
                                 if (td.get() == true) {
                                     dialog.setVisible(false);
                                     dialog.dispose();
-                                    JOptionPane.showMessageDialog(null, "Saving new template successfull", "New Contact Group", JOptionPane.INFORMATION_MESSAGE);
+                                    JOptionPane.showMessageDialog(null, "Saving new group successfull", 
+                                            "New Contact Group", JOptionPane.INFORMATION_MESSAGE);
                                 }
                                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
                             } catch (InterruptedException | ExecutionException ex) {

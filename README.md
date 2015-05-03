@@ -43,3 +43,10 @@ Current list of tasks to be completed are:
    * <del>Search and view listener</del> - <em>partial done at 20 April 2015</em>
    * <del>Load from database</del> - <em>done but not optimize</em>
 - <del>Gateway Setup Implementation</del> - <em>partial done at 20 April 2015</em>
+
+<b>Configuration</b>
+- Extract javacomm20-win32.zip file
+- Copy extracted file following:
+  * Copy file comm.jar to [JAVA_HOME]\jre\lib\ext and [JRE_HOME]\jre\lib\ext
+  * Copy file javax.comm.properties to [JAVA_HOME]\jre\lib and [JRE_HOME]\jre\lib
+  * Copy file win32com.dll to [JAVA_HOME]\jre\bin,[JRE_HOME]\jre\bin and C:\Program Files\WINDOWS\system32

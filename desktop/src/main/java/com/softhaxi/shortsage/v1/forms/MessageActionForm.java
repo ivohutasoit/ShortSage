@@ -176,7 +176,7 @@ public class MessageActionForm extends JPanel
 
         JLabel llMessage = new JLabel("Message Detail");
         llMessage.setForeground(Color.blue);
-        lfContact = new HLookupField("Lookup or Typed Contact") {
+        lfContact = new HLookupField("Lookup or Typed Contact with seperator (;)") {
             @Override
             public void lookupPerformed() {
                 final JDialog dialog = new JDialog();
@@ -365,6 +365,7 @@ public class MessageActionForm extends JPanel
     }
 
     // </editor-fold> 
+    
     // <editor-fold defaultstate="collapsed" desc="Public Methods">
     /**
      *
@@ -375,6 +376,7 @@ public class MessageActionForm extends JPanel
     }
 
     // </editor-fold>
+    
     // <editor-fold defaultstate="collapsed" desc="ActionListener Implementation">
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -410,6 +412,7 @@ public class MessageActionForm extends JPanel
                         mService = Service.getInstance();
                         hSession.getTransaction().begin();
                         for (String name : names) {
+                            name = name.trim();
                             if (contacts.containsKey(name)) {
                                 Contact cc = contacts.get(name);
                                 if (cc instanceof ContactPerson) {
