@@ -157,7 +157,7 @@ public class ContactPersonActionForm extends JPanel
         });
 
         cfCountry = new JComboBox(new String[]{
-            "IDN"
+            "IDN (+62)"
         });
 
         cfStatus = new JComboBox();
@@ -211,7 +211,7 @@ public class ContactPersonActionForm extends JPanel
      *
      */
     private void initListeners() {
-
+      bSave.addActionListener(this);
     }
 
     /**
@@ -238,7 +238,11 @@ public class ContactPersonActionForm extends JPanel
     }
 
     private boolean isModelValid() {
-        return true;
+      if(tfFName.getText().trim().equal("")) {
+        tfFName.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+        return false;
+      }
+      return true;
     }
 
     @Override
