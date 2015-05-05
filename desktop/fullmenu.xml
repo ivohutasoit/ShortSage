@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<application>
+  <application-menu>
+  <menubar>
+  </menubar>
+  
+  <toolbar>
+  </toolbar>
+  
+  <treemenu showCode=false>
+    <group name="Workspace" order=0>
+      <header name="Main Menu" order=10>
+        <menu order=100>
+          <code>S01</code>
+          <name>Dashboard</name>
+          <action>com.softhaxi.shortsage.v1.page.DashboardPage.class</action>
+          <icon>images/ic_dashboard.png</icon>
+        </menu>
+        
+        <menu order=200>
+          <code>S02</code>
+          <name>Duplicate Detection</name>
+          <action>com.softhaxi.shortsage.v1.page.DuplicateDetectionPage.class</action>
+          <icon>images/ic_copy_16.png.png</icon>
+        </menu>
+      </header>
+      
+      <header name="Extensible" order=20>
+        
+      </header>
+      
+      <header name="Report" order=30>
+      
+      </header>
+    </group>
+    
+    <group name="Business Extension" order=1>
+      <header name="Extensible" order=20>
+        
+      </header>
+    </group>
+    
+    <group name="Gateway Monitoring" order=2>
+      <header name="Modem Folder" order=10>
+        
+        <menu order=100>
+          <code>G01</code>
+          <name>Inbox Folder</name>
+          <action>com.softhaxi.shortsage.v1.page.InboxPage.class</action>
+          <icon>images/ic_inbox.png</icon>
+        </menu>
+        
+        
+        <menu order=200>
+          <code>G02</code>
+          <name>Outbox Folder</name>
+          <action>com.softhaxi.shortsage.v1.page.OutboxPage.class</action>
+          <icon>images/ic_outbox.png</icon>
+        </menu>
+        
+        <menu order=300>
+          <code>G03</code>
+          <name>Schedule Message</name>
+          <action>com.softhaxi.shortsage.v1.page.ScheduleMessagePage.class</action>
+          <icon></icon>
+        </menu>
+        
+      </header>
+      
+      <header name="Setup" order=20>
+        <menu order=100>
+          <code>GS1</code>
+          <name>Phone Book</name>
+          <action>com.softhaxi.shortsage.v1.page.PhoneBookPage.class</action>
+          <icon>images/ic_book_16.png</icon>
+        </menu>
+        
+        <menu order=200>
+          <code>GS2</code>
+          <name>Message Template</name>
+          <action>com.softhaxi.shortsage.v1.page.MessageTemplatePage.class</action>
+          <icon>images/ic_template_16.png</icon>
+        </menu>
+      </header>
+      
+      <header name="Setup" order=30>
+        <menu order=300>
+          <code>MS1</code>
+          <name>Gateway Setup</name>
+          <action>com.softhaxi.shortsage.v1.page.GatewaySetupPage.class</action>
+          <icon>images/ic_clip.png</icon>
+        </menu>
+      </header>
+      
+      <header name="Extension" order=40>
+      </header>
+    </group>
+    
+    <group name="Settings" order=3>
+      <header name="Settings" order=10>
+        <menu order=100>
+          <code>S01</code>
+          <name>Administration</name>
+          <action>com.softhaxi.shortsage.v1.page.AdministrationPage.class</action>
+          <icon>images/ic_clip.png</icon>
+        </menu>
+      </header>
+      
+      <header name="Setup" order=20>
+        <menu order=100>
+          <code>SS1</code>
+          <name>General Setup</name>
+          <action>com.softhaxi.shortsage.v1.page.GeneralSetupPage.class</action>
+          <icon>images/ic_clip.png</icon>
+        </menu>
+        <menu order=200>
+          <code>SS1</code>
+          <name>Miscellaneous Setup</name>
+          <action>com.softhaxi.shortsage.v1.page.MiscellaneousSetupPage.class</action>
+          <icon>images/ic_clip.png</icon>
+        </menu>
+      </header>
+    </group>
+  </treemenu>
+  
+  </application-menu>
+</application
