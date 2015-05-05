@@ -190,6 +190,18 @@ public class PhoneBookPage extends JPanel
                 loadingData();
             }
         });
+        addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent e) {
+            }
+        
+            public void ancestorMoved(AncestorEvent e) {
+             }
+        
+            public void ancestorRemoved(AncestorEvent e) {
+                // do action after removing from parent
+            }
+        });
         bNewGroup.addActionListener(this);
         bRefreshGroup.addActionListener(this);
         lGroup.addMouseListener(new MouseAdapter() {
@@ -247,13 +259,14 @@ public class PhoneBookPage extends JPanel
      *
      */
     private void loadingData() {
-        loadGroupData();
+        loadGroupData(null);
+        loadContactData(null);
     }
 
     /**
      *
      */
-    private synchronized void loadGroupData() {
+    private synchronized void loadGroupData(final Query query) {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
 
@@ -262,7 +275,7 @@ public class PhoneBookPage extends JPanel
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     hSession.getTransaction().begin();
-                    Query query = hSession.createQuery("from ContactGroup");
+                    Query query = hSession.getNamedQuery("ContactGroup.All");
                     dGroup = query.list();
 
                     hSession.getTransaction().commit();
@@ -286,7 +299,6 @@ public class PhoneBookPage extends JPanel
 
                     }
                     lGroup.setSelectedIndex(0);
-
                 }
                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
             }
