@@ -6,6 +6,7 @@ import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -22,8 +24,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 import net.java.dev.designgridlayout.DesignGridLayout;
@@ -163,8 +163,10 @@ public class ContactPersonActionForm extends JPanel
         cfStatus = new JComboBox();
         cfStatus.setEnabled(false);
         cfHandler = new JComboBox();
-        tfFName = new JXTextField(RES_GLOBAL.getString("label.contact.firstname"));
-        tfMName = new JXTextField(RES_GLOBAL.getString("label.contact.midname"));
+        tfFName = new JXTextField();
+        tfFName.setToolTipText(RES_GLOBAL.getString("label.contact.firstname"));
+        tfMName = new JXTextField();
+        tfMName.setToolTipText(RES_GLOBAL.getString("label.contact.midname"));
         tfLName = new JXTextField(RES_GLOBAL.getString("label.contact.lastname"));
         tfEmail = new JXTextField(RES_GLOBAL.getString("label.contact.email"));
         tfCompany = new JXTextField(RES_GLOBAL.getString("label.contact.company"));
@@ -184,13 +186,14 @@ public class ContactPersonActionForm extends JPanel
         JPanel pForm = new JPanel();
         DesignGridLayout layout = new DesignGridLayout(pForm);
         layout.labelAlignment(LabelAlignment.RIGHT);
-        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.prefix") + " :")).add(cfPrefix).empty(5);
+        layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.prefix") + " :")).add(cfPrefix).empty(4);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.name"))).add(tfFName)
                 .add(tfMName)
-                .add(tfLName);
+                .add(tfLName)
+                .empty(1);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.phone") + " :")).add(cfCountry)
-                .add(tfPhone, 3)
-                .empty(2);
+                .add(tfPhone, 2)
+                .empty(1);
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.email") + " :")).add(tfEmail).empty();
         layout.row().grid(new JLabel(RES_GLOBAL.getString("label.contact.company") + " :")).add(tfCompany).empty();
         layout.emptyRow();
@@ -230,6 +233,38 @@ public class ContactPersonActionForm extends JPanel
             bEdit.setVisible(false);
             bDelete.setVisible(false);
             bSaveNew.setVisible(false);
+        } else if(state == ActionState.READ) {
+            cfStatus.removeAllItems();
+            cfStatus.addItem("Active");
+            cfStatus.addItem("Inactive");
+
+            cfHandler.removeAllItems();
+            cfHandler.addItem("No Action");
+            cfHandler.addItem("Active");
+            cfHandler.addItem("Deactivate");
+            cfHandler.addItem("Delete");
+            cfHandler.setEnabled(true);
+            
+            bNew.setVisible(true);
+            bEdit.setVisible(true);
+            bDelete.setVisible(true);
+            bSave.setVisible(false);
+            bSaveNew.setVisible(false);
+            bCancel.setVisible(false);
+            
+            tfFName.setEnabled(false);
+            tfMName.setEnabled(false);
+            tfLName.setEnabled(false);
+            cfPrefix.setEnabled(false);
+            cfCountry.setEnabled(false);
+            tfPhone.setEnabled(false);
+            tfEmail.setEnabled(false);
+            tfCity.setEnabled(false);
+            tfCompany.setEnabled(false);
+            tfZip.setEnabled(false);
+            tfAddr1.setEnabled(false);
+            tfAddr2.setEnabled(false);
+            tfAddr3.setEnabled(false);
         }
     }
 
@@ -237,20 +272,56 @@ public class ContactPersonActionForm extends JPanel
      * 
      */ 
     private void initData() {
-
+        if(object != null) {
+            tfFName.setText(object.getFirstName());
+            tfMName.setText(object.getMidName());
+            tfLName.setText(object.getLastName());
+            tfCompany.setText(object.getCountry());
+        }
     }
 
     /**
      * 
      */ 
     private boolean isModelValid() {
-      if(tfFName.getText().trim().equal("")) {
+      if(tfFName.getText().trim().equals("")) {
         tfFName.setBorder(BorderFactory.createLineBorder(Color.red, 1));
         return false;
       }
       return true;
     }
+    
+    /**
+     * 
+     */
+    private void clearValueForm() {
+        
+    }
+    
+    /**
+     * 
+     * @param object 
+     */
+    public void setObject(ContactPerson object) {
+        this.object = object;
+        state = ActionState.READ;
+        initState();
+        initData();
+    }
+    
+    /**
+     * 
+     * @param state 
+     */
+    public void setActionState(ActionState state) {
+        this.state = state;
+        initState();
+    }
 
+    /**
+     * 
+     * @param e 
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {

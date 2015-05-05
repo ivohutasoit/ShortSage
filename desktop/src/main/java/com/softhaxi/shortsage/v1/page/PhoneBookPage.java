@@ -2,6 +2,7 @@ package com.softhaxi.shortsage.v1.page;
 
 import com.softhaxi.shortsage.v1.dto.ContactGroup;
 import com.softhaxi.shortsage.v1.dto.ContactPerson;
+import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.ContactGroupActionForm;
 import com.softhaxi.shortsage.v1.forms.ContactPersonActionForm;
@@ -34,8 +35,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXSearchField;
@@ -194,10 +200,12 @@ public class PhoneBookPage extends JPanel
             @Override
             public void ancestorAdded(AncestorEvent e) {
             }
-        
+
+            @Override
             public void ancestorMoved(AncestorEvent e) {
-             }
-        
+            }
+
+            @Override
             public void ancestorRemoved(AncestorEvent e) {
                 // do action after removing from parent
             }
@@ -221,7 +229,7 @@ public class PhoneBookPage extends JPanel
                         final JDialog dialog = new JDialog();
                         dialog.setModal(true);
                         dialog.setTitle(RES_GLOBAL.getString("label.new") + " Group");
-                        ContactGroupActionForm form = new ContactGroupActionForm((ContactGroup)dGroup.get(index-1));
+                        ContactGroupActionForm form = new ContactGroupActionForm((ContactGroup) dGroup.get(index - 1));
                         form.addPropertyChangeListener(new PropertyChangeListener() {
                             /**
                              *
@@ -251,6 +259,59 @@ public class PhoneBookPage extends JPanel
                 }
             }
         });
+
+        lContact.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                JList list = (JList) evt.getSource();
+                //System.out.println(evt.getButton());
+                if (evt.getButton() == 1) {
+                    int index = list.locationToIndex(evt.getPoint());
+
+                    if (index == 0) {
+                        return;
+                    }
+                    ContactPerson person = (ContactPerson) dContact.get(index);
+                    pForm.setObject(person);
+                    if (evt.getClickCount() == 1) {
+                        pForm.setActionState(ActionState.READ);
+                    } else if (evt.getClickCount() == 2) {
+                        pForm.setActionState(ActionState.EDIT);
+                    }
+                }
+            }
+        });
+        lContact.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+
+                int firstIndex = e.getFirstIndex();
+                int lastIndex = e.getLastIndex();
+                boolean isAdjusting = e.getValueIsAdjusting();
+
+                System.out.println("Event for indexes "
+                        + firstIndex + " - " + lastIndex
+                        + "; isAdjusting is " + isAdjusting
+                        + "; selected indexes:");
+
+                if (lsm.isSelectionEmpty()) {
+                    System.out.println(" <none>");
+                } else {
+                    // Find out which indexes are selected.
+                    int minIndex = lsm.getMinSelectionIndex();
+                    int maxIndex = lsm.getMaxSelectionIndex();
+                    for (int i = minIndex; i <= maxIndex; i++) {
+                        if (lsm.isSelectedIndex(i)) {
+                            ContactPerson person = (ContactPerson) dContact.get(i);
+                            pForm.setObject(person);
+                        }
+                    }
+                }
+                System.out.println();
+            }
+        });
     }
     // </editor-fold>
 
@@ -260,13 +321,12 @@ public class PhoneBookPage extends JPanel
      */
     private void loadingData() {
         loadGroupData(null);
-        loadContactData(null);
     }
 
     /**
      *
      */
-    private synchronized void loadGroupData(final Query query) {
+    private synchronized void loadGroupData(final String sql) {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
 
@@ -274,11 +334,8 @@ public class PhoneBookPage extends JPanel
             protected Boolean doInBackground() throws Exception {
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
-                    hSession.getTransaction().begin();
                     Query query = hSession.getNamedQuery("ContactGroup.All");
                     dGroup = query.list();
-
-                    hSession.getTransaction().commit();
                     hSession.close();
                     return true;
                 } catch (Exception ex) {
@@ -310,7 +367,7 @@ public class PhoneBookPage extends JPanel
                 if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())) {
                     boolean value = (boolean) evt.getNewValue();
                     if (value == false) {
-                        loadContactData();
+                        loadContactData(null);
                     }
                 }
             }
@@ -321,7 +378,7 @@ public class PhoneBookPage extends JPanel
     /**
      *
      */
-    private synchronized void loadContactData() {
+    private synchronized void loadContactData(String sql) {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
 
@@ -329,11 +386,9 @@ public class PhoneBookPage extends JPanel
             protected Boolean doInBackground() throws Exception {
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
-                    hSession.getTransaction().begin();
                     Query query = hSession.createQuery("from ContactPerson");
                     dContact = query.list();
 
-                    hSession.getTransaction().commit();
                     hSession.close();
                     return true;
                 } catch (Exception ex) {
@@ -345,12 +400,13 @@ public class PhoneBookPage extends JPanel
             @Override
             protected void done() {
                 if (!isCancelled()) {
-                    mContact.removeAllElements();
+                    mContact = new DefaultListModel();
                     for (Iterator jj = dContact.iterator(); jj.hasNext();) {
                         ContactPerson person = (ContactPerson) jj.next();
-                        mContact.addElement(person.getName());
+                        mContact.addElement(String.format("%s, %s", person.getLastName(), person.getFirstName()));
                     }
-                    if (mContact.size() != 0) {
+                    lContact.setModel(mContact);
+                    if (!mContact.isEmpty()) {
                         lContact.setSelectedIndex(0);
                     }
                 }
@@ -374,8 +430,8 @@ public class PhoneBookPage extends JPanel
     // </editor-fold>
 
     /**
-     * 
-     * @param e 
+     *
+     * @param e
      */
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -407,7 +463,7 @@ public class PhoneBookPage extends JPanel
                 dialog.addWindowListener(new WindowAdapter() {
                     @Override
                     public void windowClosed(WindowEvent e) {
-                        loadGroupData();
+                        loadGroupData(null);
                     }
                 });
                 dialog.add(form);
@@ -415,7 +471,7 @@ public class PhoneBookPage extends JPanel
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             } else if (source == bRefreshGroup) {
-                loadGroupData();
+                loadGroupData(null);
             }
         }
     }

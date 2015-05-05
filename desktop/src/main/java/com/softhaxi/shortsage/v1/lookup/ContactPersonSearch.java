@@ -1,9 +1,30 @@
 package com.softhaxi.shortsage.v1.lookup;
 
+import com.softhaxi.shortsage.v1.dto.Contact;
 import com.softhaxi.shortsage.v1.dto.ContactPerson;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import org.jdesktop.swingx.JXSearchField;
 
 /**
  *
@@ -58,7 +79,7 @@ public class ContactPersonSearch extends JPanel {
         initButtonPanel();
     }
     
-    private void iniSearchPanel() {
+    private void initSearchPanel() {
         JPanel pSearch = new JPanel(new GridLayout(1, 2, 5, 0));
         pSearch.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         
@@ -171,16 +192,9 @@ public class ContactPersonSearch extends JPanel {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                loadData();
+                loadData(null);
             }
         });
-    }
-    
-    /**
-     * 
-     */
-    private void initListeners() {
-        // Add anchestor listener
     }
     
     /**
@@ -203,6 +217,6 @@ public class ContactPersonSearch extends JPanel {
      * @return 
      */
     public List<ContactPerson> getContacts() {
-        return new ArrayList<Contact>();
+        return new ArrayList<ContactPerson>();
     }
 }
