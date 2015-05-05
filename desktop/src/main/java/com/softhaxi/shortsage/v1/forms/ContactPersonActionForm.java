@@ -233,10 +233,16 @@ public class ContactPersonActionForm extends JPanel
         }
     }
 
+    /**
+     * 
+     */ 
     private void initData() {
 
     }
 
+    /**
+     * 
+     */ 
     private boolean isModelValid() {
       if(tfFName.getText().trim().equal("")) {
         tfFName.setBorder(BorderFactory.createLineBorder(Color.red, 1));
