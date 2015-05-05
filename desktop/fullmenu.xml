@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- http://www.mkyong.com/java/how-to-read-xml-file-in-java-dom-parser/ -->
+<!-- http://www.journaldev.com/1112/how-to-write-xml-file-in-java-dom-parser -->
 <application>
   <application-menu>
   <menubar>
