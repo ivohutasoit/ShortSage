@@ -53,7 +53,7 @@ import org.jdesktop.swingx.JXSearchField;
  * @version 1.0.0
  */
 public class PhoneBookPage extends JPanel
-        implements ActionListener {
+        implements ActionListener, ListSelectionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -67,7 +67,7 @@ public class PhoneBookPage extends JPanel
      * panel data
      */
     private JList lGroup, lContact;
-    private JPanel pData;
+    private JPanel pData, pList;
     private ContactPersonActionForm pForm;
 
     /**
@@ -103,10 +103,12 @@ public class PhoneBookPage extends JPanel
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(2, 2, 2, 2));
 
-        pData = new JPanel(new BorderLayout(4, 0));
-        pData.setPreferredSize(new Dimension(500, getHeight()));
-        add(pData, BorderLayout.WEST);
-
+        pData = new JPanel(new GridLayout(1, 2, 4, 0));
+        add(pData, BorderLayout.CENTER);
+        
+        pList = new JPanel(new GridLayout(1, 2, 4, 0));
+        pData.add(pList);
+        
         initGroupPanel();
         initContactPanel();
         initFormPanel();
@@ -117,7 +119,6 @@ public class PhoneBookPage extends JPanel
      */
     private void initGroupPanel() {
         JPanel pGroup = new JPanel(new BorderLayout());
-        pGroup.setPreferredSize(new Dimension(200, getHeight()));
         pGroup.setBackground(Color.white);
 
         JToolBar tbGroup = new JToolBar();
@@ -146,10 +147,11 @@ public class PhoneBookPage extends JPanel
         mGroup = new DefaultListModel<String>();
         mGroup.addElement("ALL");
         lGroup = new JList(mGroup);
+        lGroup.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lGroup.setSelectedIndex(0);
         pGroup.add(new JScrollPane(lGroup), BorderLayout.CENTER);
 
-        pData.add(pGroup, BorderLayout.WEST);
+        pList.add(pGroup);
     }
 
     /**
@@ -174,7 +176,7 @@ public class PhoneBookPage extends JPanel
         lContact = new JList(mContact);
         pContact.add(new JScrollPane(lContact), BorderLayout.CENTER);
 
-        pData.add(pContact, BorderLayout.CENTER);
+        pList.add(pContact);
     }
 
     /**
@@ -183,7 +185,7 @@ public class PhoneBookPage extends JPanel
     private void initFormPanel() {
         pForm = new ContactPersonActionForm();
 
-        add(pForm, BorderLayout.CENTER);
+        pData.add(pForm);
     }
 
     /**
@@ -320,13 +322,57 @@ public class PhoneBookPage extends JPanel
      *
      */
     private void loadingData() {
-        loadGroupData(null);
+        doGroupSearch();
+    }
+    /**
+     * 
+     */ 
+    private void doGroupSearch() {
+        loadDataGroup(null);
+    } 
+    
+    /**
+     * 
+     */ 
+    private void doContactSearch() {
+        String keyword = sfContact.getText().trim();
+        StringBuilder sql = new StringBuilder();
+        
+        ContactGroup group = null;
+        if(lGroup.getSelectedIndex() != 0) {
+            sql.append("select p from ContactGroupLine a")
+                .append(" join a.person p where a.deletedState = 0 and p.deletedState = 0");
+            
+            group = mGroup.get(lGroup.getSelectedIndex());
+            sql.append(" and a.group = '")
+                .append(group.getId())
+                .append("' ");
+        } else {
+            sql.append("from ContactPerson p where p.deletedState = 0");
+        }
+        
+        if(!keyword.equals("")) {
+            if(!keyword.contains("*")) {
+                sql.append(" and (p.name = '")
+                    .append(keyword)
+                    .append("' or p.id = '")
+                    .append(keyword)
+                    .append("')");
+            } else {
+                sql.append(" and (p.name like '")
+                    .append(keyword)
+                    .append("' or p.id like '")
+                    .append("')");
+            }
+        }
+        System.out.println(sql.toString());
+        loadContactData(sql.toString());
     }
 
     /**
      *
      */
-    private synchronized void loadGroupData(final String sql) {
+    private void loadGroupData(final String sql) {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
 
@@ -334,7 +380,12 @@ public class PhoneBookPage extends JPanel
             protected Boolean doInBackground() throws Exception {
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
-                    Query query = hSession.getNamedQuery("ContactGroup.All");
+                    Query query = null;
+                    if(sql == null) {
+                        query = hSession.getNamedQuery("ContactGroup.All");
+                    } else {
+                        query = hSession.createQuery(sql);
+                    }
                     dGroup = query.list();
                     hSession.close();
                     return true;
@@ -347,15 +398,15 @@ public class PhoneBookPage extends JPanel
             @Override
             protected void done() {
                 if (!isCancelled()) {
-                    mGroup.removeAllElements();
-                    mGroup.addElement("ALL");
+                    mGroup = new DefaultListModel<ContactGroup>();
+                    ContactGroup gAll = new ContactGroup();
+                    gAll.setName("All");
+                    mGroup.addElement(gAll);
 
                     for (Iterator ii = dGroup.iterator(); ii.hasNext();) {
-                        ContactGroup group = (ContactGroup) ii.next();
-                        mGroup.addElement(group.getName());
-
+                        mGroup.addElement((ContactGroup) ii.next());
                     }
-                    lGroup.setSelectedIndex(0);
+                    lGroup.setModel(mGroup);
                 }
                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
             }
@@ -367,7 +418,7 @@ public class PhoneBookPage extends JPanel
                 if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())) {
                     boolean value = (boolean) evt.getNewValue();
                     if (value == false) {
-                        loadContactData(null);
+                        lGroup.setSelectedIndex(0);
                     }
                 }
             }
@@ -378,7 +429,7 @@ public class PhoneBookPage extends JPanel
     /**
      *
      */
-    private synchronized void loadContactData(String sql) {
+    private void loadContactData(final String sql) {
         firePropertyChange(PropertyChangeField.LOADING.toString(), false, true);
         SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
 
@@ -386,7 +437,12 @@ public class PhoneBookPage extends JPanel
             protected Boolean doInBackground() throws Exception {
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
-                    Query query = hSession.createQuery("from ContactPerson");
+                    Query query = null;
+                    if(sql == null) {
+                        query = hSession.getNamedQuery("ContactPerson.All");
+                    }else {
+                        query = hSession.createQuery(sql);
+                    }
                     dContact = query.list();
 
                     hSession.close();
@@ -400,15 +456,11 @@ public class PhoneBookPage extends JPanel
             @Override
             protected void done() {
                 if (!isCancelled()) {
-                    mContact = new DefaultListModel();
+                    mContact = new DefaultListModel<ContactPerson>();
                     for (Iterator jj = dContact.iterator(); jj.hasNext();) {
-                        ContactPerson person = (ContactPerson) jj.next();
-                        mContact.addElement(String.format("%s, %s", person.getLastName(), person.getFirstName()));
+                        mContact.addElement((ContactPerson) jj.next());
                     }
                     lContact.setModel(mContact);
-                    if (!mContact.isEmpty()) {
-                        lContact.setSelectedIndex(0);
-                    }
                 }
                 firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
             }
@@ -420,6 +472,9 @@ public class PhoneBookPage extends JPanel
                 if (evt.getPropertyName().equals(PropertyChangeField.LOADING.toString())) {
                     boolean value = (boolean) evt.getNewValue();
                     if (value == false) {
+                        if (!mContact.isEmpty()) {
+                            lContact.setSelectedIndex(0);
+                        }
                         firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
                     }
                 }
@@ -473,6 +528,31 @@ public class PhoneBookPage extends JPanel
             } else if (source == bRefreshGroup) {
                 loadGroupData(null);
             }
+        } else if(e.getSource() instanceof JXSearchField) {
+            JXSearchField ss = (JXSearchField) e.getSource();
+            if(ss == sfContact) {
+                if(sfContact.getText().trim().equals("")) {
+                    JOptionPane.showDialogMessage(null,
+                            "Keyword search cannot be null",
+                            "Contact Person - Search Keyword", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                doContactSearch();
+            }
         }
+    }
+    
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if(e.getSource() instanceof JList) {
+            JList ll = (JList) e.getSource();
+            if(ll == lGroup) {
+                doContactSearch();
+            } else if(ll == lContact) {
+                
+            }
+        }
+        
     }
 }
