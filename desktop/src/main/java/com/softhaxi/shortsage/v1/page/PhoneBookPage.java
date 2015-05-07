@@ -6,10 +6,11 @@ import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.ContactGroupActionForm;
 import com.softhaxi.shortsage.v1.forms.ContactPersonActionForm;
+import com.softhaxi.shortsage.v1.renderer.ContactPersonRenderer;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -105,10 +106,10 @@ public class PhoneBookPage extends JPanel
 
         pData = new JPanel(new GridLayout(1, 2, 4, 0));
         add(pData, BorderLayout.CENTER);
-        
+
         pList = new JPanel(new GridLayout(1, 2, 4, 0));
         pData.add(pList);
-        
+
         initGroupPanel();
         initContactPanel();
         initFormPanel();
@@ -172,8 +173,9 @@ public class PhoneBookPage extends JPanel
         });
 
         pContact.add(sfContact, BorderLayout.NORTH);
-        mContact = new DefaultListModel<String>();
+        mContact = new DefaultListModel<ContactPerson>();
         lContact = new JList(mContact);
+        lContact.setCellRenderer(new ContactPersonRenderer());
         pContact.add(new JScrollPane(lContact), BorderLayout.CENTER);
 
         pList.add(pContact);
@@ -261,6 +263,7 @@ public class PhoneBookPage extends JPanel
                 }
             }
         });
+        lGroup.getSelectionModel().addListSelectionListener(this);
 
         lContact.addMouseListener(new MouseAdapter() {
             @Override
@@ -324,45 +327,46 @@ public class PhoneBookPage extends JPanel
     private void loadingData() {
         doGroupSearch();
     }
+
     /**
-     * 
-     */ 
+     *
+     */
     private void doGroupSearch() {
-        loadDataGroup(null);
-    } 
-    
+        loadGroupData(null);
+    }
+
     /**
-     * 
-     */ 
+     *
+     */
     private void doContactSearch() {
         String keyword = sfContact.getText().trim();
         StringBuilder sql = new StringBuilder();
-        
+
         ContactGroup group = null;
-        if(lGroup.getSelectedIndex() != 0) {
+        if (lGroup.getSelectedIndex() != 0) {
             sql.append("select p from ContactGroupLine a")
-                .append(" join a.person p where a.deletedState = 0 and p.deletedState = 0");
-            
-            group = mGroup.get(lGroup.getSelectedIndex());
+                    .append(" join a.person p where a.deletedState = 0 and p.deletedState = 0");
+
+            group = (ContactGroup) mGroup.get(lGroup.getSelectedIndex());
             sql.append(" and a.group = '")
-                .append(group.getId())
-                .append("' ");
+                    .append(group.getId())
+                    .append("' ");
         } else {
             sql.append("from ContactPerson p where p.deletedState = 0");
         }
-        
-        if(!keyword.equals("")) {
-            if(!keyword.contains("*")) {
+
+        if (!keyword.equals("")) {
+            if (!keyword.contains("*")) {
                 sql.append(" and (p.name = '")
-                    .append(keyword)
-                    .append("' or p.id = '")
-                    .append(keyword)
-                    .append("')");
+                        .append(keyword)
+                        .append("' or p.id = '")
+                        .append(keyword)
+                        .append("')");
             } else {
                 sql.append(" and (p.name like '")
-                    .append(keyword)
-                    .append("' or p.id like '")
-                    .append("')");
+                        .append(keyword)
+                        .append("' or p.id like '")
+                        .append("')");
             }
         }
         System.out.println(sql.toString());
@@ -381,7 +385,7 @@ public class PhoneBookPage extends JPanel
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     Query query = null;
-                    if(sql == null) {
+                    if (sql == null) {
                         query = hSession.getNamedQuery("ContactGroup.All");
                     } else {
                         query = hSession.createQuery(sql);
@@ -420,6 +424,7 @@ public class PhoneBookPage extends JPanel
                     if (value == false) {
                         lGroup.setSelectedIndex(0);
                     }
+                    doContactSearch();
                 }
             }
         });
@@ -438,9 +443,9 @@ public class PhoneBookPage extends JPanel
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     Query query = null;
-                    if(sql == null) {
+                    if (sql == null) {
                         query = hSession.getNamedQuery("ContactPerson.All");
-                    }else {
+                    } else {
                         query = hSession.createQuery(sql);
                     }
                     dContact = query.list();
@@ -528,31 +533,31 @@ public class PhoneBookPage extends JPanel
             } else if (source == bRefreshGroup) {
                 loadGroupData(null);
             }
-        } else if(e.getSource() instanceof JXSearchField) {
+        } else if (e.getSource() instanceof JXSearchField) {
             JXSearchField ss = (JXSearchField) e.getSource();
-            if(ss == sfContact) {
-                if(sfContact.getText().trim().equals("")) {
-                    JOptionPane.showDialogMessage(null,
+            if (ss == sfContact) {
+                if (sfContact.getText().trim().equals("")) {
+                    JOptionPane.showMessageDialog(null,
                             "Keyword search cannot be null",
                             "Contact Person - Search Keyword", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-                
+
                 doContactSearch();
             }
         }
     }
-    
+
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        if(e.getSource() instanceof JList) {
-            JList ll = (JList) e.getSource();
-            if(ll == lGroup) {
+        if (e.getSource() instanceof JList) {
+            ListSelectionModel ll = (ListSelectionModel) e.getSource();
+            if (ll == mGroup) {
                 doContactSearch();
-            } else if(ll == lContact) {
-                
+            } else if (ll == lContact) {
+
             }
         }
-        
+
     }
 }

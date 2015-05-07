@@ -138,9 +138,4 @@ public class ContactPerson extends Contact
     public void setPhone(String phone) {
         this.phone = phone;
     }
-    
-    @Override
-    public String toString() {
-        return super.getName();
-    }
 }
