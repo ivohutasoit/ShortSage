@@ -167,14 +167,22 @@ public class ContactPersonActionForm extends JPanel
         tfFName.setToolTipText(RES_GLOBAL.getString("label.contact.firstname"));
         tfMName = new JXTextField();
         tfMName.setToolTipText(RES_GLOBAL.getString("label.contact.midname"));
-        tfLName = new JXTextField(RES_GLOBAL.getString("label.contact.lastname"));
-        tfEmail = new JXTextField(RES_GLOBAL.getString("label.contact.email"));
-        tfCompany = new JXTextField(RES_GLOBAL.getString("label.contact.company"));
-        tfAddr1 = new JXTextField(RES_GLOBAL.getString("label.contact.fulladdress"));
+        tfLName = new JXTextField();
+        tfLName.setToolTipText(RES_GLOBAL.getString("label.contact.lastname"));
+        tfEmail = new JXTextField();
+        tfEmail.setToolTipText(RES_GLOBAL.getString("label.contact.email"));
+        tfCompany = new JXTextField();
+        tfCompany.setToolTipText(RES_GLOBAL.getString("label.contact.company"));
+        tfAddr1 = new JXTextField();
+        tfAddr1.setToolTipText(RES_GLOBAL.getString("label.contact.fulladdress"));
         tfAddr2 = new JXTextField();
+        tfAddr2.setToolTipText(RES_GLOBAL.getString("label.contact.fulladdress"));
         tfAddr3 = new JXTextField();
-        tfCity = new JXTextField(RES_GLOBAL.getString("label.contact.city"));
-        tfZip = new JXTextField(RES_GLOBAL.getString("label.contact.zip"));
+        tfAddr3.setToolTipText(RES_GLOBAL.getString("label.contact.fulladdress"));
+        tfCity = new JXTextField();
+        tfCity.setToolTipText(RES_GLOBAL.getString("label.contact.city"));
+        tfZip = new JXTextField();
+        tfZip.setToolTipText(RES_GLOBAL.getString("label.contact.zip"));
         tfPhone = new JXTextField(RES_GLOBAL.getString("label.contact.phone") + " " + 
                 RES_GLOBAL.getString("label.contact.phone.exp"));
         tfRemark = new JXTextArea();
@@ -265,6 +273,8 @@ public class ContactPersonActionForm extends JPanel
             tfAddr1.setEnabled(false);
             tfAddr2.setEnabled(false);
             tfAddr3.setEnabled(false);
+        } else if(state == ActionState.EDIT) {
+        
         }
     }
 
