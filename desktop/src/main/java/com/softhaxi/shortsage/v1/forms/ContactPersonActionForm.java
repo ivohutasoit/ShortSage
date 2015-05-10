@@ -50,6 +50,8 @@ public class ContactPersonActionForm extends JPanel
     private ContactPerson object;
     private ActionState state;
 
+    private ContactPerson tempObj;
+
     /**
      * Tool bar items
      */
@@ -183,8 +185,8 @@ public class ContactPersonActionForm extends JPanel
         tfCity.setToolTipText(RES_GLOBAL.getString("label.contact.city"));
         tfZip = new JXTextField();
         tfZip.setToolTipText(RES_GLOBAL.getString("label.contact.zip"));
-        tfPhone = new JXTextField(RES_GLOBAL.getString("label.contact.phone") + " " + 
-                RES_GLOBAL.getString("label.contact.phone.exp"));
+        tfPhone = new JXTextField(RES_GLOBAL.getString("label.contact.phone") + " "
+                + RES_GLOBAL.getString("label.contact.phone.exp"));
         tfRemark = new JXTextArea();
         tfRemark.setRows(3);
         tfRemark.setFont(tfPhone.getFont());
@@ -222,7 +224,9 @@ public class ContactPersonActionForm extends JPanel
      *
      */
     private void initListeners() {
-      bSave.addActionListener(this);
+        bNew.addActionListener(this);
+        bSave.addActionListener(this);
+        bCancel.addActionListener(this);
     }
 
     /**
@@ -240,8 +244,24 @@ public class ContactPersonActionForm extends JPanel
             bNew.setVisible(false);
             bEdit.setVisible(false);
             bDelete.setVisible(false);
+            bSave.setVisible(true);
             bSaveNew.setVisible(false);
-        } else if(state == ActionState.READ) {
+            bCancel.setVisible(true);
+
+            tfFName.setEnabled(true);
+            tfMName.setEnabled(true);
+            tfLName.setEnabled(true);
+            cfPrefix.setEnabled(true);
+            cfCountry.setEnabled(true);
+            tfPhone.setEnabled(true);
+            tfEmail.setEnabled(true);
+            tfCity.setEnabled(true);
+            tfCompany.setEnabled(true);
+            tfZip.setEnabled(true);
+            tfAddr1.setEnabled(true);
+            tfAddr2.setEnabled(true);
+            tfAddr3.setEnabled(true);
+        } else if (state == ActionState.READ) {
             cfStatus.removeAllItems();
             cfStatus.addItem("Active");
             cfStatus.addItem("Inactive");
@@ -252,14 +272,14 @@ public class ContactPersonActionForm extends JPanel
             cfHandler.addItem("Deactivate");
             cfHandler.addItem("Delete");
             cfHandler.setEnabled(true);
-            
+
             bNew.setVisible(true);
             bEdit.setVisible(true);
             bDelete.setVisible(true);
             bSave.setVisible(false);
             bSaveNew.setVisible(false);
             bCancel.setVisible(false);
-            
+
             tfFName.setEnabled(false);
             tfMName.setEnabled(false);
             tfLName.setEnabled(false);
@@ -273,55 +293,87 @@ public class ContactPersonActionForm extends JPanel
             tfAddr1.setEnabled(false);
             tfAddr2.setEnabled(false);
             tfAddr3.setEnabled(false);
-        } else if(state == ActionState.EDIT) {
-        
+        } else if (state == ActionState.EDIT) {
+
         }
     }
 
     /**
-     * 
-     */ 
+     *
+     */
     private void initData() {
-        if(object != null) {
+        if (object != null) {
             tfFName.setText(object.getFirstName());
             tfMName.setText(object.getMidName());
             tfLName.setText(object.getLastName());
+            tfPhone.setText(object.getPhone());
             tfCompany.setText(object.getCountry());
+            
+        } else {
+            clearValueForm();
         }
     }
 
     /**
-     * 
-     */ 
+     *
+     */
     private boolean isModelValid() {
-      if(tfFName.getText().trim().equals("")) {
-        tfFName.setBorder(BorderFactory.createLineBorder(Color.red, 1));
-        return false;
-      }
-      return true;
+        if (tfFName.getText().trim().equals("")) {
+            tfFName.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+            return false;
+        }
+        
+        if (tfLName.getText().trim().equals("")) {
+            tfLName.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+            return false;
+        }
+        
+        if (tfPhone.getText().trim().equals("")) {
+            tfPhone.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+            return false;
+        }
+        return true;
     }
-    
+
     /**
-     * 
+     *
      */
     private void clearValueForm() {
+        tfFName.setText("");
+        tfMName.setText("");
+        tfLName.setText("");
+        tfPhone.setText("");
+        tfCompany.setText("");
+        tfEmail.setText("");
+        tfAddr1.setText("");
+        tfAddr2.setText("");
+        tfAddr3.setText("");
+        tfCity.setText("");
+        tfZip.setText("");
         
+        tfFName.setBorder(tfMName.getBorder());
+        tfLName.setBorder(tfMName.getBorder());
+        tfPhone.setBorder(tfMName.getBorder());
     }
-    
+
     /**
-     * 
-     * @param object 
+     *
+     * @param object
      */
     public void setObject(ContactPerson object) {
         this.object = object;
-        state = ActionState.READ;
+        if (object != null) {
+            state = ActionState.READ;
+        } else {
+            state = ActionState.CREATE;
+        }
         initState();
         initData();
     }
-    
+
     /**
-     * 
-     * @param state 
+     *
+     * @param state
      */
     public void setActionState(ActionState state) {
         this.state = state;
@@ -329,14 +381,21 @@ public class ContactPersonActionForm extends JPanel
     }
 
     /**
-     * 
-     * @param e 
+     *
+     * @param e
      */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton bb = (JButton) e.getSource();
-            if (bb == bSave) {
+            if (bb == bNew) {
+                state = ActionState.CREATE;
+                tempObj = object;
+                object = null;
+
+                initState();
+                initData();
+            } else if (bb == bSave) {
                 if (!isModelValid()) {
                     return;
                 }
@@ -411,6 +470,16 @@ public class ContactPersonActionForm extends JPanel
                 });
                 td.execute();
                 dialog.setVisible(true);
+            } else if (bb == bCancel) {
+                if (tempObj != null) {
+                    state = ActionState.READ;
+                    object = tempObj;
+                    tempObj = null;
+
+                    initState();
+                    initData();
+                }
+                firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
             }
         }
     }

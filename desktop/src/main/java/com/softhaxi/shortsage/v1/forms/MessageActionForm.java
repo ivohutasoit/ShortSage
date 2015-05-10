@@ -222,7 +222,6 @@ public class MessageActionForm extends JPanel
                             dialog.setVisible(false);
                             dialog.dispose();
                         }
-
                     }
                 });
                 dialog.add(panel);

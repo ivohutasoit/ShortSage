@@ -6,7 +6,8 @@ import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
 import com.softhaxi.shortsage.v1.forms.ContactGroupActionForm;
 import com.softhaxi.shortsage.v1.forms.ContactPersonActionForm;
-import com.softhaxi.shortsage.v1.renderer.ContactPersonRenderer;
+import com.softhaxi.shortsage.v1.renderer.list.ContactGroupRendererList;
+import com.softhaxi.shortsage.v1.renderer.list.ContactPersonRendererList;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -54,7 +55,7 @@ import org.jdesktop.swingx.JXSearchField;
  * @version 1.0.0
  */
 public class PhoneBookPage extends JPanel
-        implements ActionListener, ListSelectionListener {
+        implements ActionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -145,9 +146,12 @@ public class PhoneBookPage extends JPanel
 
         pGroup.add(tbGroup, BorderLayout.NORTH);
 
-        mGroup = new DefaultListModel<String>();
-        mGroup.addElement("ALL");
+        mGroup = new DefaultListModel<ContactGroup>();
+        ContactGroup gAll = new ContactGroup();
+        gAll.setName("All");
+        mGroup.addElement(gAll);
         lGroup = new JList(mGroup);
+        lGroup.setCellRenderer(new ContactGroupRendererList());
         lGroup.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lGroup.setSelectedIndex(0);
         pGroup.add(new JScrollPane(lGroup), BorderLayout.CENTER);
@@ -175,7 +179,7 @@ public class PhoneBookPage extends JPanel
         pContact.add(sfContact, BorderLayout.NORTH);
         mContact = new DefaultListModel<ContactPerson>();
         lContact = new JList(mContact);
-        lContact.setCellRenderer(new ContactPersonRenderer());
+        lContact.setCellRenderer(new ContactPersonRendererList());
         pContact.add(new JScrollPane(lContact), BorderLayout.CENTER);
 
         pList.add(pContact);
@@ -186,6 +190,18 @@ public class PhoneBookPage extends JPanel
      */
     private void initFormPanel() {
         pForm = new ContactPersonActionForm();
+        pForm.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals(PropertyChangeField.SAVING.toString())) {
+                    boolean value = (boolean) evt.getNewValue();
+                    if (value == false) {
+                        doGroupSearch();
+                    }
+                }
+            }
+        });
 
         pData.add(pForm);
     }
@@ -232,7 +248,8 @@ public class PhoneBookPage extends JPanel
 
                         final JDialog dialog = new JDialog();
                         dialog.setModal(true);
-                        dialog.setTitle(RES_GLOBAL.getString("label.new") + " Group");
+                        dialog.setResizable(false);
+                        dialog.setTitle(RES_GLOBAL.getString("label.view") + " Group");
                         ContactGroupActionForm form = new ContactGroupActionForm((ContactGroup) dGroup.get(index - 1));
                         form.addPropertyChangeListener(new PropertyChangeListener() {
                             /**
@@ -263,7 +280,27 @@ public class PhoneBookPage extends JPanel
                 }
             }
         });
-        lGroup.getSelectionModel().addListSelectionListener(this);
+        lGroup.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+
+                if (lsm.isSelectionEmpty()) {
+                    System.out.println(" <none>");
+                } else {
+                    // Find out which indexes are selected.
+                    int minIndex = lsm.getMinSelectionIndex();
+                    int maxIndex = lsm.getMaxSelectionIndex();
+                    for (int i = minIndex; i <= maxIndex; i++) {
+                        if (lsm.isSelectedIndex(i)) {
+                            doContactSearch();
+                        }
+                    }
+                }
+                System.out.println();
+            }
+        });
 
         lContact.addMouseListener(new MouseAdapter() {
             @Override
@@ -292,17 +329,9 @@ public class PhoneBookPage extends JPanel
             public void valueChanged(ListSelectionEvent e) {
                 ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
-                int firstIndex = e.getFirstIndex();
-                int lastIndex = e.getLastIndex();
-                boolean isAdjusting = e.getValueIsAdjusting();
-
-                System.out.println("Event for indexes "
-                        + firstIndex + " - " + lastIndex
-                        + "; isAdjusting is " + isAdjusting
-                        + "; selected indexes:");
-
                 if (lsm.isSelectionEmpty()) {
                     System.out.println(" <none>");
+                    pForm.setObject(null);
                 } else {
                     // Find out which indexes are selected.
                     int minIndex = lsm.getMinSelectionIndex();
@@ -369,6 +398,7 @@ public class PhoneBookPage extends JPanel
                         .append("')");
             }
         }
+        sql.append(" order by p.lastName ASC");
         System.out.println(sql.toString());
         loadContactData(sql.toString());
     }
@@ -424,7 +454,6 @@ public class PhoneBookPage extends JPanel
                     if (value == false) {
                         lGroup.setSelectedIndex(0);
                     }
-                    doContactSearch();
                 }
             }
         });
@@ -546,18 +575,5 @@ public class PhoneBookPage extends JPanel
                 doContactSearch();
             }
         }
-    }
-
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if (e.getSource() instanceof JList) {
-            ListSelectionModel ll = (ListSelectionModel) e.getSource();
-            if (ll == mGroup) {
-                doContactSearch();
-            } else if (ll == lContact) {
-
-            }
-        }
-
     }
 }

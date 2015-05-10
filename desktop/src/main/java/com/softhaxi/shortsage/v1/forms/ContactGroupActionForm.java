@@ -5,7 +5,10 @@ import com.softhaxi.shortsage.v1.desktop.HWaitDialog;
 import com.softhaxi.shortsage.v1.enums.ActionState;
 import com.softhaxi.shortsage.v1.dto.ContactGroup;
 import com.softhaxi.shortsage.v1.dto.ContactGroupLine;
+import com.softhaxi.shortsage.v1.dto.ContactPerson;
 import com.softhaxi.shortsage.v1.enums.PropertyChangeField;
+import com.softhaxi.shortsage.v1.lookup.ContactPersonSearch;
+import com.softhaxi.shortsage.v1.page.DashboardPage;
 import com.softhaxi.shortsage.v1.renderer.TableHeaderCenterRender;
 import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
@@ -25,6 +28,7 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -38,6 +42,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.table.DefaultTableModel;
 import net.java.dev.designgridlayout.DesignGridLayout;
 import net.java.dev.designgridlayout.LabelAlignment;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTextField;
@@ -54,7 +59,7 @@ public class ContactGroupActionForm extends JPanel
 
     private ContactGroup object;
     private ActionState state;
-    
+
     private JPanel pForm;
 
     /**
@@ -81,7 +86,7 @@ public class ContactGroupActionForm extends JPanel
      */
     private Session hSession;
     private DefaultTableModel mLine;
-    private List<ContactGroupLine> dLine;
+    private List<ContactPerson> dLine;
 
     /**
      *
@@ -119,14 +124,13 @@ public class ContactGroupActionForm extends JPanel
     private void initComponents() {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(450, 250));
-        
+
         pForm = new JPanel(new BorderLayout());
         add(pForm, BorderLayout.CENTER);
-        
-        
+
         initToolbar();
         initFormPanel();
-        
+
         if (state != ActionState.CREATE) {
             setPreferredSize(new Dimension(450, 400));
             initLinePanel();
@@ -201,7 +205,6 @@ public class ContactGroupActionForm extends JPanel
         tbLine.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(2, 2, 2, 2)));
 
         bNewLine = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/ic_plus_12.png")));
-        bNewLine.addActionListener(this);
         tbLine.add(bNewLine);
         tbLine.add(new JToolBar.Separator());
 
@@ -246,6 +249,9 @@ public class ContactGroupActionForm extends JPanel
     private void initListeners() {
         bSave.addActionListener(this);
         bCancel.addActionListener(this);
+        if (state != ActionState.CREATE) {
+            bNewLine.addActionListener(this);
+        }
     }
 
     private void initState() {
@@ -286,6 +292,8 @@ public class ContactGroupActionForm extends JPanel
             tfRemark.setText(object.getRemark());
             cfStatus.setSelectedIndex(object.getStatus() - 1);
             cfHandler.setSelectedIndex(0);
+
+            doGroupLineSearch();
         }
     }
 
@@ -299,8 +307,106 @@ public class ContactGroupActionForm extends JPanel
         return true;
     }
 
+    private void doGroupLineSearch() {
+        StringBuilder sql = new StringBuilder();
+
+        if (object != null) {
+            sql.append("select p from ContactGroupLine a")
+                    .append(" join a.person p where a.deletedState = 0 and p.deletedState = 0")
+                    .append(" and a.group = '")
+                    .append(object.getId())
+                    .append("' ");
+        }
+
+//        if (!keyword.equals("")) {
+//            if (!keyword.contains("*")) {
+//                sql.append(" and (p.name = '")
+//                        .append(keyword)
+//                        .append("' or p.id = '")
+//                        .append(keyword)
+//                        .append("')");
+//            } else {
+//                sql.append(" and (p.name like '")
+//                        .append(keyword)
+//                        .append("' or p.id like '")
+//                        .append("')");
+//            }
+//        }
+        System.out.println(sql.toString());
+        loadGroupDetail(sql.toString());
+    }
+
+    private void loadGroupDetail(final String sql) {
+        final HWaitDialog dialog = new HWaitDialog("Load Detail");
+        dialog.setModal(true);
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    Query query = null;
+                    if (sql == null) {
+                        query = hSession.getNamedQuery("ContactGroupLine.All");
+                    } else {
+                        query = hSession.createQuery(sql);
+                    }
+                    dLine = query.list();
+
+                    return true;
+                } catch (Exception ex) {
+                    Logger.getLogger(DashboardPage.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    hSession.close();
+                }
+                return false;
+            }
+
+            @Override
+            protected void done() {
+                if (!isCancelled()) {
+                    Object[] obj = null;
+                    mLine = new DefaultTableModel(COLUMN_NAMES, 0);
+
+                    for (ContactPerson contact : dLine) {
+                        obj = new Object[2];
+                        obj[0] = (contact.getName() == null) ? String.format("%s %s %s", contact.getFirstName(),
+                                contact.getMidName(), contact.getLastName()) : contact.getName();
+                        obj[1] = contact.getPhone();
+                        mLine.addRow(obj);
+
+                    }
+                    ttLine.setModel(mLine);
+                }
+                firePropertyChange(PropertyChangeField.LOADING.toString(), true, false);
+            }
+        };
+        t1.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("state".equals(evt.getPropertyName())
+                        && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                    try {
+                        if (t1.get() == true) {
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        }
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(MessageTemplateActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+        t1.execute();
+        dialog.setVisible(true);
+    }
+
     // </editor-fold>
-    
+    /**
+     *
+     * @param e
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
@@ -311,8 +417,9 @@ public class ContactGroupActionForm extends JPanel
                 }
                 firePropertyChange(PropertyChangeField.SAVING.toString(), false, true);
                 final HWaitDialog dialog = new HWaitDialog("Save Data");
-
-                object = new ContactGroup();
+                if(object == null) {
+                    object = new ContactGroup();
+                }
                 object.setName(tfName.getText().trim());
                 object.setRemark(tfRemark.getText().trim());
 
@@ -364,7 +471,7 @@ public class ContactGroupActionForm extends JPanel
                                 if (td.get() == true) {
                                     dialog.setVisible(false);
                                     dialog.dispose();
-                                    JOptionPane.showMessageDialog(null, "Saving new group successfull", 
+                                    JOptionPane.showMessageDialog(null, "Saving new group successfull",
                                             "New Contact Group", JOptionPane.INFORMATION_MESSAGE);
                                 }
                                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
@@ -379,6 +486,106 @@ public class ContactGroupActionForm extends JPanel
                 dialog.setVisible(true);
             } else if (bb == bCancel) {
                 firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+            } else if (bb == bNewLine) {
+                final JDialog dialog = new JDialog();
+                dialog.setModal(true);
+                dialog.setResizable(false);
+                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                dialog.setTitle("Lookup Contact - Dialog Selection");
+
+                final ContactPersonSearch panel = new ContactPersonSearch();
+                if(!dLine.isEmpty()) {
+                    panel.setSelectedContacts(dLine);
+                }
+                panel.addPropertyChangeListener(new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ("select".equalsIgnoreCase(evt.getPropertyName())
+                                && ((boolean) evt.getNewValue()) == true) {
+                            ContactPerson contact = panel.getUserData();
+
+                            if (contact != null) {
+                                final ContactGroupLine line = new ContactGroupLine();
+                                line.setGroup(object);
+                                line.setContact(contact);
+                                line.setNumber(contact.getPhone());
+
+                                final HWaitDialog wDialog = new HWaitDialog("Save Contact Group Line");
+                                wDialog.setModal(true);
+
+                                final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
+
+                                    @Override
+                                    protected Boolean doInBackground() throws Exception {
+                                        boolean saved = false;
+                                        try {
+                                            hSession = HibernateUtil.getSessionFactory().openSession();
+                                            hSession.getTransaction().begin();
+
+                                            hSession.save(line);
+                                            saved = true;
+
+                                            if (saved == true) {
+                                                hSession.getTransaction().commit();
+                                                saved = true;
+                                            } else {
+                                                hSession.getTransaction().rollback();
+                                                saved = false;
+                                            }
+
+                                        } catch (Exception ex) {
+                                            hSession.getTransaction().rollback();
+                                            saved = false;
+                                            Logger.getLogger(ContactGroupActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                                        } finally {
+                                            hSession.close();
+                                        }
+                                        return saved;
+                                    }
+                                };
+                                t1.addPropertyChangeListener(new PropertyChangeListener() {
+
+                                    /**
+                                     *
+                                     * @param evt
+                                     */
+                                    @Override
+                                    public void propertyChange(PropertyChangeEvent evt) {
+                                        if ("state".equals(evt.getPropertyName())
+                                                && SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                                            try {
+                                                if (t1.get() == true) {
+                                                    wDialog.setVisible(false);
+                                                    wDialog.dispose();
+                                                    JOptionPane.showMessageDialog(null, "Saving new line successfull",
+                                                            "Contact Group", JOptionPane.INFORMATION_MESSAGE);
+                                                    doGroupLineSearch();
+                                                }
+                                                //firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                                            } catch (InterruptedException | ExecutionException ex) {
+                                                Logger.getLogger(MessageTemplateActionForm.class.getName()).log(Level.SEVERE, null, ex);
+                                                //firePropertyChange(PropertyChangeField.SAVING.toString(), true, false);
+                                            }
+                                        }
+                                    }
+                                });
+                                t1.execute();
+                                wDialog.setVisible(true);
+                            }
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        } else if ("cancel".equalsIgnoreCase(evt.getPropertyName())
+                                && ((boolean) evt.getNewValue()) == true) {
+                            dialog.setVisible(false);
+                            dialog.dispose();
+                        }
+                    }
+                });
+                dialog.add(panel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
             }
         }
     }

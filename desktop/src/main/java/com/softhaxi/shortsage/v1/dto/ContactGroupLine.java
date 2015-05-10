@@ -48,12 +48,12 @@ public class ContactGroupLine extends BasicEntity
         implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "GLCGID", nullable = false, insertable = false, updatable = false)
-    private Contact group;
+    @JoinColumn(name = "GLCGID", referencedColumnName = "CCCCID", nullable = false, insertable = true, updatable = false)
+    private ContactGroup group;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "GLCCID", nullable = false, insertable = false, updatable = false)
-    private Contact person;
+    @JoinColumn(name = "GLCCID", referencedColumnName = "CCCCID", nullable = false, insertable = true, updatable = false)
+    private ContactPerson person;
 
     @Column(name = "GLNMBR")
     private String number;
@@ -61,28 +61,28 @@ public class ContactGroupLine extends BasicEntity
     /**
      * @return the group
      */
-    public Contact getGroup() {
+    public ContactGroup getGroup() {
         return group;
     }
 
     /**
      * @param group the group to set
      */
-    public void setGroup(Contact group) {
+    public void setGroup(ContactGroup group) {
         this.group = group;
     }
 
     /**
      * @return the person
      */
-    public Contact getPerson() {
+    public ContactPerson getPerson() {
         return person;
     }
 
     /**
      * @param person the contact to set
      */
-    public void setContact(Contact person) {
+    public void setContact(ContactPerson person) {
         this.person = person;
     }
 
