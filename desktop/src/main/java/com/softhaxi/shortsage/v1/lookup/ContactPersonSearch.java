@@ -322,7 +322,7 @@ public class ContactPersonSearch extends JPanel
             JButton bb = (JButton) e.getSource();
             if (bb == bOK) {
                 if (tdData.getSelectedRow() != -1) {
-                    String id = tdData.getValueAt(tdData.getSelectedRow(),2);
+                    String id = (String) tdData.getValueAt(tdData.getSelectedRow(),2);
                     for(ContactPerson person : data) {
                         if(person.getId().equals(id)) {
                             userData = person;

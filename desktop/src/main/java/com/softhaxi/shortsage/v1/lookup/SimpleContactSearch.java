@@ -1,6 +1,8 @@
 package com.softhaxi.shortsage.v1.lookup;
 
+import com.softhaxi.shortsage.v1.desktop.HWaitDialog;
 import com.softhaxi.shortsage.v1.dto.Contact;
+import com.softhaxi.shortsage.v1.util.HibernateUtil;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -8,6 +10,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
@@ -23,7 +27,9 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.jdesktop.swingx.JXSearchField;
 
 /**
@@ -199,7 +205,7 @@ public class SimpleContactSearch extends JPanel
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
-                loadData();
+                doSearch();
             }
         });
     }
@@ -216,12 +222,12 @@ public class SimpleContactSearch extends JPanel
      * 
      */
     private void loadData(final String sql) {
-        final HWaitDialog dialog = new HwaitDialog();
+        final HWaitDialog dialog = new HWaitDialog("Load Data");
         dialog.setModal(true);
-        dialog.setTitle("Load Data");
-        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void>() {
             @Override
             protected Boolean doInBackground() {
+                boolean result = false;
                 try {
                     hSession = HibernateUtil.getSessionFactory().openSession();
                     Query query = null;
@@ -231,13 +237,13 @@ public class SimpleContactSearch extends JPanel
                         query = hSession.createQuery(sql);
                     }
                     contacts = query.list();
-                    return true;
+                    result = true;
                 } catch (Exception ex) {
                     
                 } finally {
-                    hSessoin.close();
+                    hSession.close();
                 }
-                return false;
+                return result;
             }
             
             @Override
@@ -251,7 +257,7 @@ public class SimpleContactSearch extends JPanel
                     dialog.dispose();
                 }
             }
-        }
+        };
         t1.execute();
         dialog.setVisible(true);
     }
@@ -269,8 +275,8 @@ public class SimpleContactSearch extends JPanel
         if(!sContacts.isEmpty()) {
             sql.append(" and a.id not in (");
             for(int ii=0; ii<sContacts.size(); ii++) {
-                Contact contact = sContact.get(ii);
-                if(ii == sContact.size()-1) {
+                Contact contact = sContacts.get(ii);
+                if(ii == sContacts.size()-1) {
                     sql.append("'")
                         .append(contact.getId())
                         .append("'");
@@ -292,36 +298,36 @@ public class SimpleContactSearch extends JPanel
             JButton bb = (JButton) e.getSource();
             int ii = 0;
             if(bb == bSelect) {
-                int[] fromindex = lLeft.getSelectedIndices();
-                Contact[] from = lLeft.getSelectedValues();
+                int[] fromindex = ldLeft.getSelectedIndices();
+                List<Contact> slTemp = ldLeft.getSelectedValuesList();
                 
                 // Then, for each item in the array, we add them to
                 // the other list.
-                for(i = 0; i < from.length; i++) {
-                    sContacts.addElement(from[i]);
+                for(int i = 0; i < slTemp.size(); i++) {
+                    mdRight.addElement(slTemp.get(i));
                 }
                 
                 // Finally, we remove the items from the first list.
                 // We must remove from the bottom, otherwise we try to 
                 // remove the wrong objects.
-                for(i = (fromindex.length-1); i >=0; i--) {
-                    aContacts.remove(fromindex[i]);
+                for(int i = (fromindex.length-1); i >=0; i--) {
+                    mdLeft.remove(fromindex[i]);
                 }
             } else if(bb == bDeselect) {
-                Contact[] to = lRight.getSelectedValues();
-                int[] toindex = lRight.getSelectedIndices();
+                List<Contact> srTemp = ldRight.getSelectedValuesList();
+                int[] toindex = ldRight.getSelectedIndices();
                 
                 // Then, for each item in the array, we add them to
                 // the other list.
-                for(i = 0; i < to.length; i++) {
-                    aContacts.addElement(to[i]);
+                for(int i = 0; i < srTemp.size(); i++) {
+                    mdLeft.addElement(srTemp.get(i));
                 }
                 
                 // Finally, we remove the items from the first list.
                 // We must remove from the bottom, otherwise we try to
                 // remove the wrong objects.
-                for(i = (toindex.length-1); i >=0; i--){
-                    sContacts.remove(toindex[i]);
+                for(int i = (toindex.length-1); i >=0; i--){
+                    mdRight.remove(toindex[i]);
                 }
             }
         }
