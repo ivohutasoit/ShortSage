@@ -49,14 +49,19 @@ public class SimpleContactSearch extends JPanel
         bSelect, bDeselect;
     
     private DefaultListModel mdLeft, mdRight;
+    private List<Contact> contacts, aContacts, sContacts;
     
-    private List<Contact> aContacts, sContacts;
+    private Session hSession;
 
     /**
      * Constructor
      */
     public SimpleContactSearch() {
-        setVisible(false);
+        this(new ArrayList<Contact>());
+    }
+    
+    public SimpleContactSearch(List<Contact> contacts) {
+        this.sContacts = contacts;
         
         mdLeft = new DefaultListModel();
         mdRight = new DefaultListModel();
@@ -89,7 +94,6 @@ public class SimpleContactSearch extends JPanel
         cfCategory.addItem("Contact Person");
         cfCategory.addItem("Search Result");
         cfCategory.setSelectedIndex(1);
-        cfCategory.setEnabled(false);
         
         sfKeyword = new JXSearchField("Contact or Group Name");
         
@@ -218,7 +222,22 @@ public class SimpleContactSearch extends JPanel
         final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
             @Override
             protected Boolean doInBackground() {
-                
+                try {
+                    hSession = HibernateUtil.getSessionFactory().openSession();
+                    Query query = null;
+                    if(sql == null) {
+                        query = hSession.getNamedQuery("Contact.All");
+                    } else {
+                        query = hSession.createQuery(sql);
+                    }
+                    contacts = query.list();
+                    return true;
+                } catch (Exception ex) {
+                    
+                } finally {
+                    hSessoin.close();
+                }
+                return false;
             }
             
             @Override
@@ -242,9 +261,26 @@ public class SimpleContactSearch extends JPanel
         StringBuilder sql = new StringBuilder("from Contact a where a.deletedState = 0");
         
         if(!keyword.equals("")) {
-            sql.append(" and (name like ('")
+            sql.append(" and (a.name like ('")
                 .append(keyword)
                 .append("')");
+        } 
+        
+        if(!sContacts.isEmpty()) {
+            sql.append(" and a.id not in (");
+            for(int ii=0; ii<sContacts.size(); ii++) {
+                Contact contact = sContact.get(ii);
+                if(ii == sContact.size()-1) {
+                    sql.append("'")
+                        .append(contact.getId())
+                        .append("'");
+                } else {
+                    sql.append("'")
+                        .append(contact.getId())
+                        .append("',");
+                }
+            }
+            sql.append(")");
         }
         
         loadData(sql.toString());
