@@ -210,7 +210,34 @@ public class SimpleContactSearch extends JPanel {
     /**
      * 
      */
-    private void loadData() {
+    private void loadData(final String sql) {
+        final HWaitDialog dialog = new HwaitDialog();
+        dialog.setModal(true);
+        dialog.setTitle("Load Data");
+        final SwingWorker<Boolean, Void> t1 = new SwingWorker<Boolean, Void> {
+            @Override
+            protected Boolean doInBackground() {
+                
+            }
+            
+            protected void done() {
+                
+            }
+        }
         
+        dialog.setVisible(true);
+    }
+    
+    private void doSearch() {
+        String keyword = sfKeyword.getText().trim();
+        StringBuilder sql = new StringBuilder("from Contact a where a.deletedState = 0");
+        
+        if(!keyword.equals("")) {
+            sql.append(" and (name like ('")
+                .append(keyword)
+                .append("')");
+        }
+        
+        loadData(sql.toString());
     }
 }
