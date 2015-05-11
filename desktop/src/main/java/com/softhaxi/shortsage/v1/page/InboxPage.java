@@ -237,7 +237,7 @@ public class InboxPage extends JPanel
                             diMsg.setDate(msg.getDate());
                             diMsg.setRefId(msg.getUuid());
                             diMsg.setGatewayId(msg.getGatewayId());
-                            diMsg.setContact(msg.getOriginator());
+                            diMsg.setNumber(msg.getOriginator());
                             diMsg.setText(msg.getText());
                             diMsg.setCenter(msg.getSmscNumber());
                             diMsg.setCreatedDate(new Date());

@@ -37,7 +37,7 @@ public class InboundNotification extends ModemCallback
             message.setDate(msg.getDate());
             message.setRefId(msg.getUuid());
             message.setGatewayId(msg.getGatewayId());
-            message.setContact(msg.getOriginator());
+            message.setNumber(msg.getOriginator());
             message.setText(msg.getText());
             message.setCenter(msg.getSmscNumber());
 

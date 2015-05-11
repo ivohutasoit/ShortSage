@@ -187,7 +187,7 @@ public class MessageActionForm extends JPanel
                 dialog.setTitle("Lookup Contact - Dialog Selection");
 
                 final SimpleContactSearch panel = new SimpleContactSearch();
-                if(!contacts.isEmpty()) {
+                if (!contacts.isEmpty()) {
                     panel.setUserData(new ArrayList<Contact>(contacts.values()));
                 }
                 panel.addPropertyChangeListener(new PropertyChangeListener() {
@@ -201,13 +201,18 @@ public class MessageActionForm extends JPanel
                                     || lContacts.size() != 0) {
                                 contacts.clear();
                                 for (Contact contact : lContacts) {
-                                    contacts.put(contact.getId(), contact);
+                                    if (contact instanceof ContactPerson) {
+                                        ContactPerson person = (ContactPerson) contact;
+                                        contacts.put(String.format("%s %s", person.getFirstName(), person.getLastName()), person);
+                                    } else {
+                                        contacts.put(contact.getName(), contact);
+                                    }
                                 }
                             }
 
                             StringBuilder sb = new StringBuilder();
                             for (Map.Entry<String, Contact> entry : contacts.entrySet()) {
-                                sb.append(entry.getValue().getName()).append("; ");
+                                sb.append(entry.getKey()).append(";");
                             }
                             lfContact.setText(sb.toString());
 
@@ -426,7 +431,7 @@ public class MessageActionForm extends JPanel
                                         mService.queueMessage(mMsg);
                                     }
                                 } else if (cc instanceof ContactGroup) {
-
+                                    
                                 }
                             } else {
                                 // Only Number
@@ -461,7 +466,8 @@ public class MessageActionForm extends JPanel
                                 dMsg = new OutboxMessage();
                                 dMsg.setRefId(mMsg.getUuid());
                                 dMsg.setGatewayId(mMsg.getGatewayId());
-                                dMsg.setContact(mMsg.getRecipient());
+                                dMsg.setNumber(mMsg.getRecipient());
+                                dMsg.setContact(contacts.get(name));
                                 dMsg.setText(mMsg.getText());
                                 dMsg.setDate(mMsg.getDate());
                                 dMsg.setFailureCause(mMsg.getFailureCause().toString());

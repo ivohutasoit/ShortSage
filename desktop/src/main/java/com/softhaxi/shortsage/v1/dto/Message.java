@@ -9,9 +9,12 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -70,9 +73,13 @@ public class Message extends BasicEntity
     @Column(name = "MGDATE")
     @Temporal(TemporalType.DATE)
     private Date date;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MGCCID", referencedColumnName = "CCCCID", nullable = true, insertable = true, updatable = false)
+    private Contact contact;
 
-    @Column(name = "MGCNTC")
-    private String contact;
+    @Column(name = "MGNMBR")
+    private String number;
 
     @Column(name = "MGTEXT", nullable = false)
     private String text;
@@ -139,15 +146,29 @@ public class Message extends BasicEntity
     /**
      * @return the contact
      */
-    public String getContact() {
+    public Contact getContact() {
         return contact;
     }
 
     /**
      * @param contact the contact to set
      */
-    public void setContact(String contact) {
+    public void setContact(Contact contact) {
         this.contact = contact;
+    }
+
+    /**
+     * @return the number
+     */
+    public String getNumber() {
+        return number;
+    }
+
+    /**
+     * @param number the contact to set
+     */
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     /**
