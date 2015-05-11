@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -181,10 +182,14 @@ public class MessageActionForm extends JPanel
             public void lookupPerformed() {
                 final JDialog dialog = new JDialog();
                 dialog.setModal(true);
+                dialog.setResizable(false);
                 dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
                 dialog.setTitle("Lookup Contact - Dialog Selection");
 
                 final SimpleContactSearch panel = new SimpleContactSearch();
+                if(!contacts.isEmpty()) {
+                    panel.setUserData(new ArrayList<Contact>(contacts.values()));
+                }
                 panel.addPropertyChangeListener(new PropertyChangeListener() {
 
                     @Override
@@ -194,18 +199,15 @@ public class MessageActionForm extends JPanel
                             List<Contact> lContacts = panel.getUserData();
                             if (lContacts != null
                                     || lContacts.size() != 0) {
-
+                                contacts.clear();
                                 for (Contact contact : lContacts) {
-                                    if (contacts.containsKey(contact.getName())) {
-                                        contacts.remove(contact.getName());
-                                        contacts.put(contact.getName(), contact);
-                                    }
+                                    contacts.put(contact.getId(), contact);
                                 }
                             }
 
                             StringBuilder sb = new StringBuilder();
                             for (Map.Entry<String, Contact> entry : contacts.entrySet()) {
-                                sb.append(entry.getKey()).append("; ");
+                                sb.append(entry.getValue().getName()).append("; ");
                             }
                             lfContact.setText(sb.toString());
 
