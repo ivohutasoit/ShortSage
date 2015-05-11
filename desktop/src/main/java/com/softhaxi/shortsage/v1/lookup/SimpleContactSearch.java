@@ -37,7 +37,8 @@ import org.jdesktop.swingx.JXSearchField;
  * @since 1
  * @version 1.0.0
  */
-public class SimpleContactSearch extends JPanel {
+public class SimpleContactSearch extends JPanel 
+        implements ActionListener {
 
     private static final ResourceBundle RES_GLOBAL = ResourceBundle.getBundle("global");
 
@@ -220,11 +221,19 @@ public class SimpleContactSearch extends JPanel {
                 
             }
             
+            @Override
             protected void done() {
-                
+                try {
+                    
+                } catch(Exception ex) {
+                    
+                } finally {
+                    dialog.setVisible(false);
+                    dialog.dispose();
+                }
             }
         }
-        
+        t1.execute();
         dialog.setVisible(true);
     }
     
@@ -239,5 +248,46 @@ public class SimpleContactSearch extends JPanel {
         }
         
         loadData(sql.toString());
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton) {
+            JButton bb = (JButton) e.getSource();
+            int ii = 0;
+            if(bb == bSelect) {
+                int[] fromindex = lLeft.getSelectedIndices();
+                Contact[] from = lLeft.getSelectedValues();
+                
+                // Then, for each item in the array, we add them to
+                // the other list.
+                for(i = 0; i < from.length; i++) {
+                    sContacts.addElement(from[i]);
+                }
+                
+                // Finally, we remove the items from the first list.
+                // We must remove from the bottom, otherwise we try to 
+                // remove the wrong objects.
+                for(i = (fromindex.length-1); i >=0; i--) {
+                    aContacts.remove(fromindex[i]);
+                }
+            } else if(bb == bDeselect) {
+                Contact[] to = lRight.getSelectedValues();
+                int[] toindex = lRight.getSelectedIndices();
+                
+                // Then, for each item in the array, we add them to
+                // the other list.
+                for(i = 0; i < to.length; i++) {
+                    aContacts.addElement(to[i]);
+                }
+                
+                // Finally, we remove the items from the first list.
+                // We must remove from the bottom, otherwise we try to
+                // remove the wrong objects.
+                for(i = (toindex.length-1); i >=0; i--){
+                    sContacts.remove(toindex[i]);
+                }
+            }
+        }
     }
 }
