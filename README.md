@@ -30,12 +30,13 @@ Current list of tasks to be completed are:
    * <del>Send message both just in time and scheduler</del> - <em>partial done at 14 April 2015</em>
    * <del>Save message into database</del> - <em>partial done at 14 April 2015</em>
    * <del>Message template usage</del> - <em>partial done at 22 April 2015</em>
+   * Look up Contact
 - Phone Book Implementation
    * <del>Create, update and delete Contact Group</del> - <em>partial done at 24 April 2015</em>
    * <del>Create, update and delete Contact Person</del> - <em>partial done at 24 April 2015</em>
-   * Fields Validation form both contact group and contact person
-   * Attact Contact Person to Contact Group
-   * Load data from database
+   * <del>Fields Validation form both contact group and contact person</del> - <em>partial done at 10 May 2015</em>
+   * <del>Attact Contact Person to Contact Group</del> - <em>partial done at 10 May 2015</em>
+   * <del>Load data from database</del> - <em>partial done at 10 May 2015</em>
 - Message Template Implementation
    * <del>Create, update and delete message template</del> - <em>partial done at 20 April 2015</em>
    * <del>Fields Validation form</del> - <em>partial done at 20 April 2015</em>
