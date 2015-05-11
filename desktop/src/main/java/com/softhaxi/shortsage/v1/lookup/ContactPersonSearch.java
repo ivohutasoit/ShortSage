@@ -36,7 +36,8 @@ import org.jdesktop.swingx.JXSearchField;
 import org.jdesktop.swingx.JXTable;
 
 /**
- *
+ * http://stackoverflow.com/questions/1492217/how-to-make-a-columns-in-jtable-invisible-for-swing-java
+ * 
  * @author Ivo Hutasoit
  * @since 1
  * @version 1.0.0
@@ -48,7 +49,8 @@ public class ContactPersonSearch extends JPanel
 
     private final static String[] COLUMN_NAMES = new String[]{
         "Contact Person",
-        "Phone Number"
+        "Phone Number",
+        ""
     };
 
     private JComboBox cfCategory;
@@ -127,6 +129,9 @@ public class ContactPersonSearch extends JPanel
         tdData.getTableHeader().setDefaultRenderer(new TableHeaderCenterRender(tdData));
         tdData.getColumnModel().getColumn(0).setPreferredWidth(200);
         tdData.getColumnModel().getColumn(1).setPreferredWidth(200);
+        tdData.getColumnModel().getColumn(2).setMinWidth(0);
+        tdData.getColumnModel().getColumn(2).setMaxWidth(0);
+        tdData.getColumnModel().getColumn(2).setWidth(0);
 
         JScrollPane sPane = new JScrollPane(tdData);
         HNumberedTable rowTable = new HNumberedTable(tdData);
@@ -217,11 +222,12 @@ public class ContactPersonSearch extends JPanel
                     mdData = new DefaultTableModel(COLUMN_NAMES, 0);
                     Object[] obj = null;
                     for (ContactPerson contact : data) {
-                        obj = new Object[2];
+                        obj = new Object[3];
                         obj[0] = (contact.getName() == null || contact.getName().equals("")) ? String.format("%s %s %s", contact.getFirstName(),
                                 contact.getMidName(), contact.getLastName()) : contact.getName();
                         obj[1] = contact.getPhone();
-
+                        obj[2] = contact.getId();
+                        
                         mdData.addRow(obj);
                     }
                     tdData.setModel(mdData);
@@ -316,7 +322,13 @@ public class ContactPersonSearch extends JPanel
             JButton bb = (JButton) e.getSource();
             if (bb == bOK) {
                 if (tdData.getSelectedRow() != -1) {
-                    userData = data.get(tdData.getSelectedRow());
+                    String id = tdData.getValueAt(tdData.getSelectedRow(),2);
+                    for(ContactPerson person : data) {
+                        if(person.getId().equals(id)) {
+                            userData = person;
+                            break;
+                        }
+                    }
                 }
                 firePropertyChange("select", false, true);
             } else if (bb == bCancel) {
