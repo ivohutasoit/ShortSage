@@ -52,6 +52,7 @@ public class BasicEntity implements Serializable {
      * 
      */ 
     public BasicEntity() {
+        this.id = UUID.randomUUID().toString();
         this.status = 1;
         this.createdDate = new Date();
         this.createdBy = "SYSTEM";
